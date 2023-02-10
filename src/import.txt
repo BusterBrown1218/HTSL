@@ -1,0 +1,6 @@
+// This action is going to import into housing using HTSL
+
+stat Clicks inc 1
+if (stat clicks > 5) {
+    chat "Clicks is greater than 5!"
+}
