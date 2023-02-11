@@ -2,7 +2,7 @@ import { addOperation } from "../gui/Queue";
 import Action from "../actions/Action";
 
 export default () => {
-	let importText = FileLib.read("./config/ChatTriggers/modules/HousingBrown/import.txt");
+	let importText = FileLib.read("./config/ChatTriggers/modules/HTSL/import.txt");
 	ChatLib.chat("Compiling HTSL . . .");
 	let importActions = importText.split("\n");
 	let actionList = [];
@@ -94,10 +94,7 @@ export default () => {
 			}];
 		}
 		if (importActions[i].startsWith("giveItem")) {
-			let override;
-			if (actionArgs[1] === "true") override = true;
-			actionData = ["change_player_group", {
-				allowMultiple: override
+			actionData = ["give_item", {
 			}];
 		}
 		if (importActions[i].startsWith("houseSpawn")) {
@@ -276,11 +273,9 @@ function getArgs(line) {
                 }
             }
             if (i + 1 === line.length) {
-				if (arg !== "") {
-                	if (line[i] !== "\"") arg = arg + line[i];
-                	args.push(arg);
-                	arg = line[i+1]
-				}
+            	if (line[i] !== "\"") arg = arg + line[i];
+            	args.push(arg);
+            	arg = line[i+1]
 				i +=1
             }
             
@@ -309,6 +304,7 @@ function conditionCompiler(arg) {
 	for (let i = 0; i < arg.length; i++) {
 		let args = [];
 		args = getArgs(arg[i]);
+		ChatLib.chat(args.toString())
 		if (arg[i].startsWith("stat")) {
 			let mode = "";
 			switch (args[2]) {
