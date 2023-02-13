@@ -1,0 +1,18 @@
+
+[general]
+
+	[general.general]
+		chat_prefix = "&f[&aHousing&f&lBrown&f]"
+		accidental_house_delete_protection = false
+
+[miscellaneous]
+
+	[miscellaneous.miscellaneous]
+		gui_timeout = 60
+		gui_cooldown = 50
+
+["actions_/_items"]
+
+	["actions_/_items"."actions_/_items"]
+		safe_mode = false
+
