@@ -9,14 +9,14 @@ gui.registerDraw(guiRender)
 gui.registerKeyTyped(guiTextRegister)
 
 function guiRender(mouseX, mouseY, partialTicks) {
-    Renderer.drawRect(Renderer.DARK_GRAY, Renderer.screen.getWidth() / 4, Renderer.screen.getHeight() / 4, Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2);
+    Renderer.drawRect(Renderer.color(30, 30, 30, 200), Renderer.screen.getWidth() / 4, Renderer.screen.getHeight() / 4, Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2);
     let lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
     let startIndex = 0;
     if (guiText.length > lineLimit) {
         startIndex = guiText.length - lineLimit;
     }
     for (let i = startIndex; i < guiText.length; i++) {
-        Renderer.drawString(`&7${i + 1}| &f${guiText[i]}`, Renderer.screen.getWidth() / 4 + 7, Renderer.screen.getHeight() / 4 + (i - startIndex) * 10 + 7);
+        Renderer.drawString(`&7${i + 1}| &f${guiText[i]}`, Renderer.screen.getWidth() / 4 + 7, Renderer.screen.getHeight() / 4 + (i - startIndex) * 10 + 7, true);
     }
     if (cursorBlink < 100) {
         cursorBlink = cursorBlink + 1;
@@ -24,7 +24,7 @@ function guiRender(mouseX, mouseY, partialTicks) {
         cursorBlink = 0;
     }
     if (cursorBlink >= 50.0 && cursorBlink < 100.0) {
-        Renderer.drawRect(Renderer.WHITE, Renderer.screen.getWidth() / 4 * 3 - 14, Renderer.screen.getHeight() / 4 + (cursorLine - startIndex) * 10 + 7, 5, 10);
+        Renderer.drawRect(Renderer.color(200, 200, 200, 200), Renderer.screen.getWidth() / 4 * 3 - 14, Renderer.screen.getHeight() / 4 + (cursorLine - startIndex) * 10 + 7, 5, 10);
     }
 }
 
