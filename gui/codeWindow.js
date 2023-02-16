@@ -3,20 +3,33 @@ let guiText;
 let cursorLine = 0;
 let cursorBlink = 0;
 let fileNameSave;
-
+let lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
+let startIndex = 0;
 gui.registerDraw(guiRender)
 
 gui.registerKeyTyped(guiTextRegister)
 
 function guiRender(mouseX, mouseY, partialTicks) {
     Renderer.drawRect(Renderer.color(30, 30, 30, 200), Renderer.screen.getWidth() / 4, Renderer.screen.getHeight() / 4, Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2);
-    let lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
-    let startIndex = 0;
-    if (guiText.length > lineLimit) {
-        startIndex = guiText.length - lineLimit;
+    lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
+    // startIndex = 0;
+    // if (cursorLine > lineLimit) {
+    //     startIndex = cursorLine - lineLimit - 1;
+    // }
+    let lineConstrict;
+    if (guiText.length < lineLimit) {
+        lineConstrict = guiText.length;
+    } else {
+        lineConstrict = lineLimit + startIndex;
     }
-    for (let i = startIndex; i < guiText.length; i++) {
-        Renderer.drawString(`&7${i + 1}| &f${guiText[i]}`, Renderer.screen.getWidth() / 4 + 7, Renderer.screen.getHeight() / 4 + (i - startIndex) * 10 + 7, true);
+    for (let i = startIndex; i < lineLimit + startIndex && i < guiText.length; i++) {
+        if (guiText[i].length >= 0) {
+            if (guiText[i].startsWith("//")) {
+                Renderer.drawString(`&7${i + 1}| &2${guiText[i]}`,Renderer.screen.getWidth() / 4 + 7, Renderer.screen.getHeight() / 4 + (i - startIndex) * 10 + 7, true);
+            } else {
+                Renderer.drawString(`&7${i + 1}| &f${guiText[i]}`, Renderer.screen.getWidth() / 4 + 7, Renderer.screen.getHeight() / 4 + (i - startIndex) * 10 + 7, true);
+            }
+        }
     }
     if (cursorBlink < 100) {
         cursorBlink = cursorBlink + 1;
@@ -24,25 +37,33 @@ function guiRender(mouseX, mouseY, partialTicks) {
         cursorBlink = 0;
     }
     if (cursorBlink >= 50.0 && cursorBlink < 100.0) {
-        Renderer.drawRect(Renderer.color(200, 200, 200, 200), Renderer.screen.getWidth() / 4 * 3 - 14, Renderer.screen.getHeight() / 4 + (cursorLine - startIndex) * 10 + 7, 5, 10);
+        Renderer.drawRect(Renderer.color(200, 200, 200, 200), Renderer.screen.getWidth() / 4 * 3 - 14, Renderer.screen.getHeight() / 4 + (cursorLine) * 10 + 7, 5, 10);
     }
 }
 
 function guiTextRegister(typedChar, keyCode) {
     if (keyCode === 28.0) {
-        cursorLine = cursorLine + 1;
-        guiText.splice(cursorLine, 0, "");
+        guiText.splice(cursorLine + startIndex + 1, 0, "");
+        if (startIndex + lineLimit < guiText.length && cursorLine + 1 === lineLimit) {
+            startIndex = startIndex + 1;
+        } else if (cursorLine + 1 !== lineLimit) {
+            cursorLine = cursorLine + 1;
+        }
         return;
     }
     if (keyCode === 14.0) {
-        if (guiText[cursorLine].length <= 0 && guiText.length > 1) {
-            cursorLine = cursorLine - 1;
-            return guiText.splice(cursorLine + 1, 1);
+        if (guiText[cursorLine + startIndex].length <= 0 && guiText.length > 1) {   
+            if (startIndex > 0) {
+                startIndex = startIndex - 1;
+            } else if (cursorLine < lineLimit) {
+                cursorLine = cursorLine - 1;
+            }
+            return guiText.splice(cursorLine + startIndex + 1, 1);
         }
-        if (guiText[cursorLine].length <= 0) {
+        if (guiText[cursorLine + startIndex].length <= 0) {
             return;
         }
-        guiText[cursorLine] = guiText[cursorLine].substring(0, guiText[cursorLine].length - 1);
+        guiText[cursorLine + startIndex] = guiText[cursorLine + startIndex].substring(0, guiText[cursorLine + startIndex].length - 1);
         return;
     }
     if (keyCode === 1.0) {
@@ -54,16 +75,20 @@ function guiTextRegister(typedChar, keyCode) {
     if (keyCode === 200) {
         if (cursorLine > 0){
             cursorLine = cursorLine - 1;
+        } else if (startIndex > 0) {
+            startIndex = startIndex - 1;
         }
         return;
     }
     if (keyCode === 208) {
-        if (cursorLine < guiText.length - 1){
+        if (cursorLine + 1 < lineLimit && cursorLine + startIndex + 1 < guiText.length){
             cursorLine = cursorLine + 1;
+        } else if (cursorLine + startIndex + 1 < guiText.length) {
+            startIndex = startIndex + 1;
         }
         return;
     }
-    guiText[cursorLine] = guiText[cursorLine] + typedChar;
+    guiText[cursorLine + startIndex] = guiText[cursorLine + startIndex] + typedChar;
 }
 
 export default (fileName) => {
@@ -78,7 +103,13 @@ export default (fileName) => {
     fileNameSave = fileName;
     try {
         guiText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.txt`).split("\n");
-        cursorLine = guiText.length - 1;
+        lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
+        if (guiText.length > lineLimit) {
+            cursorLine = lineLimit - 1;
+            startIndex = guiText.length - lineLimit;
+        } else {
+            cursorLine = guiText.length - 1;
+        }
         return gui.open();
     } catch (error) {
         return ChatLib.chat(`${fileName}.txt can't be loaded! Please make sure this file exists!`);
