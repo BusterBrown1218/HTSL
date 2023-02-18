@@ -11,6 +11,5 @@ register("command", ...args => {
 }).setName('htsl').setAliases(['ht']);
 
 register("worldLoad", () => {
-    ChatLib.chat("HTSL loaded successfully!");
+    ChatLib.chat("&3[HTSL] &fLoaded successfully!");
 });
-

@@ -58,4 +58,3 @@
 // Random syntax
 // random {
 // stat "Hello World" inc 1
-// }

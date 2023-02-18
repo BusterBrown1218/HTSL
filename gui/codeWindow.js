@@ -12,16 +12,6 @@ gui.registerKeyTyped(guiTextRegister)
 function guiRender(mouseX, mouseY, partialTicks) {
     Renderer.drawRect(Renderer.color(30, 30, 30, 200), Renderer.screen.getWidth() / 4, Renderer.screen.getHeight() / 4, Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2);
     lineLimit = Math.floor((Renderer.screen.getHeight() - 7) / 20);
-    // startIndex = 0;
-    // if (cursorLine > lineLimit) {
-    //     startIndex = cursorLine - lineLimit - 1;
-    // }
-    let lineConstrict;
-    if (guiText.length < lineLimit) {
-        lineConstrict = guiText.length;
-    } else {
-        lineConstrict = lineLimit + startIndex;
-    }
     for (let i = startIndex; i < lineLimit + startIndex && i < guiText.length; i++) {
         if (guiText[i].length >= 0) {
             if (guiText[i].startsWith("//")) {
@@ -68,7 +58,7 @@ function guiTextRegister(typedChar, keyCode) {
     }
     if (keyCode === 1.0) {
         FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${fileNameSave}.txt`, guiText.join("\n"));
-        ChatLib.chat(`Saved text to ${fileNameSave}.txt`);
+        ChatLib.chat(`&3[HTSL] &fSaved text to ${fileNameSave}.txt`);
         return;
     }
     if (keyCode === 42.0 || keyCode === 203.0 || keyCode === 205.0 || keyCode === 29) return;
@@ -94,10 +84,10 @@ function guiTextRegister(typedChar, keyCode) {
 export default (fileName) => {
     if (!fileName) fileName = "default";
     if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.txt`)) {
-        ChatLib.chat(`Created new file "${fileName}.txt"`);
+        ChatLib.chat(`&3[HTSL] &fCreated new file "${fileName}.txt"`);
         FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.txt`, "");
     } else {
-        ChatLib.chat(`Loading ${fileName}.txt . . .`);
+        ChatLib.chat(`&3[HTSL] &fLoading ${fileName}.txt . . .`);
     }
     guiText = [];
     fileNameSave = fileName;
@@ -112,7 +102,7 @@ export default (fileName) => {
         }
         return gui.open();
     } catch (error) {
-        return ChatLib.chat(`${fileName}.txt can't be loaded! Please make sure this file exists!`);
+        return ChatLib.chat(`&3[HTSL] &f${fileName}.txt can't be loaded! Please make sure this file exists!`);
     }
     
 }

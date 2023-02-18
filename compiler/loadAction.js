@@ -4,7 +4,7 @@ import Action from "../actions/Action";
 export default (fileName) => {
 	try {
 	let importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.txt`);
-	ChatLib.chat("Compiling HTSL . . .");
+	ChatLib.chat("&3[HTSL] &fCompiling . . .");
 	let importActions = importText.split("\n");
 	let actionList = [];
 	let subaction = "";
@@ -236,7 +236,7 @@ export default (fileName) => {
 	}
 	loadResponse(actionList);
 	} catch (error) {
-		ChatLib.chat("File not found!");
+		ChatLib.chat("&3[HTSL] &fFile not found!");
 	}
 }
 

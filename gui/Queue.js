@@ -59,7 +59,7 @@ function doneLoading(actionName, actionAuthor) {
 		fails = [];
 		ChatLib.chat(`&f${queue.length} &coperation${queue.length !== 1 ? 's' : ''} left in queue.`);
 	} else {
-		ChatLib.chat(`HTSL imported successfully!`);
+		ChatLib.chat(`&3[HTSL] &fImported successfully!`);
 	}
 }
 
