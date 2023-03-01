@@ -108,7 +108,7 @@ export default (fileName) => {
 			actionData = ["parkour_checkpoint", {}];
 		}
 		if (importActions[i].startsWith("sound")) {
-			actionData = ["give_experience_levels", {
+			actionData = ["play_sound", {
 				sound: actionArgs[1],
 				pitch: actionArgs[2]
 			}];
