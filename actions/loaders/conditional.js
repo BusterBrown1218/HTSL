@@ -209,6 +209,9 @@ function loadCondition(condition) {
 				sequence.push(['item', { item: conditionData.blockType }]);
 			}
 			break;
+		case 'is_sneaking':
+			sequence.push(['option', { option: "Doing Parkour" }]); // select is sneaking condition
+			break;
 
 	}
 	return sequence;
