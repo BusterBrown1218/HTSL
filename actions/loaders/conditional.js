@@ -43,7 +43,6 @@ function loadCondition(condition) {
 	sequence.push(['click', { slot: 50 }]); // add conditional
 	switch (conditionType) {
 		case "has_potion_effect":
-			ChatLib.chat("Hi")
 			sequence.push(['setGuiContext', { context: 'Condition -> Has Potion Effect' }]);
 			sequence.push(['option', { option: "Has Potion Effect" }]); // select potion effect condition
 			if (conditionData.effect) {
@@ -139,7 +138,7 @@ function loadCondition(condition) {
 						break;
 				}
 			}
-			if (!isNaN(conditionData.compareValue)) {
+			if (conditionData.compareValue) {
 				sequence.push(['click', { slot: 12 }]); // select "Compare Value"
 				sequence.push(['anvil', { text: conditionData.compareValue }]);
 			}
@@ -169,7 +168,7 @@ function loadCondition(condition) {
 						break;
 				}
 			}
-			if (!isNaN(conditionData.compareValue)) {
+			if (conditionData.compareValue) {
 				sequence.push(['click', { slot: 12 }]); // select "Compare Value"
 				sequence.push(['anvil', { text: conditionData.compareValue }]);
 			}
@@ -188,7 +187,56 @@ function loadCondition(condition) {
 			}
 			sequence.push(['back']); // go back to edit conditionals tab
 			break;
-
+		case 'is_sneaking':
+			sequence.push(['option', { option: "Player Sneaking" }]); // select is sneaking condition
+			break;
+		case 'placeholder_number_requirement':
+			sequence.push(['option', { option: "Placeholder Number Requirement" }]);
+			if (conditionData.placeholder) {
+				sequence.push(['click', { slot: 10 }]); //set placeholder
+				sequence.push(['anvil', { text: conditionData.placeholder}]);
+			}
+			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+				sequence.push(['click', { slot: 11 }]); // select "Comparator"
+				switch (conditionData.comparator) {
+					case "less_than":
+						sequence.push(['click', { slot: 10 }]); // select "Less Than"
+						break;
+					case "less_than_or_equal_to":
+						sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+						break;
+					case "greater_than_or_equal_to":
+						sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+						break;
+					case "greater_than":
+						sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+						break;
+				}
+			}
+			if (conditionData.compareValue) {
+				sequence.push(['click', { slot: 12 }]); //set compare value
+				sequence.push(['anvil', { text: conditionData.compareValue }]);
+			}
+			sequence.push(['back']);
+			break;
+		case 'required_gamemode':
+			sequence.push(['option', { option: "Required Gamemode" }]);
+			if (conditionData.gameMode) {
+				sequence.push(['click', { slot: 10 }]);
+				switch (conditionData.gameMode) {
+					case "adventure":
+						sequence.push(['option', { option: "Adventure"}]);
+						break;
+					case "survival":
+						sequence.push(['option', { option: "Survival"}]);
+						break;
+					case "creative":
+						sequence.push(['option', { option: "Creative"}]);
+						break;
+				}
+			}
+			sequence.push(['back']);
+			break;
 
 		// special cases start here:
 		case 'damage_cause':
@@ -209,9 +257,7 @@ function loadCondition(condition) {
 				sequence.push(['item', { item: conditionData.blockType }]);
 			}
 			break;
-		case 'is_sneaking':
-			sequence.push(['option', { option: "Doing Parkour" }]); // select is sneaking condition
-			break;
+		
 
 	}
 	return sequence;

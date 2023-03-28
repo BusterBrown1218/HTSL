@@ -8,6 +8,8 @@ input.setEnabled(false);
 input.setText('Enter File Name')
 input.mcObject.func_146203_f(24) // set max length
 
+// const exportButton = new Button(0, 0, 0, 20, 'Export HTSL');
+
 register('guiRender', (x, y) => {
 	if (!Player.getContainer()) return;
 	if (!isInActionGui()) return;
@@ -25,6 +27,9 @@ register('guiRender', (x, y) => {
 	button.setWidth(chestWidth / 2 - sizeDifference);
 	button.setX(Renderer.screen.getWidth() / 2 + sizeDifference);
 	button.setY(chestGuiTop - button.getHeight() - 29);
+
+	// exportButton.setWidth(chestWidth / 2);
+	// exportButton.setX()
 
 	input.setWidth(chestWidth / 2 + sizeDifference - 5);
 	input.setX(Renderer.screen.getWidth() / 2 - input.getWidth() + sizeDifference - 5);

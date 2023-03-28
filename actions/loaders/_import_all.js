@@ -28,6 +28,7 @@ import random_action from "./random_action";
 import use_remove_held_item from "./use_remove_held_item";
 import apply_inventory_layout from "./apply_inventory_layout";
 import trigger_function from "./trigger_function";
+import enchant_held_item from "./enchant_held_item";
 
 export default {
 	conditional,
@@ -60,4 +61,5 @@ export default {
 	use_remove_held_item,
 	apply_inventory_layout,
 	trigger_function,
+	enchant_held_item
 };

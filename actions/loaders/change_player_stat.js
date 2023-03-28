@@ -8,11 +8,17 @@ export default (actionData) => {
 
 	if (actionData.mode && (actionData.mode !== "increment" && actionData.mode !== "inc")) {
 		sequence.push(['click', { slot: 11 }]);
-		if (actionData.mode === 'decrement' || actionData.mode === 'dec') {
+		if (actionData.mode === 'decrement' || actionData.mode === 'dec' || actionData.mode === '-=') {
 			sequence.push(['click', { slot: 11 }]);
 		}
-		if (actionData.mode === 'set') {
+		if (actionData.mode === 'set' || actionData.mode === "=") {
 			sequence.push(['click', { slot: 12 }]);
+		}
+		if (actionData.mode === 'multiply' || actionData.mode === 'mult' || actionData.mode === '*=') {
+			sequence.push(['click', { slot: 13}]);
+		}
+		if (actionData.mode === 'divide' || actionData.mode === 'div' || actionData.mode === '//=' || actionData.mode === '/=') {
+			sequence.push(['click', { slot: 14}]);
 		}
 	}
 

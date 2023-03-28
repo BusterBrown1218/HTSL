@@ -1,6 +1,6 @@
 import './gui/LoadActionGUI';
 import update from './update/update';
-import Settings from "./utils/config";
+import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
 
 register("command", ...args => {
@@ -10,7 +10,7 @@ register("command", ...args => {
 	} catch(e) {
 		command = 'help';
 	}
-    if (command === 'config') return Settings.openGUI();
+    if (command === 'config') return Config.openGUI();
     if (command === 'gui') {
         args.shift();
         return codeWindow(args.join(' '));

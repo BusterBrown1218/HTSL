@@ -1,1 +1,2 @@
-- Added auto-updating!
+- Added new actions and Conditionals
+- Fixed multiple bugs

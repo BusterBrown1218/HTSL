@@ -28,6 +28,7 @@ import exit from "./exit";
 import cancel_event from "./cancel_event";
 import apply_inventory_layout from "./apply_inventory_layout";
 import trigger_function from "./trigger_function";
+import enchant_held_item from "./enchant_held_item";
 
 export default {
 	change_player_group,
@@ -60,4 +61,5 @@ export default {
 	cancel_event,
 	apply_inventory_layout,
 	trigger_function,
+	enchant_held_item
 };

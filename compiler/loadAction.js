@@ -167,6 +167,12 @@ export default (fileName) => {
 		if (importActions[i].startsWith("consumeItem")) {
 			actionData = ["use_remove_held_item", {}];
 		}
+		if (importActions[i].startsWith("enchant")) {
+			actionData = ["enchant_held_item", {
+				enchantment: actionArgs[1],
+				level: actionArgs[2]
+			}];
+		}
 		if (importActions[i].startsWith("if") && (subaction !== "if" && subaction !== "else")) {
 			subaction = "if";
 			let conditions = conditionCompiler(importActions[i].substring(3, importActions[i].length - 3));
@@ -217,7 +223,6 @@ export default (fileName) => {
 			subactions = [];
 			subaction = "";
 		}
-
 		// Push the action data to the correct list
 		if (actionData.length > 0) {
 			if (subaction === "if") {
@@ -234,20 +239,23 @@ export default (fileName) => {
 			}
 		}
 	}
+
 	loadResponse(actionList);
 	} catch (error) {
 		ChatLib.chat("&3[HTSL] &fFile not found!");
 	}
 }
 
-function loadResponse(actionList, actionName, actionAuthor) {
+function loadResponse(actionList) {
+	
 	for (let i = 0; i < actionList.length; i++) {
 		let actionType = actionList[i][0];
 		let actionData = actionList[i][1];
 		let action = new Action(actionType, actionData);
 		action.load();
 	}
-	addOperation(['done', { actionName, actionAuthor }]);
+	
+	addOperation(['done']);
 }
 
 function loadTestAction() {
@@ -257,37 +265,25 @@ function loadTestAction() {
 	addOperation(['done', { actionName: 'Test Action', actionAuthor: 'Test Author' }]);
 }
 
-function getArgs(line) {
+function getArgs(input) {
 	let args = [];
-	let arg = "";
-    let stringArg;
-	for (let i = 0; i < line.length; i++) {
-		if ((line[i] === " " && !stringArg) || line[i] ==="\"" || i + 1 === line.length) {
-            if (line[i] === " " && !stringArg) {
-				if (arg !== "") {
-                	args.push(arg);
-                	arg = "";
-				}
-            }
-            if (line[i] === "\"") {
-                if (stringArg) {
-                    stringArg = false;
-                } else {
-                    stringArg = true;
-                }
-            }
-            if (i + 1 === line.length) {
-            	if (line[i] !== "\"") arg = arg + line[i];
-            	args.push(arg);
-            	arg = line[i+1]
-				i +=1
-            }
-            
-        } else {
-            arg = arg + line[i];
-        }
-	}
-    return args;
+  	let inQuotes = false;
+  	let currentArg = '';
+  	for (let i = 0; i < input.length; i++) {
+    	if (input[i] === '\\' && (input[i + 1] === '"' || input[i + 1] === "'")) {
+      	currentArg += input[i + 1];
+      	i++;
+    	} else if (input[i] === '"' || input[i] === "'") {
+      		inQuotes = !inQuotes;
+    	} else if (input[i] === ' ' && !inQuotes) {
+      	args.push(currentArg);
+      	currentArg = '';
+    	} else {
+      	currentArg += input[i];
+    	}
+  	}
+  	if (currentArg) args.push(currentArg);
+  	return args;
 }
 
 function conditionCompiler(arg) {
@@ -312,6 +308,9 @@ function conditionCompiler(arg) {
 			let mode = "";
 			switch (args[2]) {
 				case "=":
+					mode = "equal_to"
+					break;
+				case "==":
 					mode = "equal_to"
 					break;
 				case "<":
@@ -343,6 +342,9 @@ function conditionCompiler(arg) {
 			let mode = "";
 			switch (args[2]) {
 				case "=":
+					mode = "equal_to"
+					break;
+				case "==":
 					mode = "equal_to"
 					break;
 				case "<":
@@ -410,6 +412,48 @@ function conditionCompiler(arg) {
 			conditionList.push(["block_type", {
 				blockType: args[1],
 			}]);
+		}
+		if (arg[i].startsWith("placeholder")) {
+			let mode = "";
+			switch (args[2]) {
+				case "=":
+					mode = "equal_to"
+					break;
+				case "==":
+					mode = "equal_to"
+					break;
+				case "<":
+					mode = "less_than"
+					break;
+				case "<=":
+					mode = "less_than_or_equal_to"
+					break;
+				case ">":
+					mode = "greater_than"
+					break;
+				case "=>":
+					mode = "greater_than_or_equal_to"
+					break;
+				case ">=":
+					mode = "greater_than_or_equal_to"
+					break;
+				case "=<":
+					mode = "less_than_or_equal_to"
+					break;
+			}
+			conditionList.push(["placeholder_number_requirement", {
+				placeholder: args[1],
+				comparator: mode,
+				compareValue: args[3]
+			}]);
+		}
+		if (arg[i].startsWith("gamemode")) {
+			conditionList.push(["required_gamemode", {
+				gameMode: args[1].toLowerCase(),
+			}]);
+		}
+		if (arg[i].startsWith("isSneaking")) {
+			conditionList.push(["is_sneaking", {}])
 		}
 	}
 	

@@ -34,6 +34,7 @@
 // tp custom_coordinates "2 90 1 ~ ~"
 // function "function name" true
 // consumeItem
+// enchant "enchant name"
 
 // Conditionals . . . this was a pain
 // if or (stat "hello world" <= 10) {
@@ -54,7 +55,11 @@
 // hasGroup "groupname" true
 // damageCause "cause name"
 // blockType "blockType"
+// isSneaking
+// gamemode "gamemodename"
+// placeholder "placeholdername" (<, <=, =, =>, >) value
 
 // Random syntax
 // random {
 // stat "Hello World" inc 1
+// }

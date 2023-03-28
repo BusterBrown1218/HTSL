@@ -45,7 +45,7 @@ function guiTextRegister(typedChar, keyCode) {
         if (guiText[cursorLine + startIndex].length <= 0 && guiText.length > 1) {   
             if (startIndex > 0) {
                 startIndex = startIndex - 1;
-            } else if (cursorLine < lineLimit) {
+            } else if (cursorLine < lineLimit && cursorLine > 0) {
                 cursorLine = cursorLine - 1;
             }
             return guiText.splice(cursorLine + startIndex + 1, 1);
@@ -61,7 +61,7 @@ function guiTextRegister(typedChar, keyCode) {
         ChatLib.chat(`&3[HTSL] &fSaved text to ${fileNameSave}.txt`);
         return;
     }
-    if (keyCode === 42.0 || keyCode === 203.0 || keyCode === 205.0 || keyCode === 29) return;
+    if ([42, 203, 205, 29, 54, 157, 184, 56, 219, 15, 58, 211, 207, 209, 201, 199, 210, 197, 70, 183, 88, 87, 68, 67, 66, 65, 64, 63, 62, 61, 60, 59].includes(keyCode)) return;
     if (keyCode === 200) {
         if (cursorLine > 0){
             cursorLine = cursorLine - 1;

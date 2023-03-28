@@ -1,2 +1,2 @@
-// Comments are now green!
+// Comments are green!
 chat "Hello World!"
