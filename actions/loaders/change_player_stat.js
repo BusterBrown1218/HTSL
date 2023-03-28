@@ -6,7 +6,7 @@ export default (actionData) => {
 		sequence.push(['chat', { text: actionData.stat }]);
 	}
 
-	if (actionData.mode && (actionData.mode !== "increment" && actionData.mode !== "inc")) {
+	if (actionData.mode && (actionData.mode !== "increment" || actionData.mode !== "inc" || actionData.mode !== "+=")) {
 		sequence.push(['click', { slot: 11 }]);
 		if (actionData.mode === 'decrement' || actionData.mode === 'dec' || actionData.mode === '-=') {
 			sequence.push(['click', { slot: 11 }]);

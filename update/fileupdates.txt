@@ -7,5 +7,6 @@ actions/loaders/_import_all.js
 actions/loaders/_import_limited.js
 gui/codeWindow.js
 utils/getEnchant.js
+upate/changelog.txt
 imports/testing.txt
 metadata.json
