@@ -1,2 +1,8 @@
+Patch 0.4.2
 - Added new actions and Conditionals
 - Fixed multiple bugs
+- Added multiplication and division to stats
+
+Patch 0.4.3
+- Added compiler errors
+- Patched multiple bugs

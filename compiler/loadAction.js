@@ -15,20 +15,45 @@ export default (fileName) => {
 			importActions[i] = importActions[i].substr(4);
 		}
 		let actionArgs = getArgs(importActions[i]);
+		let action = actionArgs[0];
 		actionData = [];
-		if (importActions[i].startsWith("//")) {};
-		if (importActions[i].startsWith("stat")) {
+		let compileError;
+		if (action === "//") {};
+		if (action === "stat") {
+			switch (actionArgs[2]) {
+				case "inc":
+				case "+=":
+					actionArgs[2] = "increment";
+					break;
+				case "dec":
+				case "-=":
+					actionArgs[2] = "decrement";
+					break;
+				case "=":
+					actionArgs[2] = "set";
+					break;
+				case "mult":
+				case "*=":
+					actionArgs[2] = "multiply";
+					break;
+				case "div":
+				case "/=":
+				case "//=":
+					actionArgs[2] = "divide";
+					break;
+			}
+			if (!['increment', 'decrement', 'set', 'multiply', 'divide'].includes(actionArgs[2])) compileError = `&cUnknown operator &e${actionArgs[2]}&c on line &e${i + 1}`;
 			actionData = ["change_player_stat", {
 				stat: actionArgs[1],
 				mode: actionArgs[2],
 				value: actionArgs[3]
 			}];		
 		}
-		if (importActions[i].startsWith("applyLayout")) {
-			actionData = ["apply_inventory_layout", {layout:actionArgs[1]}];
+		if (action === "applyLayout") {
+			actionData = ["apply_inventory_layout", { layout: actionArgs[1] }];
 		}
-		if (importActions[i].startsWith("applyPotion")) {
-			let override;
+		if (action === "applyPotion") {
+			let override = false;
 			if (actionArgs[4] === "true") override = true;
 			actionData = ["apply_potion_effect", {
 				effect: actionArgs[1],
@@ -37,26 +62,49 @@ export default (fileName) => {
 				overrideExistingEffects: override
 			}];
 		}
-		if (importActions[i].startsWith("cancelEvent")) {
+		if (action === "cancelEvent") {
 			actionData = ["cancel_event", {}];
 		}
-		if (importActions[i].startsWith("exit") && (subaction === "if" || subaction === "else")) {
+		if (action === "exit" && (subaction === "if" || subaction === "else")) {
 			actionData = ["exit", {}];
 		}
-		if (importActions[i].startsWith("globalstat")) {
+		if (action === "globalstat") {
+			switch (actionArgs[2]) {
+				case "inc":
+				case "+=":
+					actionArgs[2] = "increment";
+					break;
+				case "dec":
+				case "-=":
+					actionArgs[2] = "decrement";
+					break;
+				case "=":
+					actionArgs[2] = "set";
+					break;
+				case "mult":
+				case "*=":
+					actionArgs[2] = "multiply";
+					break;
+				case "div":
+				case "/=":
+				case "//=":
+					actionArgs[2] = "divide";
+					break;
+			}
+			if (!['increment', 'decrement', 'set', 'multiply', 'divide'].includes(actionArgs[2])) compileError = `&cUnknown operator &e${actionArgs[2]}&c on line &e${i + 1}`;
 			actionData = ["change_global_stat", {
 				stat: actionArgs[1],
 				mode: actionArgs[2],
 				value: actionArgs[3]
-			}];
+			}];	
 		}
-		if (importActions[i].startsWith("changeHealth")) {
+		if (action === "changeHealth") {
 			actionData = ["change_health", {
 				health: actionArgs[2],
 				mode: actionArgs[1],
 			}];
 		}
-		if (importActions[i].startsWith("changePlayerGroup")) {
+		if (action === "changePlayerGroup") {
 			let override;
 			if (actionArgs[2] === "true") override = true;
 			actionData = ["change_player_group", {
@@ -64,15 +112,15 @@ export default (fileName) => {
 				demotionProtection: override
 			}];
 		}
-		if (importActions[i].startsWith("clearEffects")) {
+		if (action === "clearEffects") {
 			actionData = ["clear_all_potion_effects", {}];
 		}
-		if (importActions[i].startsWith("actionBar")) {
+		if (action === "actionBar") {
 			actionData = ["display_action_bar", {
 				message: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("title")) {
+		if (action === "title") {
 			actionData = ["display_title", {
 				title: actionArgs[1],
 				subtitle: actionArgs[2],
@@ -81,82 +129,93 @@ export default (fileName) => {
 				fadeOut: actionArgs[5]
 			}];
 		}
-		if (importActions[i].startsWith("failParkour")) {
+		if (action === "failParkour") {
 			actionData = ["fail_parkour", {
 				reason: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("fullHeal")) {
+		if (action === "fullHeal") {
 			actionData = ["full_heal", {}];
 		}
-		if (importActions[i].startsWith("xpLevel")) {
-			actionData["give_experience_levels", {
+		if (action === "xpLevel") {
+			actionData = ["give_experience_levels", {
 				levels: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("giveItem")) {
+		if (action === "giveItem") {
 			actionData = ["give_item", {
 			}];
 		}
-		if (importActions[i].startsWith("houseSpawn")) {
+		if (action === "houseSpawn") {
 			actionData = ["go_to_house_spawn", {}];
 		}
-		if (importActions[i].startsWith("kill")) {
+		if (action === "kill") {
 			actionData = ["kill_player", {}];
 		}
-		if (importActions[i].startsWith("parkCheck")) {
+		if (action === "parkCheck") {
 			actionData = ["parkour_checkpoint", {}];
 		}
-		if (importActions[i].startsWith("sound")) {
+		if (action === "sound") {
 			actionData = ["play_sound", {
 				sound: actionArgs[1],
 				pitch: actionArgs[2]
 			}];
 		}
-		if (importActions[i].startsWith("removeItem")) {
+		if (action === "removeItem") {
 			actionData = ["remove_item", {}];
 		}
-		if (importActions[i].startsWith("resetInventory")) {
+		if (action === "resetInventory") {
 			actionData = ["reset_inventory", {}];
 		}
-		if (importActions[i].startsWith("chat")) {
+		if (action === "chat") {
 			actionData = ["send_a_chat_message", {
 				message: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("lobby")) {
+		if (action === "lobby") {
 			actionData = ["send_to_lobby", {
 				lobby: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("compassTarget")) {
+		if (action === "compassTarget") {
 			actionData = ["set_compass_target", {
 				location: actionArgs[1],
 				coordinates: actionArgs[2]
 			}];
 		}
-		if (importActions[i].startsWith("gamemode")) {
+		if (action === "gamemode") {
 			actionData = ["set_gamemode", {
 				gamemode: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("hungerLevel")) {
+		if (action === "hungerLevel") {
 			actionData = ["set_hunger_level", {
 				level: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("maxHeatlh")) {
+		if (action === "maxHealth") {
 			actionData = ["set_max_health", {
 				health: actionArgs[1]
 			}];
 		}
-		if (importActions[i].startsWith("tp")) {
-			actionData = ["teleport_player", {
-				location: actionArgs[1],
-				coordinates: actionArgs[2]
-			}];
+		if (action === "tp") {
+			if (!["house_spawn", "current_location", "custom_coordinates"].includes(actionArgs[1])) compileError = `&cUnknown location type &e"${actionArgs[1]}"&c on line &e${i + 1}`;
+			if (actionArgs[1] === "custom_coordinates") {
+				try {
+					actionData = ["teleport_player", {
+						location: actionArgs[1],
+						coordinates: actionArgs[2].split(" ")
+					}];
+				} catch (error) {
+					compileError = `&cLocation type &e"custom_coordinates"&c requires a second argument. Line &e${i + 1}`;
+				}
+			} else {
+				actionData = ["teleport_player", {
+					location: actionArgs[1]
+				}];
+			}
 		}
-		if (importActions[i].startsWith("function")) {
+		if (action === "function") {
 			let override;
 			if (actionArgs[2] === "true") override = true;
 			actionData = ["trigger_function", {
@@ -164,24 +223,25 @@ export default (fileName) => {
 				triggerForAllPlayers: override
 			}];
 		}
-		if (importActions[i].startsWith("consumeItem")) {
+		if (action === "consumeItem") {
 			actionData = ["use_remove_held_item", {}];
 		}
-		if (importActions[i].startsWith("enchant")) {
+		if (action === "enchant") {
 			actionData = ["enchant_held_item", {
 				enchantment: actionArgs[1],
 				level: actionArgs[2]
 			}];
 		}
-		if (importActions[i].startsWith("if") && (subaction !== "if" && subaction !== "else")) {
+		if (action === "if" && (subaction !== "if" && subaction !== "else")) {
 			subaction = "if";
 			let conditions = conditionCompiler(importActions[i].substring(3, importActions[i].length - 3));
+			compileError = conditions.compileError;
 			let matchConditions = false;
 			if (actionArgs[1] === "or") {
 				matchConditions = true;
 			}
 			subactions = {
-				conditions: conditions,
+				conditions: conditions.list,
 				matchAnyCondition: matchConditions,
 				if: [],
 				else: [],
@@ -197,7 +257,7 @@ export default (fileName) => {
 			subactions = [];
 			subaction = "";
 		}
-		if (importActions[i].startsWith("}") && subaction === "if" && !(importActions[i].startsWith("} else"))) {
+		if (importActions[i].startsWith("}") && subaction === "if" && !(importActions[i].startsWith("} else") || importActions[i].startsWith("}else"))) {
 			actionData = ["conditional", {
 				conditions: subactions.conditions,
 				matchAnyCondition: subactions.matchAnyCondition,
@@ -207,7 +267,7 @@ export default (fileName) => {
 			subactions = [];
 			subaction = "";
 		}
-		if (importActions[i].startsWith("} else {") && subaction === "if") {
+		if ((importActions[i].startsWith("} else {") || importActions[i].startsWith("}else")) && subaction === "if") {
 			subaction = "else";
 		}
 		if (importActions[i].startsWith("random {") && subaction === "") {
@@ -223,6 +283,12 @@ export default (fileName) => {
 			subactions = [];
 			subaction = "";
 		}
+
+		ChatLib.chat(actionArgs.toString());
+		if (compileError) {
+			ChatLib.chat(`&3[HTSL] ${compileError}`);
+			return ChatLib.chat(`&3[HTSL] &cFailed line: &e${importActions[i]}`);
+		}
 		// Push the action data to the correct list
 		if (actionData.length > 0) {
 			if (subaction === "if") {
@@ -237,17 +303,22 @@ export default (fileName) => {
 			if (subaction === "random") {
 				subactions.actions.push(actionData);
 			}
+		} else if (action) {
+			if (!(action.startsWith("//")) && action !== "if" && !(action.startsWith("}")) && action !== "random") {
+				ChatLib.chat(`&3[HTSL] &cError, unknown action "&e${action}&c" found on line &e${i + 1}`);
+				return ChatLib.chat(`&3[HTSL] &cFailed line: &e${importActions[i]}`);
+			}
 		}
 	}
 
 	loadResponse(actionList);
 	} catch (error) {
-		ChatLib.chat("&3[HTSL] &fFile not found!");
+		ChatLib.chat(`&3[HTSL] &fError compiling ${fileName}, please make sure it exists!`);
+		ChatLib.chat(error);
 	}
 }
 
 function loadResponse(actionList) {
-	
 	for (let i = 0; i < actionList.length; i++) {
 		let actionType = actionList[i][0];
 		let actionData = actionList[i][1];
@@ -266,28 +337,18 @@ function loadTestAction() {
 }
 
 function getArgs(input) {
-	let args = [];
-  	let inQuotes = false;
-  	let currentArg = '';
-  	for (let i = 0; i < input.length; i++) {
-    	if (input[i] === '\\' && (input[i + 1] === '"' || input[i + 1] === "'")) {
-      	currentArg += input[i + 1];
-      	i++;
-    	} else if (input[i] === '"' || input[i] === "'") {
-      		inQuotes = !inQuotes;
-    	} else if (input[i] === ' ' && !inQuotes) {
-      	args.push(currentArg);
-      	currentArg = '';
-    	} else {
-      	currentArg += input[i];
-    	}
-  	}
-  	if (currentArg) args.push(currentArg);
-  	return args;
+	let result = [];
+	let match;
+	let re = /"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|(\S+)/g;
+	while ((match = re.exec(input)) !== null) {
+	  	result.push(match[1] || match[2] || match[3]);
+	}
+	return result;
 }
 
 function conditionCompiler(arg) {
 	let conditionList = [];
+	let compileError
 	if (arg.startsWith("or ")) {
 		arg = arg.substring(3, arg.length);
 	}
@@ -302,14 +363,19 @@ function conditionCompiler(arg) {
 	}
 	arg = arg.split(",");
 	for (let i = 0; i < arg.length; i++) {
+		if (arg[i].startsWith(" ")) {
+			arg[i] = arg[i].substr(1);
+		}
+	}
+	for (let i = 0; i < arg.length; i++) {
 		let args = [];
 		args = getArgs(arg[i]);
-		if (arg[i].startsWith("stat")) {
+		let condition = args[0];
+		if (condition === "stat") {
 			let mode = "";
 			switch (args[2]) {
 				case "=":
 					mode = "equal_to"
-					break;
 				case "==":
 					mode = "equal_to"
 					break;
@@ -324,13 +390,19 @@ function conditionCompiler(arg) {
 					break;
 				case "=>":
 					mode = "greater_than_or_equal_to"
-					break;
 				case ">=":
 					mode = "greater_than_or_equal_to"
 					break;
 				case "=<":
 					mode = "less_than_or_equal_to"
 					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 			}
 			conditionList.push(["player_stat_requirement", {
 				stat: args[1],
@@ -338,12 +410,11 @@ function conditionCompiler(arg) {
 				compareValue: args[3]
 			}]);
 		}
-		if (arg[i].startsWith("globalstat")) {
+		if (condition === "globalstat") {
 			let mode = "";
 			switch (args[2]) {
 				case "=":
 					mode = "equal_to"
-					break;
 				case "==":
 					mode = "equal_to"
 					break;
@@ -358,13 +429,19 @@ function conditionCompiler(arg) {
 					break;
 				case "=>":
 					mode = "greater_than_or_equal_to"
-					break;
 				case ">=":
 					mode = "greater_than_or_equal_to"
 					break;
 				case "=<":
 					mode = "less_than_or_equal_to"
 					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 			}
 			conditionList.push(["global_stat_requirement", {
 				stat: args[1],
@@ -372,28 +449,28 @@ function conditionCompiler(arg) {
 				compareValue: args[3]
 			}]);
 		}
-		if (arg[i].startsWith("hasPotion")) {
+		if (condition === "hasPotion") {
 			conditionList.push(["has_potion_effect", {
 				effect: args[1],
 			}]);
 		}
-		if (arg[i].startsWith("doingParkour")) {
+		if (condition === "doingParkour") {
 			conditionList.push(["doing_parkour", {}]);
 		}
-		if (arg[i].startsWith("hasItem")) {
+		if (condition === "hasItem") {
 			conditionList.push(["has_item", {}]);
 		}
-		if (arg[i].startsWith("inRegion")) {
+		if (condition === "inRegion") {
 			conditionList.push(["within_region", {
 				region: args[1],
 			}]);
 		}
-		if (arg[i].startsWith("hasPermission")) {
+		if (condition === "hasPermission") {
 			conditionList.push(["required_permission", {
 				permission: args[1],
 			}]);
 		}
-		if (arg[i].startsWith("hasGroup")) {
+		if (condition === "hasGroup") {
 			let includeHigher = false;
 			if (args[1] === "true") {
 				includeHigher = true;
@@ -403,22 +480,21 @@ function conditionCompiler(arg) {
 				includeHigherGroups: includeHigher
 			}]);
 		}
-		if (arg[i].startsWith("damageCause")) {
+		if (condition === "damageCause") {
 			conditionList.push(["damage_cause", {
 				damageCause: args[1],
 			}]);
 		}
-		if (arg[i].startsWith("blockType")) {
+		if (condition === "blockType") {
 			conditionList.push(["block_type", {
 				blockType: args[1],
 			}]);
 		}
-		if (arg[i].startsWith("placeholder")) {
+		if (condition === "placeholder") {
 			let mode = "";
 			switch (args[2]) {
 				case "=":
 					mode = "equal_to"
-					break;
 				case "==":
 					mode = "equal_to"
 					break;
@@ -433,13 +509,19 @@ function conditionCompiler(arg) {
 					break;
 				case "=>":
 					mode = "greater_than_or_equal_to"
-					break;
 				case ">=":
 					mode = "greater_than_or_equal_to"
 					break;
 				case "=<":
 					mode = "less_than_or_equal_to"
 					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 			}
 			conditionList.push(["placeholder_number_requirement", {
 				placeholder: args[1],
@@ -447,15 +529,26 @@ function conditionCompiler(arg) {
 				compareValue: args[3]
 			}]);
 		}
-		if (arg[i].startsWith("gamemode")) {
+		if (condition === "gamemode") {
 			conditionList.push(["required_gamemode", {
 				gameMode: args[1].toLowerCase(),
 			}]);
 		}
-		if (arg[i].startsWith("isSneaking")) {
+		if (condition === "isSneaking") {
 			conditionList.push(["is_sneaking", {}])
 		}
+		if (conditionList.length !== i + 1) {
+			compileError = `&cUnknown condition &e"${arg[i]}"`;
+			let conditions = {
+				list: conditionList,
+				compileError: compileError
+			}
+			return conditions;
+		}
 	}
-	
-	return conditionList;
+	let conditions = {
+		list: conditionList,
+		compileError: compileError
+	}
+	return conditions;
 }

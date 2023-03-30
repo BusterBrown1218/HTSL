@@ -43,11 +43,11 @@ register('tick', () => {
 		case 'option': return Navigator.setSelecting(operationData.option);
 		case 'chat': return Navigator.inputChat(operationData.text);
 		case 'item': return Navigator.selectItem(operationData.item);
-		case 'done': return doneLoading(operationData.actionName, operationData.actionAuthor);
+		case 'done': return doneLoading();
 	}
 })
 
-function doneLoading(actionName, actionAuthor) {
+function doneLoading() {
 	timeWithoutOperation = 0;
 	queue = [];
 	operationTimes = { started: 0, total: 0 };

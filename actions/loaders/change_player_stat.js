@@ -6,18 +6,18 @@ export default (actionData) => {
 		sequence.push(['chat', { text: actionData.stat }]);
 	}
 
-	if (actionData.mode && (actionData.mode !== "increment" || actionData.mode !== "inc" || actionData.mode !== "+=")) {
+	if (actionData.mode && actionData.mode !== "increment") {
 		sequence.push(['click', { slot: 11 }]);
-		if (actionData.mode === 'decrement' || actionData.mode === 'dec' || actionData.mode === '-=') {
+		if (actionData.mode === 'decrement') {
 			sequence.push(['click', { slot: 11 }]);
 		}
-		if (actionData.mode === 'set' || actionData.mode === "=") {
+		if (actionData.mode === 'set') {
 			sequence.push(['click', { slot: 12 }]);
 		}
-		if (actionData.mode === 'multiply' || actionData.mode === 'mult' || actionData.mode === '*=') {
+		if (actionData.mode === 'multiply') {
 			sequence.push(['click', { slot: 13}]);
 		}
-		if (actionData.mode === 'divide' || actionData.mode === 'div' || actionData.mode === '//=' || actionData.mode === '/=') {
+		if (actionData.mode === 'divide') {
 			sequence.push(['click', { slot: 14}]);
 		}
 	}
