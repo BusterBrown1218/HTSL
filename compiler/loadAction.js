@@ -283,8 +283,6 @@ export default (fileName) => {
 			subactions = [];
 			subaction = "";
 		}
-
-		ChatLib.chat(actionArgs.toString());
 		if (compileError) {
 			ChatLib.chat(`&3[HTSL] ${compileError}`);
 			return ChatLib.chat(`&3[HTSL] &cFailed line: &e${importActions[i]}`);
