@@ -237,6 +237,81 @@ function loadCondition(condition) {
 			}
 			sequence.push(['back']);
 			break;
+		case 'player_health':
+			sequence.push(['option', { option: "Player Health" }]);
+			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+				sequence.push(['click', { slot: 10 }]); // select "Comparator"
+				switch (conditionData.comparator) {
+					case "less_than":
+						sequence.push(['click', { slot: 10 }]); // select "Less Than"
+						break;
+					case "less_than_or_equal_to":
+						sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+						break;
+					case "greater_than_or_equal_to":
+						sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+						break;
+					case "greater_than":
+						sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+						break;
+				}
+			}
+			if (conditionData.compareValue) {
+				sequence.push(['click', { slot: 11 }]); //set compare value
+				sequence.push(['anvil', { text: conditionData.compareValue }]);
+			}
+			sequence.push(['back']);
+			break;
+		case 'max_player_health':
+			sequence.push(['option', { option: "Max Player Health" }]);
+			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+				sequence.push(['click', { slot: 10 }]); // select "Comparator"
+				switch (conditionData.comparator) {
+					case "less_than":
+						sequence.push(['click', { slot: 10 }]); // select "Less Than"
+						break;
+					case "less_than_or_equal_to":
+						sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+						break;
+					case "greater_than_or_equal_to":
+						sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+						break;
+					case "greater_than":
+						sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+						break;
+				}
+			}
+			if (conditionData.compareValue) {
+				sequence.push(['click', { slot: 11 }]); //set compare value
+				sequence.push(['anvil', { text: conditionData.compareValue }]);
+			}
+			sequence.push(['back']);
+			break;
+			case 'player_hunger':
+				sequence.push(['option', { option: "Player Hunger" }]);
+				if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+					sequence.push(['click', { slot: 10 }]); // select "Comparator"
+					switch (conditionData.comparator) {
+						case "less_than":
+							sequence.push(['click', { slot: 10 }]); // select "Less Than"
+							break;
+						case "less_than_or_equal_to":
+							sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+							break;
+						case "greater_than_or_equal_to":
+							sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+							break;
+						case "greater_than":
+							sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+							break;
+					}
+				}
+				if (conditionData.compareValue) {
+					sequence.push(['click', { slot: 11 }]); //set compare value
+					sequence.push(['anvil', { text: conditionData.compareValue }]);
+				}
+				sequence.push(['back']);
+				break;
 
 		// special cases start here:
 		case 'damage_cause':

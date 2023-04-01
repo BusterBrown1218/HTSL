@@ -6,7 +6,11 @@ actions/loaders/enchant_held_item.js
 actions/loaders/_import_all.js
 actions/loaders/_import_limited.js
 gui/codeWindow.js
+gui/Navigator.js
+gui/Queue.js
 utils/getEnchant.js
 upate/changelog.txt
 imports/testing.txt
+utils/getItemFromNBT.js
+index.js
 metadata.json

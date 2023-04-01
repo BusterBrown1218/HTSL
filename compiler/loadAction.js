@@ -143,7 +143,11 @@ export default (fileName) => {
 			}];
 		}
 		if (action === "giveItem") {
+			let allowMultiple = false;
+			if (actionArgs[2] === "true") allowMultiple = true;
 			actionData = ["give_item", {
+				item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${actionArgs[1]}.json`)) },
+				allowMultiple: allowMultiple
 			}];
 		}
 		if (action === "houseSpawn") {
@@ -162,7 +166,9 @@ export default (fileName) => {
 			}];
 		}
 		if (action === "removeItem") {
-			actionData = ["remove_item", {}];
+			actionData = ["remove_item", {
+				item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${actionArgs[1]}.json`)) }
+			}];
 		}
 		if (action === "resetInventory") {
 			actionData = ["reset_inventory", {}];
@@ -455,9 +461,6 @@ function conditionCompiler(arg) {
 		if (condition === "doingParkour") {
 			conditionList.push(["doing_parkour", {}]);
 		}
-		if (condition === "hasItem") {
-			conditionList.push(["has_item", {}]);
-		}
 		if (condition === "inRegion") {
 			conditionList.push(["within_region", {
 				region: args[1],
@@ -535,7 +538,133 @@ function conditionCompiler(arg) {
 		if (condition === "isSneaking") {
 			conditionList.push(["is_sneaking", {}])
 		}
-		if (conditionList.length !== i + 1) {
+		if (condition === "hasItem") {
+			let item_type = "metadata";
+			if (args[2] === "item_type") item_type = "item_type";
+			let requireAmount = false;
+			if (args[4] === "requireAmount") requireAmount = true;
+			conditionList.push(["has_item", {
+				item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
+				whatToCheck: item_type,
+				whereToCheck: args[3],
+				requireAmount: requireAmount
+			}]);
+		}
+		if (condition === "health") {
+			let mode = "";
+			switch (args[1]) {
+				case "=":
+					mode = "equal_to"
+				case "==":
+					mode = "equal_to"
+					break;
+				case "<":
+					mode = "less_than"
+					break;
+				case "<=":
+					mode = "less_than_or_equal_to"
+					break;
+				case ">":
+					mode = "greater_than"
+					break;
+				case "=>":
+					mode = "greater_than_or_equal_to"
+				case ">=":
+					mode = "greater_than_or_equal_to"
+					break;
+				case "=<":
+					mode = "less_than_or_equal_to"
+					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+			}
+			conditionList.push(["player_health", {
+				comparator: mode,
+				compareValue: args[2]
+			}])
+		}
+		if (condition === "maxHealth") {
+			let mode = "";
+			switch (args[1]) {
+				case "=":
+					mode = "equal_to"
+				case "==":
+					mode = "equal_to"
+					break;
+				case "<":
+					mode = "less_than"
+					break;
+				case "<=":
+					mode = "less_than_or_equal_to"
+					break;
+				case ">":
+					mode = "greater_than"
+					break;
+				case "=>":
+					mode = "greater_than_or_equal_to"
+				case ">=":
+					mode = "greater_than_or_equal_to"
+					break;
+				case "=<":
+					mode = "less_than_or_equal_to"
+					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+			}
+			conditionList.push(["max_player_health", {
+				comparator: mode,
+				compareValue: args[2]
+			}])
+		}
+		if (condition === "hunger") {
+			let mode = "";
+			switch (args[1]) {
+				case "=":
+					mode = "equal_to"
+				case "==":
+					mode = "equal_to"
+					break;
+				case "<":
+					mode = "less_than"
+					break;
+				case "<=":
+					mode = "less_than_or_equal_to"
+					break;
+				case ">":
+					mode = "greater_than"
+					break;
+				case "=>":
+					mode = "greater_than_or_equal_to"
+				case ">=":
+					mode = "greater_than_or_equal_to"
+					break;
+				case "=<":
+					mode = "less_than_or_equal_to"
+					break;
+				default:
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+			}
+			conditionList.push(["player_hunger", {
+				comparator: mode,
+				compareValue: args[2]
+			}])
+		}
+		if (conditionList.length !== i + 1 && !(condition === "" || !condition)) {
 			compileError = `&cUnknown condition &e"${arg[i]}"`;
 			let conditions = {
 				list: conditionList,

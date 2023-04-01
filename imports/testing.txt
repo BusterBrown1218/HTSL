@@ -12,18 +12,14 @@
 // failParkour "This is a reason!"
 // fullHeal
 // xpLevel 10
-
-// Yeah I'm not gonna do giveitem functionality in a while
-// giveItem false
+// giveItem "filenme" false
 // houseSpawn
 // kill
 // parkCheck
 
 // Yeah gl with the sound names
 // sound "Sound name" 2
-
-// Another item action, another future me problem idk
-// removeItem
+// removeItem "filename"
 // resetInventory
 // chat "Hello there! This is a message"
 // lobby "Lobby name"
@@ -48,8 +44,7 @@
 // globalstat "statname" (<, <=, =, =>, >) value
 // hasPotion "potionname"
 // doingParkour
-// hasItem
-// I'll do hasItem stuff later
+// hasItem "filename" "item_type" "Hand" "requireAmount"
 // inRegion "regionname"
 // hasPermission "permissionname"
 // hasGroup "groupname" true
@@ -58,6 +53,9 @@
 // isSneaking
 // gamemode "gamemodename"
 // placeholder "placeholdername" (<, <=, =, =>, >) value
+// hunger >= value
+// health >= value
+// maxHealth >= value
 
 // Random syntax
 // random {

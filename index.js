@@ -28,6 +28,12 @@ register("command", ...args => {
         ChatLib.chat("&3[HTSL] &fChanges:")
         return ChatLib.chat(FileLib.read('./config/ChatTriggers/modules/HTSL/update/changelog.txt'));
     }
+    if (command === 'saveitem') {
+        if (args.length < 2) return ChatLib.chat("&3[HTSL] &cPlease enter a filename to save it to!");
+        let itemHeld = Player.getHeldItem().getNBT().toString().replace(/["']/g, '\\$&');
+        FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`, `{"item": "${itemHeld}"}`);
+        return ChatLib.chat(`&3[HTSL] &fSaved item to ${args[1]}.json`);
+    }
     if (command === 'help') {
         ChatLib.chat('&6---------------------');
         ChatLib.chat('&6/htsl help &fShows this message')
@@ -36,6 +42,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl guide &fOpen\'s a syntax guide');
         ChatLib.chat('&6/htsl update &fForce updates HTSL (will save your files)');
         ChatLib.chat('&6/htsl changelog &fShows you all the significant changes made in the last update!');
+        ChatLib.chat('&6/htsl saveitem <filename> &fSave an item to import!');
         ChatLib.chat('&6---------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');

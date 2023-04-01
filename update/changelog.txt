@@ -6,3 +6,9 @@ Patch 0.4.2
 Patch 0.4.3
 - Added compiler errors
 - Patched multiple bugs
+
+Patch 0.4.4
+- Allowed for blank conditionals again
+- Added "health" "maxHealth" and "hunger" conditions
+- Added /htsl saveitem <filename> to import items in actions
+- Updated giveItem, removeItem, and hasItem actions and conditions

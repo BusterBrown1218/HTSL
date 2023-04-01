@@ -1,6 +1,6 @@
 import utilInputAnvil from '../utils/inputAnvil';
 import utilLoadItem from '../utils/loadItemstack';
-import createItemStack from '../utils/createItemStack';
+import getItemFromNBT from '../utils/getItemFromNBT';
 import Settings from '../utils/config';
 
 const lastItemAddedMargin = Settings.guiCooldown; // wait certain amount of ms after the last item in the GUI was added before safely saying that the GUI has loaded.
@@ -106,7 +106,7 @@ function setSelecting(option) {
 function selectItem(item) {
 	switch (item.type) {
 		case 'customItem':
-			const itemStack = createItemStack(item.itemData);
+			const itemStack = getItemFromNBT(item.itemData.item.replace(/\\/g, '')).getItemStack();
 			Navigator.isLoadingItem = true;
 			utilLoadItem(itemStack, 26);
 			setNotReady();
