@@ -1,5 +1,6 @@
 metadata.json
-changelog.txt
+update/changelog.txt
+update/fileupdates.txt
 compiler/convertAction.js
 compiler/loadAction.js
 imports/default.htsl
