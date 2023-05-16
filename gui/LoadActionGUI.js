@@ -87,6 +87,10 @@ register('guiMouseClick', (x, y, mouseButton) => {
 		button.setText('Getting Data...');
 		button.setEnabled(true);
 
+		if (input.getText() === "Enter File Name" || input.getText() === "") {
+			input.setText('default');
+		}
+
 		loadAction(input.getText());
 
 		input.setSelectionEnd(0);

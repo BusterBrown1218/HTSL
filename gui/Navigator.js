@@ -170,7 +170,7 @@ function inputChat(text) {
 	if (Settings.useSafeMode) Client.Companion.setCurrentChatMessage(text);
 	else {
 		if (text.startsWith('/')) text = "&r" + text
-		ChatLib.say(text);
+		ChatLib.say("/ac " + text);
 	}
 	setNotReady();
 }

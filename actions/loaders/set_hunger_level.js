@@ -6,5 +6,5 @@ export default (actionData) => {
 		sequence.push(['anvil', { text: actionData.level }]);
 	}
 
-	return ['Set Hunger Level', sequence];
+	return ['Change Hunger Level', sequence];
 }

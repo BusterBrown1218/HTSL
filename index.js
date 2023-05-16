@@ -2,6 +2,7 @@ import './gui/LoadActionGUI';
 import update from './update/update';
 import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
+import convertAction from './compiler/convertAction';
 
 register("command", ...args => {
     let command;
@@ -25,14 +26,23 @@ register("command", ...args => {
         return update();
     }
     if (command === 'changelog') {
-        ChatLib.chat("&3[HTSL] &fChanges:")
-        return ChatLib.chat(FileLib.read('./config/ChatTriggers/modules/HTSL/update/changelog.txt'));
+        ChatLib.chat("&3[HTSL] &fChanges:");
+        let changelog = FileLib.read('./config/ChatTriggers/modules/HTSL/update/changelog.txt').split("\n");
+        changelog.forEach(line => {
+            ChatLib.chat(line.trim());
+        });
+        return;
     }
     if (command === 'saveitem') {
         if (args.length < 2) return ChatLib.chat("&3[HTSL] &cPlease enter a filename to save it to!");
         let itemHeld = Player.getHeldItem().getNBT().toString().replace(/["']/g, '\\$&');
         FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`, `{"item": "${itemHeld}"}`);
         return ChatLib.chat(`&3[HTSL] &fSaved item to ${args[1]}.json`);
+    }
+    if (command === 'convert') {
+        if (args.length < 3) return ChatLib.chat("&3[HTSL] &cPlease enter the action id and then the filename to save it to!");
+        convertAction(args[1], args[2]);
+        return ChatLib.chat(`&3[HTSL] &fSuccessfully converted action into HTSL script saved at ${args[2]}.htsl`);
     }
     if (command === 'help') {
         ChatLib.chat('&6---------------------');
@@ -43,6 +53,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl update &fForce updates HTSL (will save your files)');
         ChatLib.chat('&6/htsl changelog &fShows you all the significant changes made in the last update!');
         ChatLib.chat('&6/htsl saveitem <filename> &fSave an item to import!');
+        ChatLib.chat('&6/htsl convert <action id> <filename> &fConverts a housingeditor action to htsl!');
         ChatLib.chat('&6---------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');

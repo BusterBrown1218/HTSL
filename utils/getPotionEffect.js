@@ -22,5 +22,9 @@ export default (effect) => {
 		case 'wither': return { slot: 33 };
 		case 'health_boost': return { slot: 34 };
 		case 'absorption': return { slot: 10, page: true }; // of course its the only one on the page 2
+		default: {
+			ChatLib.chat(`&3[HTSL] &6Warning: Unknown effect "${effect}"`);
+			return { slot: 10 }
+		}
 	}
 }

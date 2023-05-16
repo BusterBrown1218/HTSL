@@ -23,5 +23,9 @@ export default (enchant) => {
 		case 'Punch': return { slot: 34 };
 		case 'Flame': return { slot: 10, page: true };
 		case 'Infinity': return { slot: 11, page: true };
+		default: {
+			ChatLib.chat(`&3[HTSL] &6Warning: Unknown effect "${enchant}"`);
+			return { slot: 10 }
+		}
 	}
 }

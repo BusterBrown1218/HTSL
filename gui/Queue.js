@@ -12,8 +12,7 @@ register('tick', () => {
 	if (queue.length > 0) timeWithoutOperation++;
 	if (timeWithoutOperation > Settings.guiTimeout & queue.length > 0 && !Settings.useSafeMode) {
 		fails.push(`&cOperation timed out. &f(too long without GUI click)`);
-		const doneOperation = queue.pop();
-		doneLoading(doneOperation[1].actionName, doneOperation[1].actionAuthor);
+		doneLoading();
 	}
 	if (!Navigator.isReady) return;
 	if (queue.length === 0) return;

@@ -331,6 +331,10 @@ function loadCondition(condition) {
 				sequence.push(['click', { slot: 10 }]); // select "Item"
 				sequence.push(['item', { item: conditionData.blockType }]);
 			}
+			if (conditionData.matchTypeOnly) {
+				sequence.push(['click', { slot: 11 }]); // click match type only option, default is false
+			}
+			sequence.push(['back']);
 			break;
 		
 

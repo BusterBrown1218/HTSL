@@ -1,0 +1,63 @@
+// This is a comment and is being ignored by the compiler
+// stat "Hello World" dec 10
+// applyLayout "items"
+// applyPotion "strength" 10 10 true
+// cancelEvent
+// globalstat "Hello World" set 2
+// changeHealth inc 20
+// changePlayerGroup "mod" true
+// clearEffects
+// actionBar "message hehe he ha"
+// title "Hello World!" "This is a subtitle!" 5 2 3
+// failParkour "This is a reason!"
+// fullHeal
+// xpLevel 10
+// giveItem "filenme" false
+// houseSpawn
+// kill
+// parkCheck
+
+// Yeah gl with the sound names
+// sound "Sound name" 2
+// removeItem "filename"
+// resetInventory
+// chat "Hello there! This is a message"
+// lobby "Lobby name"
+// compassTarget custom_coordinates "2 90 1 ~ ~"
+// gamemode creative
+// hungerLevel 4
+// maxHealth 40
+// tp custom_coordinates "2 90 1 ~ ~"
+// function "function name" true
+// consumeItem
+// enchant "enchant name" 10
+
+// Conditionals . . . this was a pain
+// if or (stat "hello world" <= 10) {
+// stat "Hello World" set 10
+// } else {
+// globalstat "Hello World" dec 10
+// }
+
+// Conditions syntax
+// stat "statname" (<, <=, =, =>, >) value
+// globalstat "statname" (<, <=, =, =>, >) value
+// hasPotion "potionname"
+// doingParkour
+// hasItem "filename" "item_type" "Hand" "requireAmount"
+// inRegion "regionname"
+// hasPermission "permissionname"
+// hasGroup "groupname" true
+// damageCause "cause name"
+// blockType "blockType"
+// isSneaking
+// gamemode "gamemodename"
+// placeholder "placeholdername" (<, <=, =, =>, >) value
+// hunger >= value
+// health >= value
+// maxHealth >= value
+
+// Random syntax
+// random {
+// stat "Hello World" inc 1
+// }

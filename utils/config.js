@@ -47,12 +47,6 @@ class Settings {
 	
 	constructor() {
 		this.initialize(this);
-		this.setCategoryDescription("General", "&aHousingEditor Configuration\n\n&bhttps://www.housingeditor.com/")
-		this.setCategoryDescription("Actions / Items", "&aConfigure how you like to load in actions and items.")
-		this.setCategoryDescription("WorldEdit / Protools", "&aConfigure the added WorldEdit features in HousingEditor.")
-		this.setCategoryDescription("House Tracking", "&eHouse tracking is not included in this version of HousingEditor.")
-		this.setCategoryDescription("Miscellaneous", "&aA few more config options for development.\n&eYou probably won't need to change these.")
-		this.setSubcategoryDescription("WorldEdit / Protools", "Recieve Pro Tools", "Configure what you want to receive when you run /protools.")
 	}
 }
 

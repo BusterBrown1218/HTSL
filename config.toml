@@ -9,7 +9,7 @@
 
 	[miscellaneous.miscellaneous]
 		gui_timeout = 60
-		gui_cooldown = 50
+		gui_cooldown = 10
 
 ["actions_/_items"]
 

@@ -1,14 +1,8 @@
-Patch 0.4.2
-- Added new actions and Conditionals
-- Fixed multiple bugs
-- Added multiplication and division to stats
-
-Patch 0.4.3
-- Added compiler errors
-- Patched multiple bugs
-
-Patch 0.4.4
-- Allowed for blank conditionals again
-- Added "health" "maxHealth" and "hunger" conditions
-- Added /htsl saveitem <filename> to import items in actions
-- Updated giveItem, removeItem, and hasItem actions and conditions
+Update 5.0:
+- added /htsl convert <housingeditor action id>
+- added compiler errors for every action
+- added a checker to make sure it isn't trying to import more than possible actions
+- fixed bugs with houseSpawn and hungerLevel actions
+- fixed bug causing timeout errors to not occur
+- made the change log display better
+- added compiler errors for unknown effects and enchants
