@@ -8,7 +8,6 @@ imports/testing.htsl
 gui/codeWindow.js
 index.js
 gui/Navigator.js
-config.toml
 actions/loaders/conditional.js
 gui/loadActionGUI.js
 utils/getPotionEffect.js
