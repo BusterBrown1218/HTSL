@@ -8,5 +8,16 @@ export default (actionData) => {
 
 	if (actionData.allowMultiple) sequence.push(['click', { slot: 11 }]);
 
+	if (actionData.slot) {
+		if (actionData.slot !== "First Slot") {
+			sequence.push(['click', { slot: 12 }]);
+			sequence.push(['option', { option: actionData.slot }]);
+		}
+	}
+
+	if (actionData.replace) {
+		sequence.push(['click', { slot: 13 }]);
+	}
+
 	return ['Give Item', sequence];
 }

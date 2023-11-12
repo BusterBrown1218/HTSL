@@ -71,7 +71,7 @@ function doneLoading() {
   Navigator.isWorking = false;
   queue = [];
   operationTimes = { started: 0, total: 0 };
-  Client.currentGui.close();
+  if (Settings.closeGUI) Client.currentGui.close();
 
   if (fails.length > 0) {
     ChatLib.chat(

@@ -12,13 +12,12 @@
 // failParkour "This is a reason!"
 // fullHeal
 // xpLevel 10
-// giveItem "filenme" false
+// giveItem "filenme" false "Helmet"
 // houseSpawn
 // kill
 // parkCheck
-
 // Yeah gl with the sound names
-// sound "Sound name" 2
+// sound "Anvil Land" 0.7 1 "custom_coordinates" "~ ~ ~"
 // removeItem "filename"
 // resetInventory
 // chat "Hello there! This is a message"
@@ -31,6 +30,12 @@
 // function "function name" true
 // consumeItem
 // enchant "enchant name" 10
+// displayMenu "Your Statistics"
+// closeMenu
+// pause 5
+// setTeam Blue
+// teamstat Kills Blue inc 1
+// balanceTeam
 
 // Conditionals . . . this was a pain
 // if or (stat "hello world" <= 10) {
@@ -56,6 +61,13 @@
 // hunger >= value
 // health >= value
 // maxHealth >= value
+// teamstat Kills Blue == 1
+// hasTeam "Blue"
+// isFlying
+// fishingEnv "Water"
+// isItem "stone" metadata Hand anyAmount
+// canPvp
+// portal "End Portal"
 
 // Random syntax
 // random {

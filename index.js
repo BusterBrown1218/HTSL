@@ -1,5 +1,4 @@
 import './gui/LoadActionGUI';
-import update from './update/update';
 import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
 import convertAction from './compiler/convertAction';
@@ -21,9 +20,6 @@ register("command", ...args => {
             new TextComponent("&3[HTSL] &fJust click this: &b&l[Guide]").setClick("open_url", "https://hypixel.net/threads/guide-htsl.5280752/")
         );
         return ChatLib.chat(guideLink);
-    }
-    if (command === 'update') {
-        return update();
     }
     if (command === 'changelog') {
         ChatLib.chat("&3[HTSL] &fChanges:");
@@ -50,7 +46,6 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl gui <script name> &fOpens a window for editing scripts');
         ChatLib.chat('&6/htsl config &fOpens the settings menu for HTSL');
         ChatLib.chat('&6/htsl guide &fOpen\'s a syntax guide');
-        ChatLib.chat('&6/htsl update &fForce updates HTSL (will save your files)');
         ChatLib.chat('&6/htsl changelog &fShows you all the significant changes made in the last update!');
         ChatLib.chat('&6/htsl saveitem <filename> &fSave an item to import!');
         ChatLib.chat('&6/htsl convert <action id> <filename> &fConverts a housingeditor action to htsl!');

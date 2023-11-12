@@ -90,7 +90,7 @@ export class Button {
 			textField.setAccessible(true);
 			return textField.get(this.mcObject);
 		}
-		this.render = (x,y) => {
+		this.render = (x, y) => {
 			this.mcObject.func_146112_a(Client.getMinecraft(), x, y);
 		}
 

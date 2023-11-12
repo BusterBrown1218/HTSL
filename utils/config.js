@@ -20,6 +20,22 @@ class Settings {
 	})
 	useSafeMode = false;
 
+	@SwitchProperty({
+		name: "Save Imports",
+		description: 'Will keep the filename of your import inbetween imports so you don\'t have to type the same thing multiple times',
+		category: "Miscellaneous",
+		subcategory: "Miscellaneous",
+	})
+	saveimports = false;
+
+	@SwitchProperty({
+		name: "Close GUI on Exit",
+		description: 'Closes the GUI when it finishes and import or exits due to error/cancelation',
+		category: "Miscellaneous",
+		subcategory: "Miscellaneous",
+	})
+	closeGUI = true;
+
 	
 	// MISCELLANEOUS
 

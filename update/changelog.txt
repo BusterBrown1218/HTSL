@@ -1,8 +1,5 @@
-Update 5.0:
-- added /htsl convert <housingeditor action id>
-- added compiler errors for every action
-- added a checker to make sure it isn't trying to import more than possible actions
-- fixed bugs with houseSpawn and hungerLevel actions
-- fixed bug causing timeout errors to not occur
-- made the change log display better
-- added compiler errors for unknown effects and enchants
+Update 5.1:
+- added new actions
+- changed to use packets while importing (faster and alt+tab-able) (thank you Clovenbob)
+- added cancel import (thank you Clovenbob x2)
+- minor bug fixes and QoL changes

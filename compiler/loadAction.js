@@ -20,10 +20,7 @@ export default (fileName) => {
 		let subactions = [];
 		let actionData;
 		for (let i = 0; i < importActions.length; i++) {
-			if (importActions[i].startsWith("    ")) {
-				importActions[i] = importActions[i].substr(4);
-			}
-			let actionArgs = getArgs(importActions[i]);
+			let actionArgs = getArgs(importActions[i].trim());
 			let action = actionArgs[0];
 			actionData = [];
 			let compileError;
@@ -35,6 +32,16 @@ export default (fileName) => {
 					stat: actionArgs[1],
 					mode: actionArgs[2],
 					value: actionArgs[3]
+				}];
+			}
+			if (action === "teamstat") {
+				actionArgs[3] = validOperator(actionArgs[3]);
+				if (null === actionArgs[3]) compileError = `&cUnknown operator on line &e${i + 1}`;
+				actionData = ["change_team_stat", {
+					stat: actionArgs[1],
+					team: actionArgs[2],
+					mode: actionArgs[3],
+					value: actionArgs[4]
 				}];
 			}
 			if (action === "applyLayout") {
@@ -116,10 +123,15 @@ export default (fileName) => {
 			if (action === "giveItem") {
 				let allowMultiple = false;
 				if (actionArgs[2] === "true") allowMultiple = true;
+				let replace = false;
+				if (actionArgs[4] === "true") replace = true;
 				if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${actionArgs[1]}.json`)) compileError = `&cUnknown item file &e${actionArgs[1]}&c on line ${i + 1}`;
+				
 				actionData = ["give_item", {
 					item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${actionArgs[1]}.json`)) },
-					allowMultiple: allowMultiple
+					allowMultiple: allowMultiple,
+					slot: actionArgs[3],
+					replace
 				}];
 			}
 			if (action === "houseSpawn") {
@@ -132,10 +144,36 @@ export default (fileName) => {
 				actionData = ["parkour_checkpoint", {}];
 			}
 			if (action === "sound") {
-				actionData = ["play_sound", {
-					sound: actionArgs[1],
-					pitch: actionArgs[2]
-				}];
+				if (!["house_spawn", "current_location", "custom_coordinates", "invokers_location"].includes(actionArgs[4])) compileError = `&cUnknown location type &e"${actionArgs[4]}"&c on line &e${i + 1}`;
+				if (actionArgs[4] === "custom_coordinates") {
+					try {
+						if (actionArgs[5]) {
+							actionData = ["play_sound", {
+								sound: actionArgs[1],
+								volume: actionArgs[2],
+								pitch: actionArgs[3],
+								location: actionArgs[4],
+								coordinates: actionArgs[5].split(" ")
+							}];
+						} else {
+							actionData = ["play_sound", { 
+								sound: actionArgs[1],
+								volume: actionArgs[2],
+								pitch: actionArgs[3],
+								location: actionArgs[4],
+							}];
+						}
+					} catch (error) {
+						compileError = `&cLocation type &e"custom_coordinates"&c requires a second argument. Line &e${i + 1}`;
+					}
+				} else {
+					actionData = ["play_sound", {
+						sound: actionArgs[1],
+						volume: actionArgs[2],
+						pitch: actionArgs[3],
+						location: actionArgs[4]
+					}];
+				}
 			}
 			if (action === "removeItem") {
 				if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${actionArgs[1]}.json`)) compileError = `&cUnknown item file &e${actionArgs[1]}&c on line ${i + 1}`;
@@ -196,7 +234,7 @@ export default (fileName) => {
 				}];
 			}
 			if (action === "tp") {
-				if (!["house_spawn", "current_location", "custom_coordinates"].includes(actionArgs[1])) compileError = `&cUnknown location type &e"${actionArgs[1]}"&c on line &e${i + 1}`;
+				if (!["house_spawn", "current_location", "custom_coordinates", "invokers_location"].includes(actionArgs[1])) compileError = `&cUnknown location type &e"${actionArgs[1]}"&c on line &e${i + 1}`;
 				if (actionArgs[1] === "custom_coordinates") {
 					try {
 						if (actionArgs[2]) {
@@ -224,6 +262,21 @@ export default (fileName) => {
 					triggerForAllPlayers: override
 				}];
 			}
+			if (action === "displayMenu") {
+				actionData = ["display_menu", {
+					menu: actionArgs[1]
+				}];
+			}
+			if (action === "pause") {
+				actionData = ["pause_execution", {
+					ticks: actionArgs[1]
+				}];
+			}
+			if (action === "setTeam") {
+				actionData = ["set_player_team", {
+					team: actionArgs[1]
+				}];
+			}
 			if (action === "consumeItem") {
 				actionData = ["use_remove_held_item", {}];
 			}
@@ -232,6 +285,12 @@ export default (fileName) => {
 					enchantment: actionArgs[1],
 					level: actionArgs[2]
 				}];
+			}
+			if (action === "closeMenu") {
+				actionData = ["close_menu", {}];
+			}
+			if (action === "balanceTeam") {
+				actionData = ["balance_player_team", {}];
 			}
 			if (subaction !== "" && (action === "if" || action === "random")) compileError = `&cInvalid nested actions &e${action}`;
 			if (action === "if" && !(subaction == "if" || subaction == "else")) {
@@ -319,6 +378,7 @@ export default (fileName) => {
 	} catch (error) {
 		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
 		ChatLib.chat(error);
+		console.error(error);
 	}
 }
 
@@ -376,7 +436,6 @@ function conditionCompiler(arg) {
 		args = getArgs(arg[i]);
 		let condition = args[0];
 		if (condition === "stat") {
-			let mode = "";
 			mode = validComparator(args[2]);
 			if (mode === null) {
 				compileError = `&cUnknown compare operation &e"${args[2]}"`;
@@ -392,153 +451,198 @@ function conditionCompiler(arg) {
 				compareValue: args[3]
 			}]);
 		}
-		if (condition === "globalstat") {
-			let mode = "";
-			mode = validComparator(args[2]);
-			if (mode === null) {
-				compileError = `&cUnknown compare operation &e"${args[2]}"`;
-				let conditions = {
-					list: conditionList,
-					compileError: compileError
+		let mode = "";
+		let item_type = "metadata";
+		let requireAmount = false;
+		switch (condition) {
+			case "globalstat":
+				mode = validComparator(args[2]);
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 				}
-				return conditions;
-			}
-			conditionList.push(["global_stat_requirement", {
-				stat: args[1],
-				comparator: mode,
-				compareValue: args[3]
-			}]);
-		}
-		if (condition === "hasPotion") {
-			conditionList.push(["has_potion_effect", {
-				effect: args[1],
-			}]);
-		}
-		if (condition === "doingParkour") {
-			conditionList.push(["doing_parkour", {}]);
-		}
-		if (condition === "inRegion") {
-			conditionList.push(["within_region", {
-				region: args[1],
-			}]);
-		}
-		if (condition === "hasPermission") {
-			conditionList.push(["required_permission", {
-				permission: args[1],
-			}]);
-		}
-		if (condition === "hasGroup") {
-			let includeHigher = false;
-			if (args[1] === "true") {
-				includeHigher = true;
-			}
-			conditionList.push(["required_group", {
-				group: args[1],
-				includeHigherGroups: includeHigher
-			}]);
-		}
-		if (condition === "damageCause") {
-			conditionList.push(["damage_cause", {
-				damageCause: args[1],
-			}]);
-		}
-		if (condition === "placeholder") {
-			let mode = "";
-			mode = validComparator(args[2]);
-			if (mode === null) {
-				compileError = `&cUnknown compare operation &e"${args[2]}"`;
-				let conditions = {
-					list: conditionList,
-					compileError: compileError
+				conditionList.push(["global_stat_requirement", {
+					stat: args[1],
+					comparator: mode,
+					compareValue: args[3]
+				}]);
+				break;
+			case "teamstat":
+				mode = validComparator(args[3]);
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 				}
-				return conditions;
-			}
-			conditionList.push(["placeholder_number_requirement", {
-				placeholder: args[1],
-				comparator: mode,
-				compareValue: args[3]
-			}]);
-		}
-		if (condition === "gamemode") {
-			if (!["adventure", "survival", "creative"].includes(args[1])) compileError = `&cUnknown gamemode type &e${args[1]}`;
-			conditionList.push(["required_gamemode", {
-				gameMode: args[1].toLowerCase(),
-			}]);
-		}
-		if (condition === "isSneaking") {
-			conditionList.push(["is_sneaking", {}])
-		}
-		if (condition === "hasItem") {
-			let item_type = "metadata";
-			if (args[2] === "item_type") item_type = "item_type";
-			let requireAmount = false;
-			if (args[4] === "requireAmount") requireAmount = true;
-			if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) compileError = `&cUnknown item file &e${args[1]}`;
-			conditionList.push(["has_item", {
-				item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
-				whatToCheck: item_type,
-				whereToCheck: args[3],
-				requireAmount: requireAmount
-			}]);
-		}
-		if (condition === "health") {
-			let mode = "";
-			mode = validComparator(args[1]);
-			if (mode === null) {
-				compileError = `&cUnknown compare operation &e"${args[1]}"`;
-				let conditions = {
-					list: conditionList,
-					compileError: compileError
+				conditionList.push(["team_stat_requirement", {
+					stat: args[1],
+					team: args[2],
+					comparator: mode,
+					compareValue: args[4]
+				}]);
+				break;
+			case "hasTeam":
+				conditionList.push(["required_team", {
+					team: args[1],
+				}]);
+				break;
+			case "isFlying":
+				conditionList.push(["player_flying"]);
+				break;
+			case "canPvp":
+				conditionList.push(["pvp_enabled"]);
+				break;
+			case "hasPotion":
+				conditionList.push(["has_potion_effect", {
+					effect: args[1],
+				}]);
+				break;
+			case "fishingEnv":
+				conditionList.push(["fishing_environment", {
+					environment: args[1],
+				}]);
+				break;
+			case "portal":
+				conditionList.push(["portal_type", {
+					portal: args[1],
+				}]);
+				break;
+			case "doingParkour":
+				conditionList.push(["doing_parkour", {}]);
+				break;
+			case "inRegion":
+				conditionList.push(["within_region", {
+					region: args[1],
+				}]);
+				break;
+			case "hasPermission":
+				conditionList.push(["required_permission", {
+					permission: args[1],
+				}]);
+				break;
+			case "hasGroup":
+				let includeHigher = false;
+				if (args[1] === "true") {
+					includeHigher = true;
 				}
-				return conditions;
-			}
-			conditionList.push(["player_health", {
-				comparator: mode,
-				compareValue: args[2]
-			}])
-		}
-		if (condition === "maxHealth") {
-			let mode = "";
-			mode = validComparator(args[1])
-			if (mode === null) {
-				compileError = `&cUnknown compare operation &e"${args[1]}"`;
-				let conditions = {
-					list: conditionList,
-					compileError: compileError
+				conditionList.push(["required_group", {
+					group: args[1],
+					includeHigherGroups: includeHigher
+				}]);
+				break;
+			case "damageCause":
+				conditionList.push(["damage_cause", {
+					damageCause: args[1],
+				}]);
+				break;
+			case "placeholder":
+				mode = validComparator(args[2]);
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[2]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 				}
-				return conditions;
-			}
-			conditionList.push(["max_player_health", {
-				comparator: mode,
-				compareValue: args[2]
-			}])
-		}
-		if (condition === "hunger") {
-			let mode = "";
-			mode = validComparator(args[1]);
-			if (mode == null) {
-				compileError = `&cUnknown compare operation &e"${args[1]}"`;
-				let conditions = {
-					list: conditionList,
-					compileError: compileError
+				conditionList.push(["placeholder_number_requirement", {
+					placeholder: args[1],
+					comparator: mode,
+					compareValue: args[3]
+				}]);
+				break;
+			case "gamemode":
+				if (!["adventure", "survival", "creative"].includes(args[1])) compileError = `&cUnknown gamemode type &e${args[1]}`;
+				conditionList.push(["required_gamemode", {
+					gameMode: args[1].toLowerCase(),
+				}]);
+				break;
+			case "isSneaking":
+				conditionList.push(["is_sneaking", {}]);
+				break;
+			case "hasItem":
+				if (args[2] === "item_type") item_type = "item_type";
+				if (args[4] === "requireAmount") requireAmount = true;
+				if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) compileError = `&cUnknown item file &e${args[1]}`;
+				conditionList.push(["has_item", {
+					item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
+					whatToCheck: item_type,
+					whereToCheck: args[3],
+					requireAmount: requireAmount
+				}]);
+				break;
+			case "isItem":
+				if (args[2] === "item_type") item_type = "item_type";
+				if (args[4] === "requireAmount") requireAmount = true;
+				if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) compileError = `&cUnknown item file &e${args[1]}`;
+				conditionList.push(["is_item", {
+					item: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
+					whatToCheck: item_type,
+					whereToCheck: args[3],
+					requireAmount: requireAmount
+				}]);
+				break;
+			case "health":
+				mode = validComparator(args[1]);
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
 				}
-				return conditions;
-			}
-			conditionList.push(["player_hunger", {
-				comparator: mode,
-				compareValue: args[2]
-			}])
-		}
-		if (condition === "blockType") {
-			let matchBlockType = false;
-			if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) compileError = `&cUnknown item file &e${args[1]}`;
-			if (args[2] === "true") matchBlockType = !matchBlockType;
-			conditionList.push(["block_type", {
-				blockType: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
-				matchTypeOnly: matchBlockType
-			}]);
-
-			ChatLib.chat(conditionList.toString());
+				conditionList.push(["player_health", {
+					comparator: mode,
+					compareValue: args[2]
+				}]);
+				break;
+			case "maxHealth":
+				mode = validComparator(args[1])
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+				}
+				conditionList.push(["max_player_health", {
+					comparator: mode,
+					compareValue: args[2]
+				}]);
+				break;
+			case "hunger":
+				mode = validComparator(args[1]);
+				if (mode == null) {
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+				}
+				conditionList.push(["player_hunger", {
+					comparator: mode,
+					compareValue: args[2]
+				}]);
+				break;
+			case "blockType":
+				let matchBlockType = false;
+				if (!FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) compileError = `&cUnknown item file &e${args[1]}`;
+				if (args[2] === "true") matchBlockType = !matchBlockType;
+				conditionList.push(["block_type", {
+					blockType: { type: "customItem", itemData: JSON.parse(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`)) },
+					matchTypeOnly: matchBlockType
+				}]);
+				break;
 		}
 		if (conditionList.length !== i + 1 && !(condition === "" || !condition)) {
 			compileError = `&cUnknown condition &e"${arg[i]}"`;

@@ -29,13 +29,25 @@ import use_remove_held_item from "./use_remove_held_item";
 import apply_inventory_layout from "./apply_inventory_layout";
 import trigger_function from "./trigger_function";
 import enchant_held_item from "./enchant_held_item";
+import display_menu from "./display_menu";
+import close_menu from "./close_menu";
+import pause_execution from "./pause_execution";
+import set_player_team from "./set_player_team";
+import change_team_stat from "./change_team_stat";
+import balance_player_team from "./balance_player_team";
 
 export default {
+	balance_player_team,
+	change_team_stat,
+	set_player_team,
+	pause_execution,
 	conditional,
 	change_player_group,
+	close_menu,
 	kill_player,
 	full_heal,
 	go_to_house_spawn,
+	display_menu,
 	display_title,
 	display_action_bar,
 	reset_inventory,

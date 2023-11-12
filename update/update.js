@@ -32,10 +32,7 @@ register("worldLoad", () => {
             if (versionCompare(currentVersion, latestVersion)) {
                 return ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
             }
-            const update = new Message(
-                new TextComponent("&3[HTSL] &fNew HTSL version available! Click this message to update!").setClick("suggest_command", "/htsl update")
-            );
-            ChatLib.chat(update);
+            ChatLib.chat("&3[HTSL] &fNew HTSL version available!");
             
         });
     } catch (error) {
@@ -43,55 +40,3 @@ register("worldLoad", () => {
     }
     worldLoadMessage = true;
 });
-
-register("command", ...args => {
-    let command;
-    try	{
-		command = args[0].toLowerCase();
-	} catch(e) {
-		command = 'help';
-	}
-    if (command === 'update') {
-        
-    }
-}).setName("htsl");
-
-export default () => {
-    axios({
-        url: `http://busterbrown1218.xyz/htsl/update/update/fileupdates.txt`,
-        method: 'GET'
-    }).then(newFileChanges => {
-        let fileChanges = newFileChanges.data.split("/n").filter((str) => str !== '');
-        let updateProgress = 0;
-        fileChanges.forEach(fileChange => {
-        if (fileChange === "metadata.json") {
-            axios({
-                url: `https://raw.githubusercontent.com/BusterBrown1218/HTSL/main/${fileChange}`,
-                method: 'GET'
-            }).then(newFile => {
-                FileLib.write(`./config/ChatTriggers/modules/HTSL/${fileChange}`, JSON.stringify(newFile.data));
-                ChatLib.chat(`&3[HTSL] &fUpdated ${fileChange}`);
-                updateProgress = updateProgress + 1;
-                if (updateProgress >= fileChanges.length) {
-                    ChatLib.chat("&3[HTSL] &fFully updated successfully!");
-                    ChatLib.chat("&3[HTSL] &fType \"/ct reload\" to use the new features or \"/htsl changelog\"!");
-                }
-            });
-        } else {
-            axios({
-                url: `http://busterbrown1218.xyz/htsl/update/${fileChange}`,
-                method: 'GET'
-            }).then(newFile => {
-                FileLib.write(`./config/ChatTriggers/modules/HTSL/${fileChange}`, newFile.data.split('/n').join('\n'));
-                ChatLib.chat(`&3[HTSL] &fUpdated ${fileChange}`);
-                updateProgress = updateProgress + 1;
-                if (updateProgress >= fileChanges.length) {
-                    ChatLib.chat("&3[HTSL] &fFully updated successfully!");
-                    ChatLib.chat("&3[HTSL] &fType \"/ct reload\" to use the new features or \"/htsl changelog\"!");
-                }
-            });
-        }
-    });
-    });
-    
-}

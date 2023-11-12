@@ -46,7 +46,7 @@ function loadCondition(condition) {
 			sequence.push(['setGuiContext', { context: 'Condition -> Has Potion Effect' }]);
 			sequence.push(['option', { option: "Has Potion Effect" }]); // select potion effect condition
 			if (conditionData.effect) {
-				sequence.push(['click', { slot: 10}]); // select "Effect"
+				sequence.push(['click', { slot: 10 }]); // select "Effect"
 				let { slot, page } = getPotionEffect(conditionData.effect);
 				if (page) {
 					sequence.push(['click', { slot: 53 }]);
@@ -55,9 +55,37 @@ function loadCondition(condition) {
 			}
 			sequence.push(['back']); // go back to edit conditionals tab 
 			break;
-		
+
+		case "fishing_environment":
+			sequence.push(['setGuiContext', { context: 'Condition -> Fishing Environment' }]);
+			sequence.push(['option', { option: "Fishing Environment" }]); // select potion effect condition
+			if (conditionData.environment) {
+				sequence.push(['click', { slot: 10 }]); // select "Effect"
+				sequence.push(['option', { option: conditionData.environment }]);
+			}
+			sequence.push(['back']); // go back to edit conditionals tab 
+			break;
+
+			case "portal_type":
+				sequence.push(['setGuiContext', { context: 'Condition -> Portal Type' }]);
+				sequence.push(['option', { option: "Portal Type" }]); // select potion effect condition
+				if (conditionData.portal) {
+					sequence.push(['click', { slot: 10 }]); // select "Effect"
+					sequence.push(['option', { option: conditionData.portal }]);
+				}
+				sequence.push(['back']); // go back to edit conditionals tab 
+				break;
+
 		case "doing_parkour":
 			sequence.push(['option', { option: "Doing Parkour" }]); // select doing parkour condition
+			break;
+
+		case "player_flying":
+			sequence.push(['option', { option: "Player Flying" }]); // select doing parkour condition
+			break;
+
+		case "pvp_enabled":
+			sequence.push(['option', { option: "PvP Enabled" }]); // select doing parkour condition
 			break;
 
 		case "has_item":
@@ -88,13 +116,47 @@ function loadCondition(condition) {
 						break;
 				}
 			}
-			if (conditionData.requireAmount ) {	// Any Amount is the default here
+			if (conditionData.requireAmount) {	// Any Amount is the default here
 				sequence.push(['click', { slot: 13 }]); // select "Required Amount"
 				sequence.push(['click', { slot: 11 }]); // select "Equal or Greater Amount"
 			}
 			sequence.push(['back']); // go back to edit conditionals tab 
 			break;
-		
+		case "is_item":
+			sequence.push(['setGuiContext', { context: 'Condition -> Is Item' }]);
+			sequence.push(['option', { option: "Is Item" }]); // select has item condition
+			if (conditionData.item) {
+				sequence.push(['click', { slot: 10 }]); // select "Item"
+				sequence.push(['item', { item: conditionData.item }]); // slot 36 is the first slot in the hotbar
+			}
+			if (conditionData.whatToCheck === "item_type") { // item metadata is default
+				sequence.push(['click', { slot: 11 }]); // select "What to Check"
+				sequence.push(['click', { slot: 10 }]); // select "Item Type"
+			}
+			if (conditionData.whereToCheck && conditionData.whereToCheck !== 'anywhere') {
+				sequence.push(['click', { slot: 12 }]); // select "Where to Check"
+				switch (conditionData.whereToCheck) { // the default is "Anywhere" that is why there is no case for it
+					case "Hand":
+						sequence.push(['click', { slot: 10 }]); // select "Hand"
+						break;
+					case "Armor":
+						sequence.push(['click', { slot: 11 }]); // select "Armor"
+						break;
+					case "Hotbar":
+						sequence.push(['click', { slot: 12 }]); // select "Hotbar"
+						break;
+					case "Inventory":
+						sequence.push(['click', { slot: 13 }]); // select "Inventory"
+						break;
+				}
+			}
+			if (conditionData.requireAmount) {	// Any Amount is the default here
+				sequence.push(['click', { slot: 13 }]); // select "Required Amount"
+				sequence.push(['click', { slot: 11 }]); // select "Equal or Greater Amount"
+			}
+			sequence.push(['back']); // go back to edit conditionals tab 
+			break;
+
 		case 'within_region':
 			sequence.push(['setGuiContext', { context: 'Condition -> Within Region' }]);
 			sequence.push(['option', { option: "Within Region" }]); // select within region condition
@@ -143,6 +205,49 @@ function loadCondition(condition) {
 				sequence.push(['anvil', { text: conditionData.compareValue }]);
 			}
 			sequence.push(['back']); // go back to edit conditionals tab
+			break;
+
+		case 'team_stat_requirement':
+			sequence.push(['option', { option: "Team Stat Requirement" }]); // select player stat requirement condition
+			if (conditionData.stat && conditionData.stat !== 'Kills') {
+				sequence.push(['click', { slot: 10 }]); // select "Stat"
+				sequence.push(['chat', { text: conditionData.stat }]);
+			}
+			if (conditionData.team) {
+				sequence.push(['click', { slot: 11 }]);
+				sequence.push(['option', { option: conditionData.team }]);
+			}
+			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+				sequence.push(['click', { slot: 12 }]); // select "Comparator"
+				switch (conditionData.comparator) {
+					case "less_than":
+						sequence.push(['click', { slot: 10 }]); // select "Less Than"
+						break;
+					case "less_than_or_equal_to":
+						sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+						break;
+					case "greater_than_or_equal_to":
+						sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+						break;
+					case "greater_than":
+						sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+						break;
+				}
+			}
+			if (conditionData.compareValue) {
+				sequence.push(['click', { slot: 13 }]); // select "Compare Value"
+				sequence.push(['anvil', { text: conditionData.compareValue }]);
+			}
+			sequence.push(['back']); // go back to edit conditionals tab
+			break;
+
+		case 'required_team':
+			sequence.push(['option', { option: "Required Team" }]);
+			if (conditionData.team) {
+				sequence.push(['click', { slot: 10 }]);
+				sequence.push(['option', { option: conditionData.team }]);
+			}
+			sequence.push(['back']);
 			break;
 
 		case 'global_stat_requirement':
@@ -194,7 +299,7 @@ function loadCondition(condition) {
 			sequence.push(['option', { option: "Placeholder Number Requirement" }]);
 			if (conditionData.placeholder) {
 				sequence.push(['click', { slot: 10 }]); //set placeholder
-				sequence.push(['anvil', { text: conditionData.placeholder}]);
+				sequence.push(['anvil', { text: conditionData.placeholder }]);
 			}
 			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
 				sequence.push(['click', { slot: 11 }]); // select "Comparator"
@@ -225,13 +330,13 @@ function loadCondition(condition) {
 				sequence.push(['click', { slot: 10 }]);
 				switch (conditionData.gameMode) {
 					case "adventure":
-						sequence.push(['option', { option: "Adventure"}]);
+						sequence.push(['option', { option: "Adventure" }]);
 						break;
 					case "survival":
-						sequence.push(['option', { option: "Survival"}]);
+						sequence.push(['option', { option: "Survival" }]);
 						break;
 					case "creative":
-						sequence.push(['option', { option: "Creative"}]);
+						sequence.push(['option', { option: "Creative" }]);
 						break;
 				}
 			}
@@ -287,31 +392,31 @@ function loadCondition(condition) {
 			}
 			sequence.push(['back']);
 			break;
-			case 'player_hunger':
-				sequence.push(['option', { option: "Player Hunger" }]);
-				if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
-					sequence.push(['click', { slot: 10 }]); // select "Comparator"
-					switch (conditionData.comparator) {
-						case "less_than":
-							sequence.push(['click', { slot: 10 }]); // select "Less Than"
-							break;
-						case "less_than_or_equal_to":
-							sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
-							break;
-						case "greater_than_or_equal_to":
-							sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
-							break;
-						case "greater_than":
-							sequence.push(['click', { slot: 14 }]); // select "Greater Than"
-							break;
-					}
+		case 'player_hunger':
+			sequence.push(['option', { option: "Player Hunger" }]);
+			if (conditionData.comparator && conditionData.comparator !== 'equal_to') { // default is "Equal"
+				sequence.push(['click', { slot: 10 }]); // select "Comparator"
+				switch (conditionData.comparator) {
+					case "less_than":
+						sequence.push(['click', { slot: 10 }]); // select "Less Than"
+						break;
+					case "less_than_or_equal_to":
+						sequence.push(['click', { slot: 11 }]); // select "Less Than or Equal"
+						break;
+					case "greater_than_or_equal_to":
+						sequence.push(['click', { slot: 13 }]); // select "Greater Than or Equal"
+						break;
+					case "greater_than":
+						sequence.push(['click', { slot: 14 }]); // select "Greater Than"
+						break;
 				}
-				if (conditionData.compareValue) {
-					sequence.push(['click', { slot: 11 }]); //set compare value
-					sequence.push(['anvil', { text: conditionData.compareValue }]);
-				}
-				sequence.push(['back']);
-				break;
+			}
+			if (conditionData.compareValue) {
+				sequence.push(['click', { slot: 11 }]); //set compare value
+				sequence.push(['anvil', { text: conditionData.compareValue }]);
+			}
+			sequence.push(['back']);
+			break;
 
 		// special cases start here:
 		case 'damage_cause':
@@ -336,7 +441,7 @@ function loadCondition(condition) {
 			}
 			sequence.push(['back']);
 			break;
-		
+
 
 	}
 	return sequence;

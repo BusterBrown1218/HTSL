@@ -10,8 +10,11 @@ export default (actionData) => {
 		case 'current_location':
 			sequence.push(['click', { slot: 11 }]);
 			break;
-		case 'custom_coordinates':
+		case 'invokers_location':
 			sequence.push(['click', { slot: 12 }]);
+			break;
+		case 'custom_coordinates':
+			sequence.push(['click', { slot: 13 }]);
 			sequence.push(['anvil', { text: actionData.coordinates.join(' ') }]);
 			break;
 	}

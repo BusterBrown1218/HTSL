@@ -1,12 +1,13 @@
 import { Input, Button } from './GuiBuilder';
 import loadAction from '../compiler/loadAction';
+import saveImports from '../utils/config';
 
 const button = new Button(0, 0, 0, 20, 'Import HTSL');
 
 const input = new Input(0, 0, 0, 18);
 input.setEnabled(false);
-input.setText('Enter File Name')
-input.mcObject.func_146203_f(24) // set max length
+input.setText('Enter File Name');
+input.mcObject.func_146203_f(1000) // set max length
 
 // const exportButton = new Button(0, 0, 0, 20, 'Export HTSL');
 
@@ -97,7 +98,7 @@ register('guiMouseClick', (x, y, mouseButton) => {
 		input.setCursorPosition(0);
 		input.setLineScrollOffset(0);
 		input.setIsFocused(false);
-		input.setText('Enter File Name');
+		if (!saveImports || input.getText() == "default") input.setText('Enter File Name');
 
 		button.setText('Import HTSL');
 		button.setEnabled(true);
