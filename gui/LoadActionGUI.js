@@ -128,6 +128,7 @@ function isInActionGui() {
 	const containerName = Player.getContainer().getName();
 	if (Client.currentGui.getClassName() === "GuiEditSign") return
 	if (Player.getContainer().getClassName() !== 'ContainerChest') return false;
+	if (containerName === 'Edit Menu' || containerName === "Edit Elements") return false;
 	if (containerName.match(/Edit |Actions: /)) return true;
 	return false;
 }
