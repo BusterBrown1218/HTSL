@@ -10,9 +10,9 @@ export default class Action {
 	load() {
 		addOperation(['setGuiContext', { context: this.sequence[0] }]);
 
-		addOperation(['click', { slot: 50 }]); // click "Add Action Button"
+		if (this.sequence[0] !== "goto") addOperation(['click', { slot: 50 }]); // click "Add Action Button"
 
-		addOperation(['option', { option: this.sequence[0] }]); // click the action type
+		if (this.sequence[0] !== "goto") addOperation(['option', { option: this.sequence[0] }]); // click the action type
 
 		this.sequence[1].forEach(operation => {
 			addOperation(operation);

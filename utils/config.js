@@ -23,19 +23,26 @@ class Settings {
 	@SwitchProperty({
 		name: "Save Imports",
 		description: 'Will keep the filename of your import inbetween imports so you don\'t have to type the same thing multiple times',
-		category: "Miscellaneous",
-		subcategory: "Miscellaneous",
+		category: "Actions / Items",
+		subcategory: "Actions / Items",
 	})
 	saveimports = false;
 
 	@SwitchProperty({
 		name: "Close GUI on Exit",
-		description: 'Closes the GUI when it finishes and import or exits due to error/cancelation',
-		category: "Miscellaneous",
-		subcategory: "Miscellaneous",
+		description: 'Closes the GUI when it finishes an import or exits due to error/cancelation',
+		category: "Actions / Items",
+		subcategory: "Actions / Items",
 	})
 	closeGUI = true;
 
+	@SwitchProperty({
+		name: "Play Sound on Exit",
+		description: 'Play a sound when the import finishes',
+		category: "Actions / Items",
+		subcategory: "Actions / Items",
+	})
+	playSoundOnFinish = true;
 	
 	// MISCELLANEOUS
 

@@ -51,7 +51,14 @@ function readActions(actionType, actionData) {
             break;
         case "change_global_stat": line = `globalstat "${actionData.stat}" "${actionData.mode}" "${actionData.value}"`;
             break;
+        case "change_team_stat": line = `teamstat ${actionData.stat} ${actionData.team} ${actionData.mode} "${actionData.value}"`;
+            break;
+        case "pause_execution": line = `pause ${actionData.ticks}`;
+            break;
+
         case "change_health": line = `changeHealth "${actionData.mode}" "${actionData.health}"`;
+            break;
+        case "change_max_health": line = `maxHealth "${actionData.mode}" "${actionData.health}" ${actionData.healOnChange}`;
             break;
         case "change_player_group": line = `changePlayerGroup "${actionData.group}" ${actionData.promotionProtection}`;
             break;
@@ -91,11 +98,14 @@ function readActions(actionType, actionData) {
             break;
         case "display_title": line = `title "${actionData.title}" "${actionData.subtitle}" "${actionData.fadeIn}" "${actionData.stay}" "${actionData.fadeOut}"`;
             break;
-        // case "enchant_held_item": line = ``;
+        case "enchant_held_item": line = `enchant "${actionData.enchantment}" ${actionData.level}`;
+            break;
         case "exit": line = `exit`;
             break;
         case "fail_parkour": line = `failParkour "${actionData.reason}"`;
             break;
+        case "set_player_team": line = `setTeam "${actionData.team}"`;
+        break;
         case "full_heal": line = `fullHeal`;
             break;
         case "give_experience_levels": line = `xpLevel "${actionData.levels}"`;
@@ -108,7 +118,7 @@ function readActions(actionType, actionData) {
             break;
         case "parkour_checkpoint": line = `parkCheck`;
             break;
-        case "play_sound": line = `sound "${actionData.sound}" "${actionData.pitch}"`;
+        case "play_sound": line = `sound "${actionData.sound}" "${actionData.volume}" "${actionData.pitch}" ${actionData.location}`;
             break;
         case "random_action": {
             let sublines = ['random {'];
@@ -133,7 +143,7 @@ function readActions(actionType, actionData) {
             break;
         case "set_gamemode": line = `gamemode "${actionData.gamemode}"`;
             break;
-        case "set_hunger_level": line = `hungerLevel "${actionData.level}"`;
+        case "change_hunger_level": line = `hungerLevel ${actionData.mode} "${actionData.level}"`;
             break;
         case "set_max_health": line = `maxHealth "${actionData.health}"`;
             break;
@@ -143,24 +153,35 @@ function readActions(actionType, actionData) {
             break;
         case "use_remove_held_item": line = `consumeItem`;
             break;
+        case "close_menu": line = `closeMenu`;
+            break;
+        case "display_menu": line = `displayMenu "${actionData.menu}"`;
+            break;
+            case "balance_player_team": line = `balanceTeam`;
+            break;
     }
 
     return line;
 }
 
 function readConditions(condition) {
-
     const [conditionType, conditionData] = condition;
     switch (conditionType) {
         case "has_potion_effect": condition = `hasPotion "${conditionData.effect}"`;
+            break;
+        case "fishing_environment": condition = `fishingEnv "${conditionData.environment}"`;
             break;
         case "doing_parkour": condition = `doingParkour`;
             break;
         case "has_item": condition = `hasItem`;
             break;
+        case "is_item": condition = `isItem`;
+            break;
         case "within_region": condition = `inRegion "${conditionData.region}"`;
             break;
         case "required_permission": condition = `hasPermission "${conditionData.permission}"`;
+            break;
+        case "required_team": condition = `hasTeam "${conditionData.team}"`;
             break;
         case "player_stat_requirement": {
             switch (conditionData.comparator) {
@@ -170,7 +191,29 @@ function readConditions(condition) {
                 case "greater_than": conditionData.comparator = ">";
                 case "greater_than_or_equal_to": conditionData.comparator = "=>";
             }
-            condition = `stat "${conditionData.stat}" ${conditionData.comparator} "${conditionData.compareValue}"`;
+            condition = `stat ${conditionData.stat} ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
+        case "placeholder_number_requirement": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `placeholder ${conditionData.placeholder} ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
+        case "team_stat_requirement": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `teamstat ${conditionData.stat} ${conditionData.team} ${conditionData.comparator} "${conditionData.compareValue}"`;
         }
             break;
         case "global_stat_requirement": {
@@ -184,10 +227,66 @@ function readConditions(condition) {
             condition = `globalstat "${conditionData.stat}" ${conditionData.comparator} "${conditionData.compareValue}"`;
         }
             break;
+        case "damage_amount": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `damageAmount ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
+        case "player_health": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `health ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
+        case "player_max_health": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `maxHealth ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
+        case "player_hunger": {
+            switch (conditionData.comparator) {
+                case "equal_to": conditionData.comparator = "==";
+                case "less_than": conditionData.comparator = "<";
+                case "less_than_or_equal_to": conditionData.comparator = "<=";
+                case "greater_than": conditionData.comparator = ">";
+                case "greater_than_or_equal_to": conditionData.comparator = "=>";
+            }
+            condition = `hunger ${conditionData.comparator} "${conditionData.compareValue}"`;
+        }
+            break;
         case "required_group": condition = `hasGroup "${conditionData.group}" ${conditionData.includeHigherGroups}`;
             break;
+        case "player_flying": condition = `isFlying`;
+            break;
+        case "player_sneaking": condition = `isSneaking`;
+            break;
+        case "pvp_enabled": condition = `canPvp`;
+            break;
         case "damage_cause": condition = `damageCause "${conditionData.damageCause}"`;
+            break;
+        case "portal_type": condition = `portal "${conditionData.portalType}"`;
+            break;
+        case "required_gamemode": condition = `gamemode "${conditionData.gamemode}"`;
+            break;
         case "block_type": condition = `blockType`;
+            break;
         default: condition = "";
     }
 

@@ -1,2 +1,7 @@
-// Comments are green!
+// This is a comment!
 chat "Hello World!"
+
+// This makes the rest of the code get imported into "a function"
+goto function "a function"
+
+chat "Hello World! - a function"

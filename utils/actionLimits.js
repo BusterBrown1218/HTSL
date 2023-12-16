@@ -48,6 +48,8 @@ export function checkOccurences(arr) {
         // Check the first element of each array
         let firstElement = arr[i][0];
 
+        if (firstElement == "goto") occurrences = {};
+
         // Check if the first element is a string and if it has a hardcoded limit
         if (typeof firstElement === 'string' && limits.hasOwnProperty(firstElement)) {
             // Increment the occurrences of the string

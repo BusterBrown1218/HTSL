@@ -24,8 +24,8 @@
 // lobby "Lobby name"
 // compassTarget custom_coordinates "2 90 1 ~ ~"
 // gamemode creative
-// hungerLevel 4
-// maxHealth 40
+// hungerLevel set 4
+// maxHealth set 40
 // tp custom_coordinates "2 90 1 ~ ~"
 // function "function name" true
 // consumeItem
@@ -36,6 +36,7 @@
 // setTeam Blue
 // teamstat Kills Blue inc 1
 // balanceTeam
+// goto function "name"
 
 // Conditionals . . . this was a pain
 // if or (stat "hello world" <= 10) {
@@ -54,6 +55,7 @@
 // hasPermission "permissionname"
 // hasGroup "groupname" true
 // damageCause "cause name"
+// damageAmount (<, <=, =, =>, >) value
 // blockType "blockType"
 // isSneaking
 // gamemode "gamemodename"

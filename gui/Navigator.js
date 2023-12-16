@@ -47,8 +47,9 @@ register("postGuiRender", () => {
   }
 }).setPriority(Priority.HIGHEST);
 
-register("guiOpened", () => {
+register("guiOpened", (event) => {
   setNotReady();
+  if (event.gui.class.toString() == "class net.minecraft.client.gui.inventory.GuiInventory") return;
   Navigator.guiIsLoading = true;
 });
 
@@ -159,6 +160,7 @@ function selectItem(item) {
 }
 
 register("guiKey", (_character, code, _gui, event) => {
+  if (Navigator.goto) return;
   if (!Navigator.isWorking) return;
   if (
     code === Keyboard.KEY_ESCAPE ||
@@ -220,14 +222,23 @@ function inputAnvil(text) {
   setNotReady();
 }
 
-function inputChat(text) {
+function inputChat(text, func, command) {
+  if (text.startsWith("/") && !command) text = "&r" + text;
+  if (func) {
+    Navigator.func = func;
+  }
   if (Settings.useSafeMode) Client.Companion.setCurrentChatMessage(text);
   else {
-    if (text.startsWith("/")) text = "&r" + text;
-    ChatLib.say("/ac " + text);
+    ChatLib.say(`${command? "" : "/ac "}` + text);
   }
   setNotReady();
 }
+
+register("chat", (event) => {
+  if (!Navigator.isWorking) return;
+  ChatLib.command(`function create ${Navigator.func}`);
+  cancel(event);
+}).setCriteria("Could not find a function with that name!");
 
 function setNotReady() {
   Navigator.itemsLoaded = { items: {}, lastItemAddedTimestamp: 0 };
@@ -242,6 +253,7 @@ let Navigator = {
   isReturning: false,
   isLoadingItem: false,
   guiIsLoading: true,
+  goto: false,
   itemsLoaded: { items: {}, lastItemAddedTimestamp: 0 },
   selectOption,
   selectItem,

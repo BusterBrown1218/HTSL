@@ -32,11 +32,11 @@ register("worldLoad", () => {
             if (versionCompare(currentVersion, latestVersion)) {
                 return ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
             }
-            ChatLib.chat("&3[HTSL] &fNew HTSL version available!");
+            ChatLib.chat(new Message(new TextComponent("&3[HTSL] &fNew HTSL version available!").setClickAction("open_url", "https://github.com/BusterBrown1218/HTSL/releases")));
             
         });
     } catch (error) {
-        ChatLib.chat("&3[HTSL] &fError while checking version");
+        ChatLib.chat("&3[HTSL] &cError while checking version");
     }
     worldLoadMessage = true;
 });

@@ -66,15 +66,15 @@ function loadCondition(condition) {
 			sequence.push(['back']); // go back to edit conditionals tab 
 			break;
 
-			case "portal_type":
-				sequence.push(['setGuiContext', { context: 'Condition -> Portal Type' }]);
-				sequence.push(['option', { option: "Portal Type" }]); // select potion effect condition
-				if (conditionData.portal) {
-					sequence.push(['click', { slot: 10 }]); // select "Effect"
-					sequence.push(['option', { option: conditionData.portal }]);
-				}
-				sequence.push(['back']); // go back to edit conditionals tab 
-				break;
+		case "portal_type":
+			sequence.push(['setGuiContext', { context: 'Condition -> Portal Type' }]);
+			sequence.push(['option', { option: "Portal Type" }]); // select potion effect condition
+			if (conditionData.portal) {
+				sequence.push(['click', { slot: 10 }]); // select "Effect"
+				sequence.push(['option', { option: conditionData.portal }]);
+			}
+			sequence.push(['back']); // go back to edit conditionals tab 
+			break;
 
 		case "doing_parkour":
 			sequence.push(['option', { option: "Doing Parkour" }]); // select doing parkour condition
@@ -427,6 +427,23 @@ function loadCondition(condition) {
 				sequence.push(['option', { option: conditionData.damageCause }]);
 			}
 			sequence.push(['back']); // go back to edit conditionals tab
+			break;
+
+		case 'damage_amount':
+			sequence.push(["setGuiContext", { context: "Condition -> Damage Amount" }]);
+			sequence.push(["option", { option: "Damage Amount" }]);
+			if (conditionData.comparator && conditionData.comparator !== "equal_to") {
+				sequence.push(["click", { slot: 10 }]);
+				if (conditionData.comparator === "less_than") sequence.push(["click", { slot: 10 }]);
+				if (conditionData.comparator === "less_than_or_equal_to") sequence.push(["click", { slot: 11 }]);
+				if (conditionData.comparator === "greater_than_or_equal_to") sequence.push(["click", { slot: 13 }]);
+				if (conditionData.comparator === "greater_than") sequence.push(["click", { slot: 14 }]);
+			}
+			if (conditionData.compareValue) {
+				sequence.push(["click", { slot: 11 }]);
+				sequence.push(["anvil", { text: conditionData.compareValue }]);
+			}
+			sequence.push(["back"]);
 			break;
 
 		case 'block_type':

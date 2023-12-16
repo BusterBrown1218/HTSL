@@ -35,8 +35,10 @@ import pause_execution from "./pause_execution";
 import set_player_team from "./set_player_team";
 import change_team_stat from "./change_team_stat";
 import balance_player_team from "./balance_player_team";
+import goto from "./goto";
 
 export default {
+	goto,
 	balance_player_team,
 	change_team_stat,
 	set_player_team,

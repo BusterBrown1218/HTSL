@@ -47,6 +47,9 @@ export default (fileName) => {
 			if (action === "applyLayout") {
 				actionData = ["apply_inventory_layout", { layout: actionArgs[1] }];
 			}
+			if (action === "goto") {
+				actionData = ["goto", { container: actionArgs[1], name: actionArgs[2] }];
+			}
 			if (action === "applyPotion") {
 				let override = false;
 				if (actionArgs.length !== 5) compileError = `&cIncomplete arguments on line &e${i + 1}`;
@@ -600,6 +603,21 @@ function conditionCompiler(arg) {
 					return conditions;
 				}
 				conditionList.push(["player_health", {
+					comparator: mode,
+					compareValue: args[2]
+				}]);
+				break;
+				case "damageAmount":
+				mode = validComparator(args[1]);
+				if (mode === null) {
+					compileError = `&cUnknown compare operation &e"${args[1]}"`;
+					let conditions = {
+						list: conditionList,
+						compileError: compileError
+					}
+					return conditions;
+				}
+				conditionList.push(["damage_amount", {
 					comparator: mode,
 					compareValue: args[2]
 				}]);

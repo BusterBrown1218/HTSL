@@ -1,5 +1,5 @@
-Update 5.1:
-- added new actions
-- changed to use packets while importing (faster and alt+tab-able) (thank you Clovenbob)
-- added cancel import (thank you Clovenbob x2)
-- minor bug fixes and QoL changes
+Update 6.0:
+- added goto
+- updated HousingEditor -> HTSL converter
+- bug fixes
+- updated guide link

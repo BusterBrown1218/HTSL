@@ -12,7 +12,7 @@ register("tick", () => {
   if (queue.length > 0) timeWithoutOperation++;
   if (
     (timeWithoutOperation > Settings.guiTimeout) & (queue.length > 0) &&
-    !Settings.useSafeMode
+    !Settings.useSafeMode && !Navigator.goto
   ) {
     fails.push(`&cOperation timed out. &f(too long without GUI click)`);
     doneLoading();
@@ -32,11 +32,12 @@ register("tick", () => {
 
   if (operationTimes.started === 0) operationTimes.started = Date.now();
   operationTimes.total++;
+  if (Navigator.goto) operationTimes.started += 0.05;
   timeRemainingButton.setText(
     `Time Remaining: ${Math.round(
       (((Date.now() - operationTimes.started) / operationTimes.total) *
         queue.length) /
-        1000
+      1000
     )} seconds`
   );
 
@@ -46,6 +47,7 @@ register("tick", () => {
     if (queue.length === 0) return;
     [operationType, operationData] = queue.shift();
   }
+  Navigator.goto = false;
   switch (operationType) {
     case "click":
       return Navigator.click(operationData.slot);
@@ -58,9 +60,16 @@ register("tick", () => {
     case "option":
       return Navigator.setSelecting(operationData.option);
     case "chat":
-      return Navigator.inputChat(operationData.text);
+      return Navigator.inputChat(operationData.text, operationData.func, operationData.command);
     case "item":
       return Navigator.selectItem(operationData.item);
+    case "closeGui":
+      return Client.currentGui.close();
+    case "goto":
+      Navigator.goto = true;
+      ChatLib.chat(`&3[HTSL] &fPlease open action container &e${operationData.name}`);
+      Navigator.isReady = false;
+      return;
     case "done":
       return doneLoading();
   }
@@ -71,19 +80,18 @@ function doneLoading() {
   Navigator.isWorking = false;
   queue = [];
   operationTimes = { started: 0, total: 0 };
+  if (Settings.playSoundOnFinish) World.playSound("random.levelup", 2, 1);
   if (Settings.closeGUI) Client.currentGui.close();
 
   if (fails.length > 0) {
     ChatLib.chat(
-      `&cFailed to load: &f(${fails.length} error${
-        fails.length > 1 ? "s" : ""
+      `&cFailed to load: &f(${fails.length} error${fails.length > 1 ? "s" : ""
       })`
     );
     fails.forEach((fail) => ChatLib.chat("   > " + fail));
     fails = [];
     ChatLib.chat(
-      `&f${queue.length} &coperation${
-        queue.length !== 1 ? "s" : ""
+      `&f${queue.length} &coperation${queue.length !== 1 ? "s" : ""
       } left in queue.`
     );
   } else {
