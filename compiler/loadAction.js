@@ -18,6 +18,7 @@ export default (fileName) => {
 		let actionList = [];
 		let subaction = "";
 		let subactions = [];
+		let multiline = 0;
 		let actionData;
 		for (let i = 0; i < importActions.length; i++) {
 			let actionArgs = getArgs(importActions[i].trim());
@@ -25,6 +26,8 @@ export default (fileName) => {
 			actionData = [];
 			let compileError;
 			if (action === "//") { };
+			if (importActions[i].startsWith("/*") && multiline == 0) multiline = 1;
+			if (importActions[i].endsWith("*/") && multiline == 1) multiline = 2;
 			if (action === "stat") {
 				actionArgs[2] = validOperator(actionArgs[2]);
 				if (null === actionArgs[2]) compileError = `&cUnknown operator on line &e${i + 1}`;
@@ -352,7 +355,9 @@ export default (fileName) => {
 				return ChatLib.chat(`&3[HTSL] &cFailed line: &e${importActions[i]}`);
 			}
 			// Push the action data to the correct list
-			if (actionData.length > 0) {
+			if (multiline > 0) {
+				if (multiline == 2) multiline = 0;
+			} else if (actionData.length > 0) {
 				if (subaction === "if") {
 					subactions.if.push(actionData);
 				}

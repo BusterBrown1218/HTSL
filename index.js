@@ -60,6 +60,7 @@ register("command", ...args => {
                 if (line.match(/^ *goto function (.*)/)) {
                     let name = getArgs(line)[2];
                     addOperation(['closeGui']);
+                    addOperation(['wait', { time: 750 }]);
                     addOperation(['chat', { text: `/function edit ${name}`, func: name, command: true }]);
                 }
             });
@@ -69,6 +70,22 @@ register("command", ...args => {
         } else {
             return ChatLib.chat("&3[HTSL] &cFile not found!");
         }
+    }
+    if (command === "listscripts") {
+        let files;
+        if (args.length == 1) {
+            files = readDir("./config/ChatTriggers/modules/HTSL/imports/", false).filter(e => e.endsWith("htsl") || e.endsWith("\\")); 
+        } else {
+            args.shift();
+            files = readDir(`./config/ChatTriggers/modules/HTSL/imports/${args.join(" ")}/`, false);
+        }
+        files.filter(e => e.endsWith("\\")).forEach(directory => {
+            ChatLib.chat(`&3Directory: &f${directory.substring(0, directory.length - 1)}`);
+        })
+        ChatLib.chat("\n&3[HTSL] &fMain Directory:\n");
+        return files.filter(e => e.endsWith(".htsl")).forEach(file => {
+            ChatLib.chat(file);
+        });
     }
     if (command === 'help') {
         ChatLib.chat('&8&m-------------------------------------------------');
@@ -80,8 +97,28 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl saveitem <filename> &7Save an item to import!');
         ChatLib.chat('&6/htsl convert <action id> <filename> &7Converts a HousingEditor action to HTSL!');
         ChatLib.chat('&6/htsl addfunctions <filename> &7Imports all the required functions to prepare for import!');
+        ChatLib.chat('&6/htsl listscripts&7Lists all your scripts');
         ChatLib.chat('&8&m-------------------------------------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');
     }
 }).setName('htsl').setAliases(['ht']);
+
+function readDir(path, walk) {
+    let files = new java.io.File(path).listFiles();
+    let fileNames = [];
+    let regex = new RegExp(path.replace(/\//g, "\\\\") + "(.*)");
+    files.forEach(file => {
+        if (file.isDirectory()) {
+            if (walk) {
+                readDir(path + file.getName() + "/").forEach(newFile => fileNames.push((file.toString() + "\\" + newFile.toString()).match(regex)[1]));
+            } else {
+                fileNames.push(file.toString().match(regex)[1] + "\\");
+            }
+        } else {
+            let match = file.toString().match(regex);
+            if (match) fileNames.push(match[1]);
+        }
+    });
+    return fileNames;
+}

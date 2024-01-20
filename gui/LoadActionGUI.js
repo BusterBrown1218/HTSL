@@ -54,15 +54,6 @@ register('guiKey', (char, keyCode, gui, event) => {
 	}
 })
 
-function fileInputUpdate() {
-	// if (input.getText().length > 0) {
-	// 	button.setText('Import HTSL');
-	// 	button.setEnabled(true);
-	// } else if (input.getText().length === 0) {
-	// 	button.setEnabled(false);
-	// }
-}
-
 register('guiMouseClick', (x, y, mouseButton) => {
 	if (!Player.getContainer()) return;
 	if (!isInActionGui()) return;
@@ -79,10 +70,6 @@ register('guiMouseClick', (x, y, mouseButton) => {
 	}
 
 	if (x > button.getX() && x < button.getX() + button.getWidth() && y > button.getY() && y < button.getY() + button.getHeight()) {
-		// if (!button.getEnabled()) {
-		// 	World.playSound('mob.villager.no', 1, 1)
-		// 	return;
-		// };
 
 		World.playSound('random.click', 1, 1)
 		button.setText('Getting Data...');
@@ -128,6 +115,7 @@ function isInActionGui() {
 	const containerName = Player.getContainer().getName();
 	if (Client.currentGui.getClassName() === "GuiEditSign") return
 	if (Player.getContainer().getClassName() !== 'ContainerChest') return false;
+	if (containerName === 'Edit Menu' || containerName === "Edit Elements") return false;
 	if (containerName.match(/Edit |Actions: /)) return true;
 	return false;
 }

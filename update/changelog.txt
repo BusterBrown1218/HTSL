@@ -1,5 +1,4 @@
-Update 6.0:
-- added goto
-- updated HousingEditor -> HTSL converter
-- bug fixes
-- updated guide link
+Update 6.1:
+- added /htsl listscripts
+- fixed /htsl addfunctions
+- added multi line comments with /* and */

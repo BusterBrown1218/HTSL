@@ -70,6 +70,11 @@ register("tick", () => {
       ChatLib.chat(`&3[HTSL] &fPlease open action container &e${operationData.name}`);
       Navigator.isReady = false;
       return;
+    case "wait":
+      Navigator.isReady = false;
+      return setTimeout(() => {
+        Navigator.isReady = true;
+      }, operationData.time);
     case "done":
       return doneLoading();
   }
