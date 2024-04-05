@@ -1,7 +1,6 @@
-// This is a comment!
-chat "Hello World!"
-
-// This makes the rest of the code get imported into "a function"
-goto function "a function"
-
-chat "Hello World! - a function"
+define MACRO "stat Kills"
+MACRO inc 10
+loop 2 index {
+    MACRO mult 10
+    MACRO inc index
+}

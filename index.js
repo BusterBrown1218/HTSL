@@ -1,7 +1,7 @@
 import './gui/LoadActionGUI';
 import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
-import convertAction from './compiler/convertAction';
+import { convertHE } from './compiler/convertAction';
 import { addOperation } from './gui/Queue';
 import Navigator from './gui/Navigator';
 
@@ -49,7 +49,7 @@ register("command", ...args => {
     }
     if (command === 'convert') {
         if (args.length < 3) return ChatLib.chat("&3[HTSL] &cPlease enter the action id and then the filename to save it to!");
-        convertAction(args[1], args[2]);
+        convertHE(args[1], args[2]);
         return ChatLib.chat(`&3[HTSL] &fConverting action into HTSL script saved at ${args[2]}.htsl`);
     }
     if (command === "addfunctions") {
@@ -60,7 +60,7 @@ register("command", ...args => {
                 if (line.match(/^ *goto function (.*)/)) {
                     let name = getArgs(line)[2];
                     addOperation(['closeGui']);
-                    addOperation(['wait', { time: 750 }]);
+                    addOperation(['wait', { time: 1000 }]);
                     addOperation(['chat', { text: `/function edit ${name}`, func: name, command: true }]);
                 }
             });
@@ -97,7 +97,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl saveitem <filename> &7Save an item to import!');
         ChatLib.chat('&6/htsl convert <action id> <filename> &7Converts a HousingEditor action to HTSL!');
         ChatLib.chat('&6/htsl addfunctions <filename> &7Imports all the required functions to prepare for import!');
-        ChatLib.chat('&6/htsl listscripts&7Lists all your scripts');
+        ChatLib.chat('&6/htsl listscripts &7Lists all your scripts');
         ChatLib.chat('&8&m-------------------------------------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');

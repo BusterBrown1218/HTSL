@@ -1,65 +1,79 @@
-export function checkOccurences(arr) {
-    // Define hardcoded limits for specific strings
-    const limits = {
-        "apply_inventory_layout": 5,
-        "apply_potion_effect": 22,
-        "balance_player_team": 1,
-        "change_global_stat": 10,
-        "change_health": 5,
-        "change_player_group": 1,
-        "change_player_stat": 10,
-        "change_team_stat": 10,
-        "clear_all_potion_effects": 5,
-        "close_menu": 1,
-        "conditional": 15,
-        "display_action_bar": 5,
-        "display_menu": 10,
-        "display_title": 5,
-        "enchant_held_item": 23,
-        "fail_parkour": 1,
-        "full_heal": 5,
-        "give_experience_levels": 5,
-        "give_item": 20,
-        "go_to_house_spawn": 1,
-        "kill_player": 1,
-        "parkour_checkpoint": 1,
-        "play_sound": 25,
-        "pause_exececution": 30,
-        "random_action": 5,
-        "remove_item": 20,
-        "reset_inventory": 1,
-        "send_a_chat_message": 20,
-        "send_to_lobby": 1,
-        "set_compass_target": 5,
-        "set_gamemode": 1,
-        "set_hunger_level": 5,
-        "set_max_health": 5,
-        "set_player_team": 1,
-        "teleport_player": 5,
-        "trigger_function": 10,
-        "use_remove_held_item": 1
-    };
 
-    // Create an object to keep track of the occurrences of each string
-    let occurrences = {};
+const limits = {
+    "APPLY_LAYOUT": 5,
+    "POTION_EFFECT": 22,
+    "BALANCE_PLAYER_TEAM": 1,
+    "CANCEL_EVENT": 1,
+    "CHANGE_GLOBAL_STAT": 10,
+    "CHANGE_PLAYER_GROUP": 1,
+    "CHANGE_STAT": 10,
+    "CHANGE_TEAM_STAT": 10,
+    "CLEAR_EFFECTS": 5,
+    "CLOSE_MENU": 1,
+    "CONDITIONAL": 15,
+    "ACTION_BAR": 5,
+    "DISPLAY_MENU": 10,
+    "TITLE": 5,
+    "ENCHANT_HELD_ITEM": 23,
+    "EXIT": 1,
+    "BAIL_PARKOUR": 1,
+    "FULL_HEAL": 5,
+    "GIVE_EXP_LEVELS": 5,
+    "GIVE_ITEM": 20,
+    "SPAWN": 1,
+    "KILL": 1,
+    "PARKOUR_CHECKPOINT": 1,
+    "PLAY_SOUND": 25,
+    "PAUSE": 30,
+    "RANDOM_ACTION": 5,
+    "REMOVE_ITEM": 20,
+    "RESET_INVENTORY": 1,
+    "SEND_MESSAGE": 20,
+    "SEND_TO_LOBBY": 1,
+    "SET_COMPASS_TARGET": 5,
+    "SET_GAMEMODE": 1,
+    "SET_HUNGER_LEVEL": 5,
+    "SET_MAX_HEALTH": 5,
+    "SET_HEALTH": 5,
+    "SET_PLAYER_TEAM": 1,
+    "TELEPORT_PLAYER": 5,
+    "TRIGGER_FUNCTION": 10,
+    "USE_HELD_ITEM": 1
+};
 
-    // Loop through the array of arrays
-    for (let i = 0; i < arr.length; i++) {
-        // Check the first element of each array
-        let firstElement = arr[i][0];
+export default function checkLimits(obj) {
+    let counts = {};
 
-        if (firstElement == "goto") occurrences = {};
-
-        // Check if the first element is a string and if it has a hardcoded limit
-        if (typeof firstElement === 'string' && limits.hasOwnProperty(firstElement)) {
-            // Increment the occurrences of the string
-            occurrences[firstElement] = (occurrences[firstElement] || 0) + 1;
-
-            // Check if the number of occurrences goes over the hardcoded limit
-            if (occurrences[firstElement] > limits[firstElement]) {
-                return firstElement;
+    // Recursive function to count action types
+    function countActions(actions, context, parentActionType) {
+        actions.forEach(action => {
+            if (action.type) {
+                counts[context.type] = counts[context.type] || {};
+                counts[context.type][action.type] = (counts[context.type][action.type] || 0) + 1;
+                if (counts[context.type][action.type] > limits[action.type]) {
+                    throw { context: context, actionType: action.type };
+                }
             }
-        }
+            ['if_actions', 'else_actions', 'actions'].forEach(subAction => {
+                if (action[subAction]) {
+                    let subContext = { type: action.type, name: subAction };
+                    let subObj = action[subAction].map(a => ({ context: subContext.name, contextTarget: { name: subContext.type }, actions: [a] }));
+                    let result = checkLimits(subObj);
+                    if (result !== true) {
+                        throw result;
+                    }
+                }
+            });
+        });
     }
-    return false;
+
+    try {
+        obj.forEach(item => {
+            countActions(item.actions, { type: item.context, name: item.contextTarget.name || 'default' });
+        });
+    } catch (e) {
+        return e;
+    }
+
+    return true;
 }

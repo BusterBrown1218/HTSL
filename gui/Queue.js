@@ -41,42 +41,60 @@ register("tick", () => {
     )} seconds`
   );
 
-  let [operationType, operationData] = queue.shift();
-  if (operationType === "setGuiContext") {
-    currentGuiContext = operationData.context; // for error messages
+  let operation = queue.shift();
+  if (operation.type === "setGuiContext") {
+    currentGuiContext = operation.context; // for error messages
     if (queue.length === 0) return;
-    [operationType, operationData] = queue.shift();
+    operation = queue.shift();
   }
   Navigator.goto = false;
-  switch (operationType) {
+  switch (operation.type) {
     case "click":
-      return Navigator.click(operationData.slot);
+      return Navigator.click(operation.slot);
     case "anvil":
-      return Navigator.inputAnvil(operationData.text);
+      return Navigator.inputAnvil(operation.text);;
     case "returnToEditActions":
+      if (!Player.getContainer()) return;
       return Navigator.returnToEditActions();
     case "back":
       return Navigator.goBack();
     case "option":
-      return Navigator.setSelecting(operationData.option);
+      return Navigator.setSelecting(operation.option);
     case "chat":
-      return Navigator.inputChat(operationData.text, operationData.func, operationData.command);
+      return Navigator.inputChat(operation.text, operation.func, operation.command);
     case "item":
-      return Navigator.selectItem(operationData.item);
+      return Navigator.selectItem(operation.item);
     case "closeGui":
+      if (!Player.getContainer()) return;
       return Client.currentGui.close();
     case "goto":
       Navigator.goto = true;
-      ChatLib.chat(`&3[HTSL] &fPlease open action container &e${operationData.name}`);
+      ChatLib.chat(`&3HousingImporter &fPlease open action container &e${operation.name}`);
       Navigator.isReady = false;
       return;
     case "wait":
       Navigator.isReady = false;
-      return setTimeout(() => {
+      return Settings.guiTimeout(() => {
         Navigator.isReady = true;
-      }, operationData.time);
+      }, operation.time);
+    case "export":
+      return operation.func(Player.getContainer().getItems().splice(0, Player.getContainer().getSize() - 9 - 36));
     case "done":
       return doneLoading();
+    case "doneExport":
+      timeWithoutOperation = 0;
+      Navigator.isWorking = false;
+      queue = [];
+      operationTimes = { started: 0, total: 0 };
+      if (Settings.playSoundOnFinish) World.playSound("random.levelup", 2, 1);
+      if (Settings.closeGUI) Client.currentGui.close();
+      return operation.func();
+    case "doneSub":
+      return operation.func();
+    case "donePage":
+      return operation.func();
+    case "actionOrder":
+      return operation.func();
   }
 });
 
@@ -133,12 +151,27 @@ register("guiMouseClick", (x, y) => {
     y > cancelButton.getY() &&
     y < cancelButton.getY() + cancelButton.getHeight()
   ) {
-    fails.push(`&6Cancelled by user.`);
     queue.splice(0, queue.length - 1);
   }
 });
 
 export function addOperation(operation) {
+  if (!Navigator.isWorking) {
+    if (operation.type == "returnToEditActions") return;
+    Navigator.isReady = true;
+  }
   Navigator.isWorking = true;
   queue.push(operation);
 }
+export function forceOperation(operation) {
+  if (!Navigator.isWorking) {
+    if (operation.type == "returnToEditActions") return;
+    Navigator.isReady = true;
+  }
+  Navigator.isWorking = true;
+  queue.unshift(operation);
+}
+
+export function isWorking() {
+  return Navigator.isWorking;
+};

@@ -1,8 +1,11 @@
 import { request as axios } from "axios";
+import syntaxs from "../actions/syntax";
+import menus from "../actions/menus";
+import _conditions from "../actions/conditions";
 
 const housingEditor = 'https://api.housingeditor.com'
 
-export default (actionId, filename) => {
+export function convertHE (actionId, filename) {
     if (actionId === 'test') return loadTestAction();
 
     axios({
@@ -24,6 +27,60 @@ export default (actionId, filename) => {
     })
 }
 
+export function convertJSON (json) {
+    let script = [];
+    for (let context in json) {
+        if (json[context].context == "DEFAULT") { 
+        } else {
+            script.push(`goto ${json[context].context.toLowerCase()} "${json[context].contextTarget.name}"`);
+        }
+        let actions = json[context].actions
+        for (let action in actions) {
+            let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
+            if (syntax) syntax = syntaxs.actions[syntax];
+                else continue;
+            let menu = menus[syntax.type];
+            script.push(convertComponent(actions[action], syntax, menu));
+        }
+    }
+    return script.join("\n");
+}
+
+function convertComponent(obj, syntax, menu) {
+    let properties = syntax.full.match(/<(.*?)>/g);
+    let action = syntax.full;
+    if (properties) properties.forEach((property) => {
+        if (menu[property.match(/<(.*)>/)[1]].type == "subactions") {
+            let actions = obj[property.match(/<(.*)>/)[1]];
+            let subactions = [];
+            for (let action in actions) {
+                let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
+                if (syntax) syntax = syntaxs.actions[syntax];
+                    else continue;
+                let submenu = menus[syntax.type];
+                subactions.push(convertComponent(actions[action], syntax, submenu));
+            }
+            action = action.replace(property, subactions.join("\n"));
+        } else if (menu[property.match(/<(.*)>/)[1]].type == "conditions") {
+            let conditions = obj[property.match(/<(.*)>/)[1]];
+            let conditionList = [];
+            for (let condition in conditions) {
+                let syntax = Object.keys(syntaxs.conditions).find(n => syntaxs.conditions[n].type == conditions[condition].type);
+                if (syntax) syntax = syntaxs.conditions[syntax];
+                    else continue;
+                let submenu = _conditions[syntax.type];
+                conditionList.push(convertComponent(conditions[condition], syntax, submenu));
+            }
+            action = action.replace(property, conditionList.join(", "));
+        } else if (menu[property.match(/<(.*)>/)[1]].type == "location") {
+            let location = obj[property.match(/<(.*)>/)[1]];
+            action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z} ${location.yaw == -999 ? "" : location.yaw} ${location.yaw == 0 || location.pitch == 0 ? "" : location.pitch}"`);
+        } else action = action.replace(property, String(obj[property.match(/<(.*)>/)[1]]).includes(" ") ? `"${obj[property.match(/<(.*)>/)[1]]}"` : obj[property.match(/<(.*)>/)[1]]);
+    })
+    return action;
+}
+
+// Old HE code
 function convertData(actionList, title, author) {
     let script = [];
     script.push(`// Original action "${title}" by ${author}`);
