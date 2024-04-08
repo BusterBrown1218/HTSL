@@ -75,9 +75,16 @@ register("packetSent", (packet, event) => {
   else slotToClick = -1;
 }).setFilteredClass(C0EPacketClickWindow);
 
+let chatInput = "";
+
+function getChatInput() {
+  return chatInput;
+}
+
 register("chat", (event) => {
   if (!Navigator.isWorking) return;
   Navigator.isReady = true;
+  chatInput = new Message(EventLib.getMessage(event)).getMessageParts()[1].getClickValue();
   cancel(event);
 }).setCriteria(
   /->newLine<-Please enter the text you wish to set in chat!->newLine<- (?:\[PREVIOUS\] )?\[CANCEL\]/
@@ -261,6 +268,7 @@ export default Navigator = {
   guiIsLoading: true,
   goto: false,
   itemsLoaded: { items: {}, lastItemAddedTimestamp: 0 },
+  getChatInput,
   selectOption,
   selectItem,
   setSelecting,

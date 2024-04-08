@@ -95,6 +95,10 @@ register("tick", () => {
       return operation.func();
     case "actionOrder":
       return operation.func();
+    case "chat_input":
+      operation.func(Navigator.getChatInput());
+      ChatLib.command("chatinput cancel");
+      return;
   }
 });
 

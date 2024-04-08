@@ -3,7 +3,7 @@ import { @Vigilant @SliderProperty @SwitchProperty @NumberProperty @TextProperty
 
 @Vigilant("HTSL", `HTSL`, {
 	getCategoryComparator: () => (a, b) => {
-		const categories = ["General", "Importing", "Import Menu"];
+		const categories = ["General", "Importing/Exporting", "Import Menu"];
 
 		return categories.indexOf(a.name) - categories.indexOf(b.name);
 	},
@@ -36,25 +36,33 @@ class Settings {
 	})
 	playSoundOnFinish = true;
 
-	// Importing 
+	// Importing/Exporting 
 
 	@SwitchProperty({
 		name: "Safe Mode",
 		description: 'Will show you where to click while loading in an action, this requires manual input and is no longer considered a "macro".\n\n&aSafeMode is recommended if you want to be extra careful not to break the rules.',
-		category: "Importing",
-		subcategory: "Importing",
+		category: "Importing/Exporting",
+		subcategory: "Importing/Exporting",
 	})
 	useSafeMode = false;
 
 	@SliderProperty({
 		name: "GUI Timeout",
 		description: "Amount of ticks after not clicking anything in the GUI before declaring an error and timing out.\n\n&eIf you have lots of lagspikes / slow internet and HTSL keeps timing out you should increase this.",
-		category: "Importing",
-		subcategory: "Importing",
+		category: "Importing/Exporting",
+		subcategory: "Importing/Exporting",
 		min: 60,
 		max: 200
 	})
 	guiTimeout = 60;
+
+	@SwitchProperty({
+		name: "Export Color Codes",
+		description: 'Exporting will check for color codes, but it will be slower',
+		category: "Importing/Exporting",
+		subcategory: "Importing/Exporting",
+	})
+	exportColorCodes = true;
 	
 	// Import Menu
 

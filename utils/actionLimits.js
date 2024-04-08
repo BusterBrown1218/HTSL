@@ -48,9 +48,9 @@ export default function checkLimits(obj) {
     function countActions(actions, context, parentActionType) {
         actions.forEach(action => {
             if (action.type) {
-                counts[context.type] = counts[context.type] || {};
-                counts[context.type][action.type] = (counts[context.type][action.type] || 0) + 1;
-                if (counts[context.type][action.type] > limits[action.type]) {
+                counts[`${context.type}_${context.name}`] = counts[context.type] || {};
+                counts[`${context.type}_${context.name}`][action.type] = (counts[`${context.type}_${context.name}`][action.type] || 0) + 1;
+                if (counts[`${context.type}_${context.name}`][action.type] > limits[action.type]) {
                     throw { context: context, actionType: action.type };
                 }
             }

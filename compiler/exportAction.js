@@ -1,7 +1,8 @@
 import { addOperation, forceOperation } from "../gui/Queue"
 import { convertJSON } from "./convertAction";
-import menus from "../actions/menus"
-import conditions from "../actions/conditions"
+import menus from "../actions/menus";
+import conditions from "../actions/conditions";
+import Settings from "../utils/config";
 
 let actionobjs;
 let subactions;
@@ -95,6 +96,24 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                     forceOperation({ type: "click", slot: menu[key].slot });
                 }
                 break;
+            case "chat_input":
+                if (Settings.exportColorCodes) {
+                    if (ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "") {
+                        action[key] = null;
+                    } else {
+                        forceOperation({ type: "back" });
+                        forceOperation({
+                            type: "chat_input", func: (text) => {
+                                action[key] = text;
+                            }
+                        });
+                        forceOperation({ type: "click", slot: menu[key].slot });
+                    }
+                } else {
+                    action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]);
+                    if (action[key] == "Not Set") action[key] = null;
+                }
+                break;
             default:
                 action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]);
                 if (action[key] == "Not Set") action[key] = null;
@@ -144,7 +163,7 @@ function processPage(items, actionList, menuList, page) {
         let menu;
         let actionkey;
         for (let key in menuList) {
-            if (menuList[key]?.condition_name== ChatLib.removeFormatting(items[i].getName())) {
+            if (menuList[key]?.condition_name == ChatLib.removeFormatting(items[i].getName())) {
                 menu = menuList[key];
                 actionkey = key;
                 break;

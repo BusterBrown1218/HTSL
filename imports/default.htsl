@@ -1,6 +1,3 @@
-define MACRO "stat Kills"
-MACRO inc 10
-loop 2 index {
-    MACRO mult 10
-    MACRO inc index
-}
+stat Kills Increment 1
+chat Hello!
+title "&bHello World!" asd 1 5 1
