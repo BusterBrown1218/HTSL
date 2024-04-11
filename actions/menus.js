@@ -504,6 +504,11 @@ export default {
                 "Multiply",
                 "Divide"
             ]
+        },
+        heal_on_change: {
+            slot: 12,
+            default_value: true,
+            type: "toggle"
         }
     },
     CHANGE_HEALTH: {
@@ -524,6 +529,11 @@ export default {
                 "Multiply",
                 "Divide"
             ]
+        },
+        heal_on_change: {
+            slot: 12,
+            default_value: true,
+            type: "toggle"
         }
     },
     SET_HUNGER_LEVEL: {

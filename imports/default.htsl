@@ -1,3 +1,4 @@
-stat Kills Increment 1
-chat Hello!
-title "&bHello World!" asd 1 5 1
+loop 2 index {
+    chat {"Hey there! This is the number of messages so far:" + index}
+    tp {["custom_coordinates", "invokers_location"][index]} {["~ ~5 ~", ""][index]}
+}

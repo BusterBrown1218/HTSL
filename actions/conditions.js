@@ -286,7 +286,7 @@ export default {
         placeholder: {
             slot: 10,
             default_value: null,
-            type: "chat_input"
+            type: "anvil_input"
         },
         mode: {
             slot: 11,

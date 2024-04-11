@@ -46,7 +46,7 @@ export default function checkLimits(obj) {
 
     // Recursive function to count action types
     function countActions(actions, context, parentActionType) {
-        actions.forEach(action => {
+        if (actions) actions.forEach(action => {
             if (action.type) {
                 counts[`${context.type}_${context.name}`] = counts[context.type] || {};
                 counts[`${context.type}_${context.name}`][action.type] = (counts[`${context.type}_${context.name}`][action.type] || 0) + 1;
@@ -68,7 +68,7 @@ export default function checkLimits(obj) {
     }
 
     try {
-        obj.forEach(item => {
+        if (obj) obj.forEach(item => {
             countActions(item.actions, { type: item.context, name: item.contextTarget.name || 'default' });
         });
     } catch (e) {

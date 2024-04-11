@@ -11,172 +11,78 @@ export function isImporting() {
 
 export default (fileName) => {
 	try {
-	let importText;
-	if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
-		importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
-	} else {
-		return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
-	}
-	macros = [];
-	ChatLib.chat("&3[HTSL] &fCompiling . . .");
-	let importActions = importText.split("\n");
-	let multilineComment = false;
-	let multilineAction;
-	let actionobj = [];
-	let currentContext = { context: "DEFAULT", contextTarget: {} };
-	let actionList = [];
-	let depth = 0;
-	let lineOffset = 0;
-	let multiLineOffset = 0;
-	for (let i = 0; i < importActions.length; i++) {
-		if (importActions[i].trim() == "") continue;
-		let args = getArgs(importActions[i].trim());
-		if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${i + 1 - lineOffset}`); }
-		let keyword = args.shift();
-		if (keyword.startsWith("//")) continue;
-		if (keyword == "/*" && !multilineAction) {
-			multilineComment = true;
-			continue;
-		}
-		if (keyword == "*/" && !multilineAction) {
-			if (!multilineComment) return ChatLib.chat(`&3[HTSL] &cBroken multiline comment on line &e${i + 1 - lineOffset}`);
-			multilineComment = false;
-			continue;
-		}
-
-		// random action
-		if (args.join(" ").match(/{/) && keyword == "random") {
-			multilineAction = "random {";
-			continue;
-		}
-		// if action
-		if (args.join(" ").match(/(and|or|true|false)? ?(.*) {/) && keyword == "if") {
-			multilineAction = importActions[i];
-			continue;
-		}
-		if (args.join(" ").match(/else {/)) {
-			multilineAction += "\n} else {";
-			continue;
-		}
-		// loop
-		if (args.join(" ").match(/\d+ (.*) {/) && keyword == "loop" && !multilineAction) {
-			multilineAction = importActions[i];
-			continue;
-		} else if (args.join(" ").match(/\d+ (.*) {/) && keyword == "loop") {
-			depth++;
-		}
-
-		// close multiline action
-		if (multilineAction && keyword == "}") {
-			if (depth != 0) {
-				depth--;
-				multilineAction += `\n${importActions[i].trim()}`;
-				continue;
-			}
-			importActions[i] = multilineAction + "\n}";
-			args = getMultiline(multilineAction + "\n}").filter(n => n && n != "else");
-			if (!multilineAction.match(/if (and|or|true|false) ([\s\S]*)/) && multilineAction.startsWith("if")) {
-				args.splice(1, 0, "and");
-			}
-			if (multilineAction.match(/if (and|or|true|false)? ?\(\) {([\s\S]*)/) && multilineAction.startsWith("if")) {
-				// blank conditions
-				args.splice(2, 0, "");
-			}
-			keyword = args.shift();
-			// loop again
-			if (keyword == "loop") {
-				lineOffset += 2;
-				try {
-					let newLines = handleLoop(multilineAction);
-					lineOffset += newLines.length;
-					importActions.splice(i + 1, 0, ...newLines);
-				} catch (e) {
-					return ChatLib.chat(`&3[HTSL] &cSomething went wrong with your loop...`);
-				}
-				multilineAction = undefined;
-				continue;
-			}
-			multilineAction = undefined;
-		}
-
-		if (multilineComment) continue;
-
-		if (keyword == "define") {
-			if (syntaxes[args[0]] || ["goto", "//", "/*", "*/", "loop"].includes(args[0])) return ChatLib.chat(`&3[HTSL] &cInvalid macro name &e${args[0]}`);
-			if (macros.find(macro => macro.name == args[0])) return ChatLib.chat(`&3[HTSL] &cCannot have two macros of the same name!`);
-			macros.push({
-				name: args.shift(),
-				value: args.join(" ")
-			});
-			continue;
-		}
-
-		if (multilineAction) {
-			multilineAction += `\n${importActions[i].trim()}`;
-			multiLineOffset++;
-			continue;
-		}
-		if (keyword == "goto") {
-			actionobj.push({
-				context: currentContext.context,
-				contextTarget: currentContext.contextTarget,
-				actions: actionList
-			});
-			actionList = [];
-			currentContext = {
-				context: args[0].toUpperCase(),
-				contextTarget: { name: args[1] },
-			}
-			continue;
-		}
-		if (syntaxes.actions[keyword]) {
-			let syntax = syntaxes.actions[keyword];
-			let comp = componentFunc(args, syntax, menus[syntax.type]);
-			if (typeof comp == "string") {
-				return ChatLib.chat(`&3[HTSL] &c${comp.replace("{line}", i - lineOffset - multiLineOffset)}`);
-			}
-			if (comp) {
-				actionList.push(comp);
-			} else {
-				return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${i - lineOffset - multiLineOffset}`);
-			}
+		let importText;
+		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
+			importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
 		} else {
-			return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${i - lineOffset - multiLineOffset}`);
+			return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
 		}
-		multiLineOffset = 0;
-	}
-	actionobj.push({
-		context: currentContext.context,
-		contextTarget: currentContext.contextTarget,
-		actions: actionList
-	});
-	if (multilineAction) return ChatLib.chat(`&3[HTSL] &cBroken multiline action`);
+		macros = [];
+		ChatLib.chat("&3[HTSL] &fCompiling . . .");
+		let actionobj = preProcess(importText.split("\n"));
+		// processor
+		for (let j = 0; j < actionobj.length; j++) {
+			let actionsList = actionobj[j].actionList;
+			let newActionList = [];
+			for (let i = 0; i < actionsList.length; i++) {
+				let args = actionsList[i].line.includes("\n") ? getMultiline(actionsList[i].line) : getArgs(actionsList[i].line.trim());
+				let currentLine = actionsList[i].trueLine;
+				if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${currentLine}`); }
+				let keyword = args.shift();
+				if (syntaxes.actions[keyword]) {
+					let syntax = syntaxes.actions[keyword];
+					let comp = componentFunc(args, syntax, menus[syntax.type]);
+					if (typeof comp == "string") {
+						return ChatLib.chat(`&3[HTSL] &c${comp.replace("{line}", currentLine)}`);
+					}
+					if (comp) {
+						newActionList.push(comp);
+					} else {
+						return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
+					}
+				} else {
+					return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
+				}
+				multiLineOffset = 0;
+			}
+			actionobj[j].actionList = [];
+			actionobj[j].actions = newActionList;
+		}
 
-	if (!loadAction(actionobj)) return false;
+		if (!loadAction(actionobj)) return false;
 	} catch (error) {
 		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-		ChatLib.chat(error);
+		console.log(error);
 		console.error(error);
 	}
 }
 
+function replaceMacros(text, macros) {
+	macros.forEach(macro => {
+		// Create a regex that matches the macro name but not when it's inside quotes
+		let regex = new RegExp(`(?<!['"])\\b${macro.name}\\b(?!['"])`, 'g');
+		text = text.replace(regex, macro.value);
+	});
+	return text;
+}
+
 function getArgs(input) {
 	let conversions = [
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(.*)?/g, replacement: "$1 %stat.global/$2%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +stat +(.*)?/g, replacement: "$1 %stat.player/$2%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +?(.*)?/g, replacement: "$1 %stat.team/$2 $3%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 %random.int/$2 $3%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +health/g, replacement: "$1 %player.health%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +maxHealth/g, replacement: "$1 %player.maxhealth%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +hunger/g, replacement: "$1 %player.hunger%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locX/g, replacement: "$1 %player.location.x%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locY/g, replacement: "$1 %player.location.y%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locZ/g, replacement: "$1 %player.location.z%" },
-        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +unix/g, replacement: "$1 %date.unix%" }
-    ];
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(.*)?/g, replacement: "$1 %stat.global/$2%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +stat +(.*)?/g, replacement: "$1 %stat.player/$2%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +?(.*)?/g, replacement: "$1 %stat.team/$2 $3%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 %random.int/$2 $3%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +health/g, replacement: "$1 %player.health%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +maxHealth/g, replacement: "$1 %player.maxhealth%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +hunger/g, replacement: "$1 %player.hunger%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locX/g, replacement: "$1 %player.location.x%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locY/g, replacement: "$1 %player.location.y%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +locZ/g, replacement: "$1 %player.location.z%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +unix/g, replacement: "$1 %date.unix%" }
+	];
 	for (let conversion of conversions) {
-        input = input.replace(conversion.regex, conversion.replacement);
-    }
+		input = input.replace(conversion.regex, conversion.replacement);
+	}
 
 	let result = [];
 	let match;
@@ -208,6 +114,7 @@ function getArgs(input) {
 			});
 			try {
 				result.push(evaluateExpression(arg));
+				continue;
 			} catch (e) {
 				return false;
 			}
@@ -230,7 +137,7 @@ function parseExpression(expression) {
 	let operatorStack = [];
 	let tokens = expression.match(/(\d+|\+|-|\*|\/|\^|\(|\))/g);
 
-	tokens.forEach(token => {
+	if (tokens) tokens.forEach(token => {
 		if (!isNaN(token)) {
 			outputQueue.push(parseFloat(token));
 		} else if (token in operators) {
@@ -293,16 +200,34 @@ function evaluateExpression(expression) {
 			numberBuffer = null;
 		}
 	}
-
 	return result + (numberBuffer !== null ? numberBuffer : '');
 }
 
 function getMultiline(input) {
 	let result = [];
-	let match;
-	let re = /\(([^()]*(?:"[^"]*"[^()]*)*)\)|\{([^}]*)\}|(\S+)/g;
-	while ((match = re.exec(input)) !== null) {
-		result.push(match[1] || match[2] || match[3]);
+	let depth = 0;
+	let start = 0;
+	let inQuote = false;
+	for (let i = 0; i < input.length; i++) {
+		if (input[i] === '"' && (i === 0 || input[i - 1] !== '\\')) {
+			inQuote = !inQuote;
+		}
+		if (inQuote) continue;
+		if (input[i] === '(' || input[i] === '{') {
+			if (depth === 0) start = i;
+			depth++;
+		} else if (input[i] === ')' || input[i] === '}') {
+			depth--;
+			if (depth === 0) {
+				result.push(input.substring(start + 1, i));
+			}
+		} else if (depth === 0 && /\S/.test(input[i])) {
+			let end = input.slice(i).search(/\s/);
+			if (end === -1) end = input.length;
+			else end += i;
+			result.push(input.substring(i, end));
+			i = end;
+		}
 	}
 	return result;
 }
@@ -457,21 +382,105 @@ function componentFunc(args, syntax, menu) {
 }
 
 function handleLoop(string) {
-    let [match, length, indexName] = string.split("\n")[0].match(/loop (\d+) (.*) {(\s*|\S*)*/);
-    if (macros.find(macro => macro.name == indexName)) throw {};
+	let [match, length, indexName] = string.split("\n")[0].match(/loop (\d+) ([^ ]*) {[^]*/);
+	if (macros.find(macro => macro.name == indexName)) throw {};
 	let newLines = [];
-    for (let i = 1; i <= Number(length); i++) {
-        let loopLines = string.replace(new RegExp(`(\\b${indexName}\\b)|("${indexName}")`, "g"), (match, p1, p2) => {
-            if (p2) {
-                // If indexName is part of a string, don't replace it
-                return p2;
-            } else {
-                // Otherwise, replace indexName with i
-                return i - 1;
-            }
-        }).split("\n");
-        loopLines.shift();
-        newLines.push(...loopLines);
-    }
-    return newLines;
+	for (let i = 1; i <= Number(length); i++) {
+		let loopLines = string.replace(new RegExp(`(\\b${indexName}\\b)|("${indexName}")|(\\[${indexName}\\])`, "g"), (match, p1, p2, p3) => {
+			if (p2) {
+				// If indexName is part of a string, don't replace it
+				return p2;
+			} else if (p3) {
+				// If indexName is inside square brackets, replace it with i - 1
+				return '[' + (i - 1) + ']';
+			} else {
+				// Otherwise, replace indexName with i - 1
+				return i - 1;
+			}
+		}).split("\n");
+		loopLines.shift();
+		newLines.push(...loopLines);
+	}
+	return newLines;
+}
+
+function preProcess(importActions) {
+	let trueActions = [];
+	let actionobj = [];
+	let multilineAction;
+	let currentContext = { context: "DEFAULT", contextTarget: {} };
+	let multilineComment = false;
+	let depth = 0;
+	for (let i = 0; i < importActions.length; i++) {
+		importActions[i] = replaceMacros(importActions[i].trim(), macros);
+		if (importActions[i] == "") continue;
+		if (importActions[i].startsWith("//")) continue;
+		if (importActions[i].startsWith("/*")) { multilineComment = true; continue; }
+		if (importActions[i].endsWith("*/")) {
+			if (multilineComment) { multilineComment = false; continue; }
+			else return ChatLib.chat(`&3[HTSL] &cBroken multiline comment on line &e${i + 1}`);
+		}
+		if (multilineComment) continue;
+		if (importActions[i].endsWith("{")) depth++;
+		if (importActions[i].endsWith("{") && !multilineAction) { multilineAction = importActions[i]; continue; }
+		if (importActions[i].startsWith("}")) depth--;
+		if (importActions[i] == "}" && multilineAction && depth == 0) {
+			if (multilineAction.startsWith("loop")) {
+				let newContexts = preProcess(handleLoop(multilineAction));
+				for (let j = 0; j < newContexts.length - 1; j++) {
+					let context = newContexts[j];
+					actionobj.push({
+						context: context.context == "DEFAULT" ? currentContext.context : context.context,
+						contextTarget: JSON.stringify(context.contextTarget) == "" ? currentContext.contextTarget : context.contextTarget,
+						actionList: context.actionList.map(line => { line.trueLine = line.trueLine + i - (j + 1) * (1 + context.actionList.length); return line })
+					});
+				};
+				trueActions.push(...newContexts[newContexts.length - 1].actionList.map(line => { line.trueLine = line.trueLine + i - (newContexts.length) * (1 + newContexts[newContexts.length - 1].actionList.length); return line }))
+				currentContext = { context: newContexts[newContexts.length - 1].context, contextTarget: newContexts[newContexts.length - 1].contextTarget };
+				multilineAction = undefined;
+				continue;
+			}
+			multilineAction += "\n}";
+			if (multilineAction.startsWith("if")) {
+				multilineAction = multilineAction.replace(/^if +\(/, "if and (").replace(/ *} +else +{ */, "\n} {\n");
+			}
+			trueActions.push({ line: multilineAction, trueLine: i });
+			multilineAction = undefined;
+			continue;
+		}
+		if (multilineAction) { multilineAction += "\n" + importActions[i]; continue; }
+
+		let goto = importActions[i].match(/goto +(.*) +(.*)/);
+		if (goto) {
+			actionobj.push({
+				context: currentContext.context,
+				contextTarget: currentContext.contextTarget,
+				actionList: trueActions
+			});
+			currentContext = { context: goto[1].toUpperCase(), contextTarget: { name: goto[2] } };
+			trueActions = [];
+			continue;
+		}
+
+		if (importActions[i].startsWith("define")) {
+			if (syntaxes[importActions[i].split(/ +/)[1]] || ["goto", "//", "/*", "*/", "loop"].includes(importActions[i].split(/ +/)[1])) return ChatLib.chat(`&3[HTSL] &cInvalid macro name &e${importActions[i].split(/ +/)[1]}`);
+			if (macros.find(macro => macro.name == importActions[i].split(/ +/)[1])) return ChatLib.chat(`&3[HTSL] &cCannot have two macros of the same name!`);
+			macros.push({
+				name: importActions[i].split(/ +/)[1],
+				value: importActions[i].substring(8 + importActions[i].split(/ +/)[1].length)
+			});
+			continue;
+		}
+
+		// line
+		trueActions.push({ line: importActions[i], trueLine: i + 1 });
+	}
+	actionobj.push({
+		context: currentContext.context,
+		contextTarget: currentContext.contextTarget,
+		actionList: trueActions
+	});
+	if (multilineComment) return ChatLib.chat(`&3[HTSL] &cUnclosed multiline comment!`);
+	if (depth > 0) return ChatLib.chat(`&3[HTSL] &cUnclosed multiline action!`);
+	return actionobj;
 }
