@@ -1,5 +1,5 @@
 import { Input, Button } from './GuiBuilder';
-import loadAction, { isImporting } from '../compiler/compile';
+import { compile, isImporting } from '../compiler/compile';
 import exportAction from '../compiler/exportAction';
 import Settings from '../utils/config';
 import getItemFromNBT from '../utils/getItemFromNBT';
@@ -276,7 +276,7 @@ register('guiMouseClick', (x, y, mouseButton) => {
 		readFiles();
 	}
 
-	handleInputClick(importButton, loadAction, x, y);
+	handleInputClick(importButton, compile, x, y);
 	handleInputClick(exportButton, exportAction, x, y);
 
 	let index = -1;
@@ -302,7 +302,7 @@ register('guiMouseClick', (x, y, mouseButton) => {
 			}
 		}
 		if (filteredFiles[index].endsWith('.htsl')) {
-			if (loadAction(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);;
+			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);;
 		} else if (!filteredFiles[index].includes(".")) {
 			subDir += filteredFiles[index];
 			files = [];

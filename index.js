@@ -2,26 +2,17 @@ import './gui/LoadActionGUI';
 import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
 import { convertHE } from './compiler/convertAction';
+import { preProcess } from './compiler/compile';
 import { addOperation } from './gui/Queue';
 import Navigator from './gui/Navigator';
 
-function getArgs(input) {
-	let result = [];
-	let match;
-	let re = /"((?:\\"|[^"])*)"|'((?:\\'|[^'])*)'|(\S+)/g;
-	while ((match = re.exec(input)) !== null) {
-		result.push(match[1] || match[2] || match[3]);
-	}
-	return result;
-}
-
 register("command", ...args => {
     let command;
-    try	{
-		command = args[0].toLowerCase();
-	} catch(e) {
-		command = 'help';
-	}
+    try {
+        command = args[0].toLowerCase();
+    } catch (e) {
+        command = 'help';
+    }
     if (command === 'config') return Config.openGUI();
     if (command === 'gui') {
         args.shift();
@@ -56,16 +47,13 @@ register("command", ...args => {
         if (args.length == 1) return ChatLib.chat("&3[HTSL] &cPlease add a filename!");
         if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`)) {
             Navigator.isReady = true;
-            FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`).trim().split(/\n/).forEach(line => {
-                if (line.match(/^ *goto function (.*)/)) {
-                    let name = getArgs(line)[2];
-                    addOperation(['closeGui']);
-                    addOperation(['wait', { time: 1000 }]);
-                    addOperation(['chat', { text: `/function edit ${name}`, func: name, command: true }]);
-                }
+            preProcess(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`).split("\n")).filter(n => n.context == "FUNCTION").forEach((context, index) => {
+                if (index > 0) addOperation({ type: 'closeGui' });
+                if (index > 0) addOperation({ type: 'wait', time: 1000 });
+                addOperation({ type: 'chat', text: `/function edit ${context.contextTarget.name}`, func: context.contextTarget.name, command: true });
             });
-            addOperation(['closeGui']);
-            addOperation(['done']);
+            addOperation({ type: 'closeGui' });
+            addOperation({ type: 'done' });
             return;
         } else {
             return ChatLib.chat("&3[HTSL] &cFile not found!");
@@ -74,7 +62,7 @@ register("command", ...args => {
     if (command === "listscripts") {
         let files;
         if (args.length == 1) {
-            files = readDir("./config/ChatTriggers/modules/HTSL/imports/", false).filter(e => e.endsWith("htsl") || e.endsWith("\\")); 
+            files = readDir("./config/ChatTriggers/modules/HTSL/imports/", false).filter(e => e.endsWith("htsl") || e.endsWith("\\"));
         } else {
             args.shift();
             files = readDir(`./config/ChatTriggers/modules/HTSL/imports/${args.join(" ")}/`, false);

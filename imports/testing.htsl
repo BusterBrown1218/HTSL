@@ -1,3 +1,4 @@
+chat "hi"
 // This is a comment and is being ignored by the compiler
 // stat "Hello World" dec 10
 // applyLayout "items"

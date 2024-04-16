@@ -1,4 +1,11 @@
 loop 2 index {
-    chat {"Hey there! This is the number of messages so far:" + index}
-    tp {["custom_coordinates", "invokers_location"][index]} {["~ ~5 ~", ""][index]}
+    if () {
+        loop 2 messageNum {
+            chat {"This is message #" + messageNum}
+        }
+    }
+    // function {"test" + index + 1}
+    // goto function {"test" + index + 1}
 }
+
+goto npc "Bob" as "testing"

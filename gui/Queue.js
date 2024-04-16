@@ -69,12 +69,12 @@ register("tick", () => {
       return Client.currentGui.close();
     case "goto":
       Navigator.goto = true;
-      ChatLib.chat(`&3HousingImporter &fPlease open action container &e${operation.name}`);
+      ChatLib.chat(`&3[HTSL] &fPlease open action container &e${operation.name}`);
       Navigator.isReady = false;
       return;
     case "wait":
       Navigator.isReady = false;
-      return Settings.guiTimeout(() => {
+      return setTimeout(() => {
         Navigator.isReady = true;
       }, operation.time);
     case "export":

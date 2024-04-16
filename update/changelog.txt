@@ -1,4 +1,5 @@
-Update 6.1:
-- added /htsl listscripts
-- fixed /htsl addfunctions
-- added multi line comments with /* and */
+Update 1.1:
+- Bugfixes
+- Referencing other files
+- New settings
+- Other stuff I probably forgot

@@ -36,6 +36,14 @@ class Settings {
 	})
 	playSoundOnFinish = true;
 
+	@SwitchProperty({
+		name: "Cancel Sounds while Importing/Exporting",
+		description: 'Prevents sounds from playing while importing/Exporting',
+		category: "General",
+		subcategory: "General",
+	})
+	cancelSounds = true;
+
 	// Importing/Exporting 
 
 	@SwitchProperty({

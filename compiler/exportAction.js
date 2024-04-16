@@ -98,7 +98,7 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                 break;
             case "chat_input":
                 if (Settings.exportColorCodes) {
-                    if (ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "") {
+                    if (submenuItems[menu[key].slot].getLore()[3].substring(6) == "") {
                         action[key] = null;
                     } else {
                         forceOperation({ type: "back" });

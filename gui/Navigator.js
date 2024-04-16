@@ -60,6 +60,12 @@ register("postGuiRender", () => {
   }
 }).setPriority(Priority.HIGHEST);
 
+register("soundPlay", (useless, useless2, useless3, useless4, useless5, event) => {
+  if (!Navigator.isWorking) return;
+  if (!Settings.cancelSounds) return;
+  cancel(event)
+});
+
 register("guiOpened", (event) => {
   setNotReady();
   if (event.gui.class.toString() == "class net.minecraft.client.gui.inventory.GuiInventory") return;

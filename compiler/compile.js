@@ -9,19 +9,24 @@ export function isImporting() {
 	return working();
 }
 
-export default (fileName) => {
+export function compile(fileName, dissallowedFiles, nested) {
 	try {
+		if (!dissallowedFiles) dissallowedFiles = [];
 		let importText;
 		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
 			importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
 		} else {
 			return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
 		}
+		dissallowedFiles.push(fileName);
+		let noFiles = dissallowedFiles;
 		macros = [];
-		ChatLib.chat("&3[HTSL] &fCompiling . . .");
-		let actionobj = preProcess(importText.split("\n"));
+		if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
+		let actionobj = preProcess(importText.split("\n"), noFiles);
+		if (typeof actionobj == "string") return ChatLib.chat(actionobj);
 		// processor
 		for (let j = 0; j < actionobj.length; j++) {
+			if (actionobj[j].compiled) { actionobj[j].compiled = undefined; continue; }
 			let actionsList = actionobj[j].actionList;
 			let newActionList = [];
 			for (let i = 0; i < actionsList.length; i++) {
@@ -33,7 +38,9 @@ export default (fileName) => {
 					let syntax = syntaxes.actions[keyword];
 					let comp = componentFunc(args, syntax, menus[syntax.type]);
 					if (typeof comp == "string") {
-						return ChatLib.chat(`&3[HTSL] &c${comp.replace("{line}", currentLine)}`);
+						let line = comp.match(/\{line-?(\d+)?\}/);
+						if (line[1]) currentLine = currentLine + Number(line[1]);
+						return ChatLib.chat(`&3[HTSL] &c${comp.replace(/{line-?(\d+)}/g, currentLine)}`);
 					}
 					if (comp) {
 						newActionList.push(comp);
@@ -49,10 +56,12 @@ export default (fileName) => {
 			actionobj[j].actions = newActionList;
 		}
 
-		if (!loadAction(actionobj)) return false;
+		if (!nested) {
+			if (!loadAction(actionobj)) return false;
+		} else return actionobj.map(n => { n.compiled = true; return n });
 	} catch (error) {
 		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-		console.log(error);
+		ChatLib.chat(error);
 		console.error(error);
 	}
 }
@@ -98,14 +107,14 @@ function getArgs(input) {
 				result.push(...arg);
 				continue;
 			}
-			// null handling
-			if (arg == "null") {
-				arg = null;
-			}
 			// slot choice for items
 			let slotMatch = arg.match(/slot\_(\d+)/)
 			if (slotMatch) {
 				arg = { slot: Number(slotMatch[1]) };
+			}
+			// null handling
+			if (arg == "null") {
+				arg = null;
 			}
 		} else if (match[2]) {
 			// If the argument is in curly brackets
@@ -355,22 +364,22 @@ function componentFunc(args, syntax, menu) {
 		// handle subactions w/ recursion
 		if (menu[params[j]].type == "subactions") {
 			let subactions = [];
-			let lines = args[j].split("\n");
+			let lines = preProcess(args[j].split("\n"))[0].actionList;
 			for (let i = 0; i < lines.length; i++) {
-				let subargs = getArgs(lines[i]);
+				let subargs = getArgs(lines[i].line);
 				let keyword = subargs.shift();
 				if (keyword == "" || !keyword) continue;
 				if (syntaxes.actions[keyword]) {
 					let subsyntax = syntaxes.actions[keyword];
 					let comp = componentFunc(subargs, subsyntax, menus[subsyntax.type]);
-					if (typeof comp == "string") return comp;
+					if (typeof comp == "string") return comp.replace("{line}", `{line-${i + lines[i].trueLine}}`);
 					if (comp) {
 						subactions.push(comp);
 					} else {
-						return `Unknown action &e${args[j]}&c on &eline {line}`;
+						return `Unknown action &e${keyword}&c on &eline {line-${i + lines[i].trueLine}}`;
 					}
 				} else {
-					return `Unknown condition &e${args[j]}&c on &eline {line}`;
+					return `Unknown action &e${keyword}&c on &eline {line-${i + lines[i].trueLine}}`;
 				}
 			}
 			args[j] = subactions;
@@ -384,6 +393,7 @@ function componentFunc(args, syntax, menu) {
 function handleLoop(string) {
 	let [match, length, indexName] = string.split("\n")[0].match(/loop (\d+) ([^ ]*) {[^]*/);
 	if (macros.find(macro => macro.name == indexName)) throw {};
+	indexName = indexName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 	let newLines = [];
 	for (let i = 1; i <= Number(length); i++) {
 		let loopLines = string.replace(new RegExp(`(\\b${indexName}\\b)|("${indexName}")|(\\[${indexName}\\])`, "g"), (match, p1, p2, p3) => {
@@ -404,15 +414,18 @@ function handleLoop(string) {
 	return newLines;
 }
 
-function preProcess(importActions) {
+export function preProcess(importActions, dissallowedFiles) {
+	if (!dissallowedFiles) dissallowedFiles = [];
 	let trueActions = [];
 	let actionobj = [];
 	let multilineAction;
+	let multilineActionLength = 0;
 	let currentContext = { context: "DEFAULT", contextTarget: {} };
 	let multilineComment = false;
 	let depth = 0;
 	for (let i = 0; i < importActions.length; i++) {
 		importActions[i] = replaceMacros(importActions[i].trim(), macros);
+		if (multilineAction) multilineActionLength++;
 		if (importActions[i] == "") continue;
 		if (importActions[i].startsWith("//")) continue;
 		if (importActions[i].startsWith("/*")) { multilineComment = true; continue; }
@@ -422,11 +435,11 @@ function preProcess(importActions) {
 		}
 		if (multilineComment) continue;
 		if (importActions[i].endsWith("{")) depth++;
-		if (importActions[i].endsWith("{") && !multilineAction) { multilineAction = importActions[i]; continue; }
+		if (importActions[i].endsWith("{") && !multilineAction) { multilineAction = [{ line: importActions[i], trueLine: i }]; multilineActionLength++; continue; }
 		if (importActions[i].startsWith("}")) depth--;
 		if (importActions[i] == "}" && multilineAction && depth == 0) {
-			if (multilineAction.startsWith("loop")) {
-				let newContexts = preProcess(handleLoop(multilineAction));
+			if (multilineAction[0].line.startsWith("loop")) {
+				let newContexts = preProcess(handleLoop(multilineAction.map(obj => obj.line).join("\n")));
 				for (let j = 0; j < newContexts.length - 1; j++) {
 					let context = newContexts[j];
 					actionobj.push({
@@ -438,17 +451,30 @@ function preProcess(importActions) {
 				trueActions.push(...newContexts[newContexts.length - 1].actionList.map(line => { line.trueLine = line.trueLine + i - (newContexts.length) * (1 + newContexts[newContexts.length - 1].actionList.length); return line }))
 				currentContext = { context: newContexts[newContexts.length - 1].context, contextTarget: newContexts[newContexts.length - 1].contextTarget };
 				multilineAction = undefined;
+				multilineActionLength = 0;
 				continue;
 			}
-			multilineAction += "\n}";
-			if (multilineAction.startsWith("if")) {
-				multilineAction = multilineAction.replace(/^if +\(/, "if and (").replace(/ *} +else +{ */, "\n} {\n");
+			multilineAction.push({ line: "}", trueLine: i });
+			let lastLine = 0;
+			let newLines = [multilineAction[0].line];
+			for (let j = 1; j < multilineAction.length; j++) {
+				for (let k = 1; k < multilineAction[j].trueLine - lastLine; k++) {
+					newLines.push("");
+				}
+				newLines.push(multilineAction[j].line);
+				lastLine = multilineAction[j].trueLine;
 			}
-			trueActions.push({ line: multilineAction, trueLine: i });
+			newLines = newLines.join("\n");
+			if (newLines.startsWith("if")) {
+				newLines = newLines.replace(/^if +\(/, "if and (").replace(/ *} +else +{ */, "\n} {\n");
+			}
+			trueActions.push({ line: newLines, trueLine: i - multilineActionLength + 2 });
+
 			multilineAction = undefined;
+			multilineActionLength = 0;
 			continue;
 		}
-		if (multilineAction) { multilineAction += "\n" + importActions[i]; continue; }
+		if (multilineAction) { multilineAction.push({ line: importActions[i], trueLine: i }); continue; }
 
 		let goto = importActions[i].match(/goto +(.*) +(.*)/);
 		if (goto) {
@@ -457,23 +483,31 @@ function preProcess(importActions) {
 				contextTarget: currentContext.contextTarget,
 				actionList: trueActions
 			});
-			currentContext = { context: goto[1].toUpperCase(), contextTarget: { name: goto[2] } };
+			let gotoArgs = getArgs(importActions[i]);
+			if (gotoArgs.length == 5 && gotoArgs[3] == "as") {
+				if (dissallowedFiles.includes(gotoArgs[4])) return `&3[HTSL] &cNested file calls detected`;
+				let fileCall = compile(gotoArgs[4], dissallowedFiles, true);
+				fileCall[0].context = gotoArgs[1].toUpperCase();
+				fileCall[0].contextTarget = { name: gotoArgs[2] };
+				actionobj.push(...fileCall);
+			} else currentContext = { context: gotoArgs[1].toUpperCase(), contextTarget: { name: gotoArgs[2] } };
 			trueActions = [];
 			continue;
 		}
 
 		if (importActions[i].startsWith("define")) {
-			if (syntaxes[importActions[i].split(/ +/)[1]] || ["goto", "//", "/*", "*/", "loop"].includes(importActions[i].split(/ +/)[1])) return ChatLib.chat(`&3[HTSL] &cInvalid macro name &e${importActions[i].split(/ +/)[1]}`);
-			if (macros.find(macro => macro.name == importActions[i].split(/ +/)[1])) return ChatLib.chat(`&3[HTSL] &cCannot have two macros of the same name!`);
+			let macroName = importActions[i].split(/ +/)[1].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+			if (syntaxes[macroName] || ["goto", "//", "/*", "*/", "loop"].includes(macroName)) return ChatLib.chat(`&3[HTSL] &cInvalid macro name &e${importActions[i].split(/ +/)[1]}`);
+			if (macros.find(macro => macro.name == macroName)) return ChatLib.chat(`&3[HTSL] &cCannot have two macros of the same name!`);
 			macros.push({
-				name: importActions[i].split(/ +/)[1],
+				name: macroName,
 				value: importActions[i].substring(8 + importActions[i].split(/ +/)[1].length)
 			});
 			continue;
 		}
 
 		// line
-		trueActions.push({ line: importActions[i], trueLine: i + 1 });
+		trueActions.push({ line: importActions[i], trueLine: i });
 	}
 	actionobj.push({
 		context: currentContext.context,
