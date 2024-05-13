@@ -22,7 +22,7 @@ export default {
         },
         changeHealth: {
             type: "CHANGE_HEALTH",
-            full: "changeHealth <mode> <health> <heal_on_change>"
+            full: "changeHealth <mode> <health>"
         },
         hungerLevel: {
             type: "SET_HUNGER_LEVEL",

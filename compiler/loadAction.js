@@ -41,6 +41,9 @@ export function loadAction(script) {
                 case "PAD":
                     addOperation({ type: 'goto', name: script[container].contextTarget.name });
                     break;
+                case "REGION":
+                    addOperation({ type: 'chat', text: `/region edit ${script[container].contextTarget.name}`, command: true });
+                    break;
             }
         }
         for (let i = 0; i < script[container].actions.length; i++) {
@@ -58,9 +61,9 @@ function importComponent(component, menu) {
     addOperation({ type: 'setGuiContext', context: component.type });
     for (let key in component) {
         if (key == "type") continue;
-        if (JSON.stringify(menu[key].default_value).toLowerCase() == JSON.stringify(component[key]).toLowerCase()) continue;
+        if (JSON.stringify(menu[key].default_value).toLowerCase() == JSON.stringify(component[key]).replace("_", " ").toLowerCase()) continue;
         if (menu[key].default_value == component[key]) continue;
-        if (!component[key]) continue;
+        if (component[key] == undefined) continue;
         let setting = menu[key];
         addOperation({ type: 'click', slot: setting.slot });
         switch (setting.type) {

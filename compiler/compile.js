@@ -10,77 +10,83 @@ export function isImporting() {
 }
 
 export function compile(fileName, dissallowedFiles, nested) {
-	try {
-		if (!dissallowedFiles) dissallowedFiles = [];
-		let importText;
-		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
-			importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
-		} else {
-			return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
-		}
-		dissallowedFiles.push(fileName);
-		let noFiles = dissallowedFiles;
-		macros = [];
-		if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
-		let actionobj = preProcess(importText.split("\n"), noFiles);
-		if (typeof actionobj == "string") return ChatLib.chat(actionobj);
-		// processor
-		for (let j = 0; j < actionobj.length; j++) {
-			if (actionobj[j].compiled) { actionobj[j].compiled = undefined; continue; }
-			let actionsList = actionobj[j].actionList;
-			let newActionList = [];
-			for (let i = 0; i < actionsList.length; i++) {
-				let args = actionsList[i].line.includes("\n") ? getMultiline(actionsList[i].line) : getArgs(actionsList[i].line.trim());
-				let currentLine = actionsList[i].trueLine;
-				if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${currentLine}`); }
-				let keyword = args.shift();
-				if (syntaxes.actions[keyword]) {
-					let syntax = syntaxes.actions[keyword];
-					let comp = componentFunc(args, syntax, menus[syntax.type]);
-					if (typeof comp == "string") {
-						let line = comp.match(/\{line-?(\d+)?\}/);
-						if (line[1]) currentLine = currentLine + Number(line[1]);
-						return ChatLib.chat(`&3[HTSL] &c${comp.replace(/{line-?(\d+)}/g, currentLine)}`);
-					}
-					if (comp) {
-						newActionList.push(comp);
-					} else {
-						return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
-					}
+	// try {
+	if (!dissallowedFiles) dissallowedFiles = [];
+	let importText;
+	if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
+		importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
+	} else {
+		return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
+	}
+	dissallowedFiles.push(fileName);
+	let noFiles = dissallowedFiles;
+	macros = [];
+	if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
+	let actionobj = preProcess(importText.split("\n"), noFiles);
+	console.log(JSON.stringify(actionobj));
+	if (typeof actionobj == "string") return ChatLib.chat(actionobj);
+	// processor
+	for (let j = 0; j < actionobj.length; j++) {
+		if (actionobj[j].compiled) { actionobj[j].compiled = undefined; continue; }
+		let actionsList = actionobj[j].actionList;
+		let newActionList = [];
+		for (let i = 0; i < actionsList.length; i++) {
+			let args = actionsList[i].line.includes("\n") ? getMultiline(actionsList[i].line) : getArgs(actionsList[i].line.trim());
+			let currentLine = actionsList[i].trueLine;
+			if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${currentLine}`); }
+			let keyword = args.shift();
+			if (syntaxes.actions[keyword]) {
+				let syntax = syntaxes.actions[keyword];
+				let comp = componentFunc(args, syntax, menus[syntax.type]);
+				if (typeof comp == "string") {
+					let line = comp.match(/\{line-?(\d+)?\}/);
+					if (line[1]) currentLine = currentLine + Number(line[1]);
+					return ChatLib.chat(`&3[HTSL] &c${comp.replace(/{line-?(\d+)?}/g, currentLine)}`);
+				}
+				if (comp) {
+					newActionList.push(comp);
 				} else {
 					return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
 				}
-				multiLineOffset = 0;
+			} else {
+				return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
 			}
-			actionobj[j].actionList = [];
-			actionobj[j].actions = newActionList;
+			multiLineOffset = 0;
 		}
-
-		if (!nested) {
-			if (!loadAction(actionobj)) return false;
-		} else return actionobj.map(n => { n.compiled = true; return n });
-	} catch (error) {
-		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-		ChatLib.chat(error);
-		console.error(error);
+		actionobj[j].actionList = [];
+		actionobj[j].actions = newActionList;
 	}
+
+	if (!nested) {
+		if (!loadAction(actionobj)) return false;
+	} else return actionobj.map(n => { n.compiled = true; return n });
+	// } catch (error) {
+	// 	ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
+	// 	ChatLib.chat(error);
+	// 	console.error(error);
+	// }
 }
 
 function replaceMacros(text, macros) {
-	macros.forEach(macro => {
-		// Create a regex that matches the macro name but not when it's inside quotes
-		let regex = new RegExp(`(?<!['"])\\b${macro.name}\\b(?!['"])`, 'g');
-		text = text.replace(regex, macro.value);
-	});
-	return text;
+    macros.forEach(macro => {
+        let regex = new RegExp('\\b' + macro.name + '\\b', 'g');
+        text = text.replace(regex, (match, offset, string) => {
+            // Check if the match is inside quotes
+            let inQuotes = (string.charAt(offset - 1) === "'" || string.charAt(offset - 1) === '"') &&
+                           (string.charAt(offset + match.length) === "'" || string.charAt(offset + match.length) === '"');
+            // If the match is not inside quotes, replace it with the macro value
+            return inQuotes ? match : macro.value;
+        });
+    });
+    return text;
 }
 
 function getArgs(input) {
 	let conversions = [
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(.*)?/g, replacement: "$1 %stat.global/$2%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +stat +(.*)?/g, replacement: "$1 %stat.player/$2%" },
-		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +?(.*)?/g, replacement: "$1 %stat.team/$2 $3%" },
-		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 %random.int/$2 $3%" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +?(.*)?/g, replacement: "$1 \"%stat.team/$2 $3%\"" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 \"%random.int/$2 $3%\"" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +health/g, replacement: "$1 %player.health%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +maxHealth/g, replacement: "$1 %player.maxhealth%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +hunger/g, replacement: "$1 %player.hunger%" },
@@ -121,95 +127,40 @@ function getArgs(input) {
 			macros.forEach((macro) => {
 				arg = arg.replace(macro.name, macro.value);
 			});
-			try {
-				result.push(evaluateExpression(arg));
-				continue;
-			} catch (e) {
-				return false;
-			}
+			// try {
+			result.push(evaluateExpression(arg));
+			continue;
+			// } catch (e) {
+			// 	return false;
+			// }
 		}
 		result.push(arg);
 	}
+	// console.log(result);
 	return result;
 }
 
-function parseExpression(expression) {
-	let operators = {
-		'+': { precedence: 1, func: (a, b) => a + b },
-		'-': { precedence: 1, func: (a, b) => a - b },
-		'*': { precedence: 2, func: (a, b) => a * b },
-		'/': { precedence: 2, func: (a, b) => a / b },
-		'^': { precedence: 3, func: (a, b) => Math.pow(a, b) }
-	};
-
-	let outputQueue = [];
-	let operatorStack = [];
-	let tokens = expression.match(/(\d+|\+|-|\*|\/|\^|\(|\))/g);
-
-	if (tokens) tokens.forEach(token => {
-		if (!isNaN(token)) {
-			outputQueue.push(parseFloat(token));
-		} else if (token in operators) {
-			while (operatorStack.length > 0 && operators[token].precedence <= operators[operatorStack[operatorStack.length - 1]].precedence) {
-				let op = operators[operatorStack.pop()];
-				let [b, a] = [outputQueue.pop(), outputQueue.pop()];
-				outputQueue.push(op.func(a, b));
-			}
-			operatorStack.push(token);
-		} else if (token === '(') {
-			operatorStack.push(token);
-		} else if (token === ')') {
-			while (operatorStack.length > 0 && operatorStack[operatorStack.length - 1] !== '(') {
-				let op = operators[operatorStack.pop()];
-				let [b, a] = [outputQueue.pop(), outputQueue.pop()];
-				outputQueue.push(op.func(a, b));
-			}
-			if (operatorStack.length > 0) {
-				operatorStack.pop();  // Pop the '('
-			}
-		}
-	});
-
-	while (operatorStack.length > 0) {
-		let op = operators[operatorStack.pop()];
-		let [b, a] = [outputQueue.pop(), outputQueue.pop()];
-		outputQueue.push(op.func(a, b));
-	}
-
-	return outputQueue.pop();
-}
-
 function evaluateExpression(expression) {
-	// Split the expression into parts
-	let parts = expression.split('+').map(part => part.trim());
-
-	// Process each part
-	let result = '';
-	let numberBuffer = null;
-	for (let part of parts) {
-		// Check if part is an array access (e.g., ["hello", "test 1"][1])
-		if (part.startsWith('[') && part.includes('][')) {
-			let arrayMatch = part.match(/\[(.*?)\]\[(.*?)\]/);
-			if (arrayMatch) {
-				let array = JSON.parse('[' + arrayMatch[1] + ']');
-				let index = parseExpression(arrayMatch[2]);
-				result += (numberBuffer !== null ? numberBuffer : '') + array[index];
-				numberBuffer = null;
-			}
+	let result = "";
+	let inQuotes = false;
+	
+	for (let i = 0; i < expression.length; i++) {
+		if (expression[i] === '"') {
+			inQuotes = !inQuotes;  // Toggle the inQuotes flag
 		}
-
-		// Check if part is a number
-		else if (!isNaN(part)) {
-			numberBuffer = (numberBuffer !== null ? numberBuffer : 0) + parseInt(part);
-		}
-
-		// Otherwise, assume part is a string and remove quotes
-		else {
-			result += (numberBuffer !== null ? numberBuffer : '') + part.replace(/['"]/g, '');
-			numberBuffer = null;
+		if (inQuotes || !/[a-zA-Z]/.test(expression[i])) {
+			// If we're inside quotes or the character is not a letter, keep it
+			result += expression[i];
 		}
 	}
-	return result + (numberBuffer !== null ? numberBuffer : '');
+	
+	expression = result;
+
+	// Evaluate the expression
+	let func = new Function('return ' + expression);
+	result = func();
+
+	return result;
 }
 
 function getMultiline(input) {
@@ -294,6 +245,26 @@ function validComparator(comparator) {
 	return comparator;
 }
 
+function splitOutsideBrackets(str) {
+	let result = [];
+	let start = 0;
+	let brackets = 0;
+
+	for (let i = 0; i < str.length; i++) {
+		if (str[i] === '{') {
+			brackets++;
+		} else if (str[i] === '}') {
+			brackets--;
+		} else if (str[i] === ',' && brackets === 0) {
+			result.push(str.slice(start, i));
+			start = i + 1;
+		}
+	}
+
+	result.push(str.slice(start));
+	return result;
+}
+
 function componentFunc(args, syntax, menu) {
 	let params = [];
 	if (syntax.full.match(/\<(.*?)\>/g)) params = syntax.full.match(/\<(.*?)\>/g).map(n => n.substring(1, n.length - 1));
@@ -340,10 +311,11 @@ function componentFunc(args, syntax, menu) {
 		}
 		// handle conditions w/ recursion
 		if (menu[params[j]].type == "conditions") {
-			let conditionsArg = args[j].split(",");
+			let conditionsArg = splitOutsideBrackets(args[j]);
 			let conditionList = [];
 			for (let i = 0; i < conditionsArg.length; i++) {
 				let conditionArgs = getArgs(conditionsArg[i].trim());
+				if (typeof conditionArgs == "boolean" && !conditionArgs) return `Something went wrong with expression evaluation on &eline {line}`;
 				let keyword = conditionArgs.shift();
 				if (keyword == "" || !keyword) continue;
 				if (syntaxes.conditions[keyword]) {
@@ -367,6 +339,7 @@ function componentFunc(args, syntax, menu) {
 			let lines = preProcess(args[j].split("\n"))[0].actionList;
 			for (let i = 0; i < lines.length; i++) {
 				let subargs = getArgs(lines[i].line);
+				if (typeof subargs == "boolean" && !subargs) return `Something went wrong with expression evaluation on &eline {line-${i + lines[i].trueLine}}`;
 				let keyword = subargs.shift();
 				if (keyword == "" || !keyword) continue;
 				if (syntaxes.actions[keyword]) {
@@ -440,16 +413,22 @@ export function preProcess(importActions, dissallowedFiles) {
 		if (importActions[i] == "}" && multilineAction && depth == 0) {
 			if (multilineAction[0].line.startsWith("loop")) {
 				let newContexts = preProcess(handleLoop(multilineAction.map(obj => obj.line).join("\n")));
-				for (let j = 0; j < newContexts.length - 1; j++) {
+				actionobj.push({
+					context: currentContext.context,
+					contextTarget: currentContext.contextTarget,
+					actionList: newContexts[0].actionList.map(line => { line.trueLine = line.trueLine + i - (1) * (1 + newContexts[0].actionList.length); return line })
+				});
+				for (let j = 1; j < newContexts.length; j++) {
 					let context = newContexts[j];
-					actionobj.push({
-						context: context.context == "DEFAULT" ? currentContext.context : context.context,
-						contextTarget: JSON.stringify(context.contextTarget) == "" ? currentContext.contextTarget : context.contextTarget,
+					if (j == newContexts - 1) {
+						trueActions.push(...context.actionList.map(line => { line.trueLine = line.trueLine + i - (newContexts.length) * (1 + newContexts[newContexts.length - 1].actionList.length); return line }))
+						currentContext = { context: context.context, contextTarget: context.contextTarget };
+					} else actionobj.push({
+						context: context.context,
+						contextTarget: context.contextTarget,
 						actionList: context.actionList.map(line => { line.trueLine = line.trueLine + i - (j + 1) * (1 + context.actionList.length); return line })
 					});
 				};
-				trueActions.push(...newContexts[newContexts.length - 1].actionList.map(line => { line.trueLine = line.trueLine + i - (newContexts.length) * (1 + newContexts[newContexts.length - 1].actionList.length); return line }))
-				currentContext = { context: newContexts[newContexts.length - 1].context, contextTarget: newContexts[newContexts.length - 1].contextTarget };
 				multilineAction = undefined;
 				multilineActionLength = 0;
 				continue;

@@ -129,7 +129,7 @@ export default (fileName) => {
     items = items.splice(0, Player.getContainer().getSize() - 9 - 36);
     actionobjs = [];
 
-    processPage(items, actionobjs, menus, 0);
+    if (!processPage(items, actionobjs, menus, 0)) return false;
 
     addOperation({
         type: "doneExport", func: () => {
@@ -174,7 +174,15 @@ function processPage(items, actionList, menuList, page) {
                 break;
             }
         }
-        if (!menu) return ChatLib.chat(`&3[HTSL] &fConnor is that you?`);
+        if (["Change Player's Group", "Set Gamemode"].includes(menu.action_name) && ChatLib.removeFormatting(items[i].getLore()[3]) == "You are not allowed to edit this action!") {
+            forceOperation({
+                type: "actionOrder", func: () => {
+                    actionList.push({ type: actionkey });
+                }
+            })
+            continue;
+        }
+        if (!menu) return false;
         if (Object.keys(menu).length > 1) {
             // operations forced to the front of the queue, so they need to be added backwards
 
@@ -200,4 +208,5 @@ function processPage(items, actionList, menuList, page) {
             })
         }
     }
+    return true;
 }

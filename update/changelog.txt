@@ -1,5 +1,3 @@
-Update 1.1:
+Update 1.1.1:
 - Bugfixes
-- Referencing other files
-- New settings
-- Other stuff I probably forgot
+- Yeah that's pretty much it lol

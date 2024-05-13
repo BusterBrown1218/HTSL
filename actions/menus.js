@@ -445,7 +445,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",
@@ -470,7 +470,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",
@@ -495,7 +495,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",
@@ -504,11 +504,6 @@ export default {
                 "Multiply",
                 "Divide"
             ]
-        },
-        heal_on_change: {
-            slot: 12,
-            default_value: true,
-            type: "toggle"
         }
     },
     CHANGE_HEALTH: {
@@ -520,7 +515,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",
@@ -529,11 +524,6 @@ export default {
                 "Multiply",
                 "Divide"
             ]
-        },
-        heal_on_change: {
-            slot: 12,
-            default_value: true,
-            type: "toggle"
         }
     },
     SET_HUNGER_LEVEL: {
@@ -545,7 +535,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",
@@ -565,7 +555,7 @@ export default {
         },
         mode: {
             slot: 11,
-            default_value: "INCREMENT",
+            default_value: "SET",
             type: "static_option_select",
             options: [
                 "Increment",

@@ -82,9 +82,10 @@ let renderItemIcons = [];
 register('guiRender', (x, y) => {
 	if (!Player.getContainer()) return;
 	if (!isInActionGui()) return;
+	if (isImporting()) return;
 
 	// placements
-	let chestGuiTop = guiTopField.get(Client.currentGui.get());
+	// let chestGuiTop = guiTopField.get(Client.currentGui.get());
 	let chestWidth = xSizeField.get(Client.currentGui.get());
 	let chestX = Renderer.screen.getWidth() / 2 - chestWidth / 2;
 	let topBound = input.getY() + 30;
@@ -215,7 +216,7 @@ register('guiKey', (char, keyCode, gui, event) => {
 	input.mcObject.func_146195_b(true);
 	if (input.mcObject.func_146206_l()) {
 		input.mcObject.func_146201_a(char, keyCode);
-		if (input.getText() != "Enter File Name") filteredFiles = files.filter(n => n.includes(input.getText()));
+		if (input.getText() != "Enter File Name") filteredFiles = files.filter(n => n.toLowerCase().includes(input.getText().toLowerCase()))
 		else filteredFiles = files;
 		// fileInputUpdate()
 		if (keyCode !== 1) { // keycode for escape key
@@ -302,6 +303,7 @@ register('guiMouseClick', (x, y, mouseButton) => {
 			}
 		}
 		if (filteredFiles[index].endsWith('.htsl')) {
+			ChatLib.command("gmc");
 			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);;
 		} else if (!filteredFiles[index].includes(".")) {
 			subDir += filteredFiles[index];
@@ -330,6 +332,7 @@ function handleInputClick(button, action, x, y) {
 			input.setText('default');
 		}
 
+		ChatLib.command("gmc");
 		action(subDir + input.getText());
 
 		input.setSelectionEnd(0);
@@ -346,7 +349,6 @@ function isButtonHovered(button, x, y) {
 		y > button.getY() &&
 		y < button.getY() + button.getHeight();
 }
-
 
 register('guiClosed', (gui) => {
 	if (gui.class.getName() !== 'net.minecraft.client.gui.inventory.GuiChest') return;
@@ -408,7 +410,7 @@ function readFiles() {
 
 			return 0;
 		});
-		if (input.getText() != "Enter File Name") filteredFiles = files.filter(n => n.includes(input.getText()));
+		if (input.getText() != "Enter File Name") filteredFiles = files.filter(n => n.toLowerCase().includes(input.getText().toLowerCase()));
 		else filteredFiles = files;
 	} catch (e) {
 		console.error(e);

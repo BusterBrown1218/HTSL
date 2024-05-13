@@ -1,11 +1,1 @@
-loop 2 index {
-    if () {
-        loop 2 messageNum {
-            chat {"This is message #" + messageNum}
-        }
-    }
-    // function {"test" + index + 1}
-    // goto function {"test" + index + 1}
-}
-
-goto npc "Bob" as "testing"
+chat "Does anyone even look at this?"

@@ -74,8 +74,9 @@ function convertComponent(obj, syntax, menu) {
             action = action.replace(property, conditionList.join(", "));
         } else if (menu[property.match(/<(.*)>/)[1]].type == "location") {
             let location = obj[property.match(/<(.*)>/)[1]];
-            action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z} ${location.yaw == -999 ? "" : location.yaw} ${location.yaw == 0 || location.pitch == 0 ? "" : location.pitch}"`);
-        } else action = action.replace(property, String(obj[property.match(/<(.*)>/)[1]]).includes(" ") ? `"${obj[property.match(/<(.*)>/)[1]]}"` : obj[property.match(/<(.*)>/)[1]]);
+            action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z}${location.yaw == 0 ? "" : " " + location.yaw}${location.pitch == 0 || location.pitch == 0 ? "" : " " + location.pitch}"`);
+        } else if (obj[property.match(/<(.*)>/)[1]] != null) action = action.replace(property, String(obj[property.match(/<(.*)>/)[1]]).includes(" ") ? `"${obj[property.match(/<(.*)>/)[1]]}"` : obj[property.match(/<(.*)>/)[1]]);
+        else action = action.replace(property, "null");
     })
     return action;
 }

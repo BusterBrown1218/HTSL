@@ -1,27 +1,16 @@
 import Settings from '../utils/config';
 import utilInputAnvil from '../utils/inputAnvil';
 import loadItem from '../utils/loadItemstack';
-
-function getItemFromNBT(nbtStr) {
-  let nbt = net.minecraft.nbt.JsonToNBT.func_180713_a(nbtStr); // Get MC NBT object from string
-  let count = nbt.func_74771_c('Count') // get byte
-  let id = nbt.func_74779_i('id') // get string
-  let damage = nbt.func_74765_d('Damage') // get short
-  let tag = nbt.func_74781_a('tag') // get tag
-  let item = new Item(id); // create ct item object
-  item.setStackSize(count);
-  item = item.getItemStack(); // convert to mc object
-  item.func_77964_b(damage); // set damage of mc item object
-  if (tag) item.func_77982_d(tag); // set tag of mc item object
-  item = new Item(item); // convert back to ct object
-  return item;
-}
+import getItemFromNBT from '../utils/getItemFromNBT';
 
 const S2EPacketCloseWindow = Java.type(
   "net.minecraft.network.play.server.S2EPacketCloseWindow"
 );
 const C0EPacketClickWindow = Java.type(
   "net.minecraft.network.play.client.C0EPacketClickWindow"
+);
+const C01PacketChatMessage = Java.type(
+  "net.minecraft.network.play.client.C01PacketChatMessage"
 );
 const slotIdField =
   C0EPacketClickWindow.class.getDeclaredField("field_149552_b");
@@ -98,12 +87,13 @@ register("chat", (event) => {
 
 register("guiRender", () => {
   if (Navigator.isReady) return;
-  if (!Player.getContainer()) return;
   let container = Player.getContainer();
+  if (!container) return;
   if (container.getClassName() === "ContainerCreative") return;
   if (container.getName() === "Housing Menu") return;
   if (Navigator.itemsLoaded.lastItemAddedTimestamp === 0) return; // no items loaded yet so wait for items to load
   if (container.getItems().splice(container.getSize() - 44, 9).filter(n => n).length == 0 && container.getClassName() !== "ContainerPlayer") return;
+  if (Navigator.isLoadingItem) return;
   Navigator.isReady = true;
   Navigator.guiIsLoading = false;
 });
@@ -174,6 +164,7 @@ function selectItem(item) {
       ).getItemStack();
       Navigator.isLoadingItem = true;
       loadItem(itemStack, 26);
+      click(53);
       setNotReady();
       break;
     case "clickSlot":
@@ -185,11 +176,11 @@ function selectItem(item) {
 register("guiKey", (_character, code, _gui, event) => {
   if (Navigator.goto) return;
   if (!Navigator.isWorking) return;
-  // if (
-  //   code === Keyboard.KEY_ESCAPE ||
-  //   code === Client.getMinecraft().field_71474_y.field_151445_Q.func_151463_i()
-  // )
-  //   cancel(event);
+  if (
+    code === Keyboard.KEY_ESCAPE ||
+    code === Client.getMinecraft().field_71474_y.field_151445_Q.func_151463_i()
+  )
+    cancel(event);
 });
 
 register("packetReceived", (packet, event) => {
@@ -206,20 +197,17 @@ register("packetReceived", (packet, event) => {
     const containerName = Player.getContainer().getName();
     if (containerName !== "Select an Item") return;
     Navigator.isLoadingItem = false;
-    click(53); // slot that is used to load items
   }
 });
 
 function selectOption(optionName) {
   const playerContainer = Player.getContainer();
 
-  let index = -1;
-
-  for (let item of playerContainer.getItems()) {
-    index++;
+  for (let i = 0; i < playerContainer.getSize() - 36; i++) {
+    let item = playerContainer.getItems()[i];
     if (item === null) continue; // skip the empty slots
     if (ChatLib.removeFormatting(item.name) === optionName) {
-      click(index);
+      click(i);
       Navigator.isSelecting = false;
       return;
     }
@@ -248,7 +236,9 @@ function inputChat(text, func, command) {
   }
   if (Settings.useSafeMode) Client.Companion.setCurrentChatMessage(text);
   else {
-    ChatLib.say(`${command? "" : "/ac "}` + text);
+    Client.sendPacket(new C01PacketChatMessage(
+      `${command? "" : "/ac "}` + text
+    ));
   }
   setNotReady();
 }
