@@ -1,4 +1,5 @@
 import { request as axios } from "axios";
+import Settings from "../utils/config";
 
 function versionCompare(myVersion, minimumVersion) {
 
@@ -26,9 +27,10 @@ try {
         const latestVersion = response.data.version;
         const currentVersion = JSON.parse(FileLib.read("HTSL", "./metadata.json")).version;
         if (versionCompare(currentVersion, latestVersion)) {
-            return ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
+            if (Settings.loadMessage) ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
+            return;
         }
-        ChatLib.chat(new Message(new TextComponent("&3[HTSL] &fNew HTSL version available!").setClickAction("open_url", "https://github.com/BusterBrown1218/HTSL/releases")));
+        ChatLib.chat(new Message(new TextComponent("&3[HTSL] &fNew HTSL version available!").setClick("open_url", "https://github.com/BusterBrown1218/HTSL/releases")));
 
     });
 } catch (error) {

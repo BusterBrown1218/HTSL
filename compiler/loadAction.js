@@ -43,6 +43,7 @@ export function loadAction(script) {
                     break;
                 case "REGION":
                     addOperation({ type: 'chat', text: `/region edit ${script[container].contextTarget.name}`, command: true });
+                    addOperation({ type: 'option', option: script[container].contextTarget.trigger });
                     break;
             }
         }

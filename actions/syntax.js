@@ -21,7 +21,7 @@ export default {
             full: "globalstat <stat> <mode> <amount>"
         },
         changeHealth: {
-            type: "CHANGE_HEALTH",
+            type: "SET_HEALTH",
             full: "changeHealth <mode> <health>"
         },
         hungerLevel: {

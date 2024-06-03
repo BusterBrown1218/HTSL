@@ -177,7 +177,7 @@ register('guiRender', (x, y) => {
 				}
 				// Renderer.drawImage(openTrashBin, xBound - 24, topBound + 3 + 20 * (i - page * linesPerPage), 16, 16);
 				if (input.getText() != "Enter File Name" && input.getText() != "") {
-					Renderer.drawRect(Renderer.color(252, 229, 15, 100), input.getX() + 21 + Renderer.getStringWidth(filteredFiles[i].substring(0, filteredFiles[i].indexOf(input.getText()))), topBound + 5 + 20 * (i - page * linesPerPage), Renderer.getStringWidth(input.getText()), 17)
+					Renderer.drawRect(Renderer.color(252, 229, 15, 100), input.getX() + 21 + Renderer.getStringWidth(filteredFiles[i].substring(0, filteredFiles[i].toLowerCase().indexOf(input.getText().toLowerCase()))), topBound + 5 + 20 * (i - page * linesPerPage), Renderer.getStringWidth(input.getText()), 17)
 				}
 			}
 			if (!hovered) hoveringIndex = -1;
@@ -303,8 +303,13 @@ register('guiMouseClick', (x, y, mouseButton) => {
 			}
 		}
 		if (filteredFiles[index].endsWith('.htsl')) {
-			ChatLib.command("gmc");
-			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);;
+			if (Player.asPlayerMP().player.field_71075_bZ.field_75098_d === false) ChatLib.command("gmc");
+			console.log(filteredFiles[index]);
+			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);
+			if (Settings.saveimports) {
+				input.setText(filteredFiles[index].substring(0, filteredFiles[index].length - 5));
+				filteredFiles = files.filter(n => n.toLowerCase().includes(input.getText().toLowerCase()));
+			}
 		} else if (!filteredFiles[index].includes(".")) {
 			subDir += filteredFiles[index];
 			files = [];
@@ -332,7 +337,7 @@ function handleInputClick(button, action, x, y) {
 			input.setText('default');
 		}
 
-		ChatLib.command("gmc");
+		if (Player.asPlayerMP().player.field_71075_bZ.field_75098_d === false) ChatLib.command("gmc");
 		action(subDir + input.getText());
 
 		input.setSelectionEnd(0);
@@ -374,12 +379,15 @@ register('guiOpened', (gui) => {
 	// for some reason this event triggers before the gui actually loads?? so we have to wait
 	setTimeout(() => {
 		if (!isInActionGui()) return;
+		if (wasInActionGui) return;
+		if (!wasInActionGui && isInActionGui()) wasInActionGui = true;
 
-		subDir = "";
+		if (!Settings.saveimports) subDir = "";
 		readFiles();
 	}, 50);
 });
 
+let wasInActionGui = false;
 function isInActionGui() {
 	const containerName = Player.getContainer().getName();
 	if (Client.currentGui.getClassName() === "GuiEditSign") return false;

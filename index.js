@@ -5,6 +5,7 @@ import { convertHE } from './compiler/convertAction';
 import { preProcess } from './compiler/compile';
 import { addOperation } from './gui/Queue';
 import Navigator from './gui/Navigator';
+import "./update/update";
 
 register("command", ...args => {
     let command;
@@ -75,6 +76,9 @@ register("command", ...args => {
             ChatLib.chat(file);
         });
     }
+    if (command === "version") {
+        return ChatLib.chat(`&3[HTSL] &fVersion ${JSON.parse(FileLib.read("HTSL", "./metadata.json")).version}`);
+    }
     if (command === 'help') {
         ChatLib.chat('&8&m-------------------------------------------------');
         ChatLib.chat('&6/htsl help &7Opens the HTSL help menu!')
@@ -86,6 +90,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl convert <action id> <filename> &7Converts a HousingEditor action to HTSL!');
         ChatLib.chat('&6/htsl addfunctions <filename> &7Imports all the required functions to prepare for import!');
         ChatLib.chat('&6/htsl listscripts &7Lists all your scripts');
+        ChatLib.chat('&6/htsl version &7Returns your current HTSL version');
         ChatLib.chat('&8&m-------------------------------------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');

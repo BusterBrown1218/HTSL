@@ -10,75 +10,75 @@ export function isImporting() {
 }
 
 export function compile(fileName, dissallowedFiles, nested) {
-	// try {
-	if (!dissallowedFiles) dissallowedFiles = [];
-	let importText;
-	if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
-		importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
-	} else {
-		return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
-	}
-	dissallowedFiles.push(fileName);
-	let noFiles = dissallowedFiles;
-	macros = [];
-	if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
-	let actionobj = preProcess(importText.split("\n"), noFiles);
-	console.log(JSON.stringify(actionobj));
-	if (typeof actionobj == "string") return ChatLib.chat(actionobj);
-	// processor
-	for (let j = 0; j < actionobj.length; j++) {
-		if (actionobj[j].compiled) { actionobj[j].compiled = undefined; continue; }
-		let actionsList = actionobj[j].actionList;
-		let newActionList = [];
-		for (let i = 0; i < actionsList.length; i++) {
-			let args = actionsList[i].line.includes("\n") ? getMultiline(actionsList[i].line) : getArgs(actionsList[i].line.trim());
-			let currentLine = actionsList[i].trueLine;
-			if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${currentLine}`); }
-			let keyword = args.shift();
-			if (syntaxes.actions[keyword]) {
-				let syntax = syntaxes.actions[keyword];
-				let comp = componentFunc(args, syntax, menus[syntax.type]);
-				if (typeof comp == "string") {
-					let line = comp.match(/\{line-?(\d+)?\}/);
-					if (line[1]) currentLine = currentLine + Number(line[1]);
-					return ChatLib.chat(`&3[HTSL] &c${comp.replace(/{line-?(\d+)?}/g, currentLine)}`);
-				}
-				if (comp) {
-					newActionList.push(comp);
+	console.log(fileName);
+	try {
+		if (!dissallowedFiles) dissallowedFiles = [];
+		let importText;
+		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
+			importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
+		} else {
+			return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
+		}
+		dissallowedFiles.push(fileName);
+		let noFiles = dissallowedFiles;
+		macros = [];
+		if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
+		let actionobj = preProcess(importText.split("\n"), noFiles);
+		if (typeof actionobj == "string") return ChatLib.chat(actionobj);
+		// processor
+		for (let j = 0; j < actionobj.length; j++) {
+			if (actionobj[j].compiled) { actionobj[j].compiled = undefined; continue; }
+			let actionsList = actionobj[j].actionList;
+			let newActionList = [];
+			for (let i = 0; i < actionsList.length; i++) {
+				let args = actionsList[i].line.includes("\n") ? getMultiline(actionsList[i].line) : getArgs(actionsList[i].line.trim());
+				let currentLine = actionsList[i].trueLine;
+				if (typeof args == "boolean" && !args) { return ChatLib.chat(`&3[HTSL] &cSomething went wrong with expression evaluation on &eline ${currentLine}`); }
+				let keyword = args.shift();
+				if (syntaxes.actions[keyword]) {
+					let syntax = syntaxes.actions[keyword];
+					let comp = componentFunc(args, syntax, menus[syntax.type]);
+					if (typeof comp == "string") {
+						let line = comp.match(/\{line-?(\d+)?\}/);
+						if (line[1]) currentLine = currentLine + Number(line[1]);
+						return ChatLib.chat(`&3[HTSL] &c${comp.replace(/{line-?(\d+)?}/g, currentLine)}`);
+					}
+					if (comp) {
+						newActionList.push(comp);
+					} else {
+						return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
+					}
 				} else {
 					return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
 				}
-			} else {
-				return ChatLib.chat(`&3[HTSL] &cUnknown action &e${keyword}&c on &eline ${currentLine}`);
+				multiLineOffset = 0;
 			}
-			multiLineOffset = 0;
+			actionobj[j].actionList = [];
+			actionobj[j].actions = newActionList;
 		}
-		actionobj[j].actionList = [];
-		actionobj[j].actions = newActionList;
-	}
 
-	if (!nested) {
-		if (!loadAction(actionobj)) return false;
-	} else return actionobj.map(n => { n.compiled = true; return n });
-	// } catch (error) {
-	// 	ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-	// 	ChatLib.chat(error);
-	// 	console.error(error);
-	// }
+		if (!nested) {
+			if (!loadAction(actionobj)) return false;
+		} else return actionobj.map(n => { n.compiled = true; return n });
+	} catch (error) {
+		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
+		ChatLib.chat(error);
+		console.error(error);
+	}
 }
 
 function replaceMacros(text, macros) {
-    macros.forEach(macro => {
-        let regex = new RegExp('\\b' + macro.name + '\\b', 'g');
-        text = text.replace(regex, (match, offset, string) => {
-            // Check if the match is inside quotes
-            let inQuotes = (string.charAt(offset - 1) === "'" || string.charAt(offset - 1) === '"') &&
-                           (string.charAt(offset + match.length) === "'" || string.charAt(offset + match.length) === '"');
-            // If the match is not inside quotes, replace it with the macro value
-            return inQuotes ? match : macro.value;
-        });
-    });
-    return text;
+	macros.forEach(macro => {
+		let regex = new RegExp('\\b' + macro.name + '\\b', 'g');
+		text = text.replace(regex, (match, offset, string) => {
+			// Check if the match is inside quotes
+			let inQuotes = (string.charAt(offset - 1) === "'" || string.charAt(offset - 1) === '"') &&
+				(string.charAt(offset + match.length) === "'" || string.charAt(offset + match.length) === '"');
+			// If the match is not inside quotes, replace it with the macro value
+			return inQuotes ? match : macro.value;
+		});
+	});
+	return text;
 }
 
 function getArgs(input) {
@@ -143,7 +143,7 @@ function getArgs(input) {
 function evaluateExpression(expression) {
 	let result = "";
 	let inQuotes = false;
-	
+
 	for (let i = 0; i < expression.length; i++) {
 		if (expression[i] === '"') {
 			inQuotes = !inQuotes;  // Toggle the inQuotes flag
@@ -153,7 +153,7 @@ function evaluateExpression(expression) {
 			result += expression[i];
 		}
 	}
-	
+
 	expression = result;
 
 	// Evaluate the expression
@@ -393,7 +393,7 @@ export function preProcess(importActions, dissallowedFiles) {
 	let actionobj = [];
 	let multilineAction;
 	let multilineActionLength = 0;
-	let currentContext = { context: "DEFAULT", contextTarget: {} };
+	let currentContext = { context: "DEFAULT", contextTarget: {}, trueActions: [] };
 	let multilineComment = false;
 	let depth = 0;
 	for (let i = 0; i < importActions.length; i++) {
@@ -413,11 +413,23 @@ export function preProcess(importActions, dissallowedFiles) {
 		if (importActions[i] == "}" && multilineAction && depth == 0) {
 			if (multilineAction[0].line.startsWith("loop")) {
 				let newContexts = preProcess(handleLoop(multilineAction.map(obj => obj.line).join("\n")));
-				actionobj.push({
-					context: currentContext.context,
-					contextTarget: currentContext.contextTarget,
-					actionList: newContexts[0].actionList.map(line => { line.trueLine = line.trueLine + i - (1) * (1 + newContexts[0].actionList.length); return line })
-				});
+				// handle default context
+				if (newContexts[0].context == "DEFAULT") {
+					trueActions.push(...newContexts[0].actionList.map(line => { line.trueLine = line.trueLine + i - (1) * (1 + newContexts[0].actionList.length); return line }));
+				} else {
+					actionobj.push({
+						context: currentContext.context,
+						contextTarget: currentContext.contextTarget,
+						actionList: trueActions
+					});
+					actionobj.push({
+						context: newContexts[0].context,
+						contextTarget: newContexts[0].contextTarget,
+						actionList: newContexts[0].actionList.map(line => { line.trueLine = line.trueLine + i - (j + 1) * (1 + newContexts[0].actionList.length); return line })
+					});
+				}
+
+				// handle other contexts
 				for (let j = 1; j < newContexts.length; j++) {
 					let context = newContexts[j];
 					if (j == newContexts - 1) {
@@ -469,7 +481,13 @@ export function preProcess(importActions, dissallowedFiles) {
 				fileCall[0].context = gotoArgs[1].toUpperCase();
 				fileCall[0].contextTarget = { name: gotoArgs[2] };
 				actionobj.push(...fileCall);
-			} else currentContext = { context: gotoArgs[1].toUpperCase(), contextTarget: { name: gotoArgs[2] } };
+			} else if (gotoArgs.length == 6 && gotoArgs[2] == "region" && gotoArgs[4] == "as") {
+				if (dissallowedFiles.includes(gotoArgs[4])) return `&3[HTSL] &cNested file calls detected`;
+				let fileCall = compile(gotoArgs[4], dissallowedFiles, true);
+				fileCall[0].context = gotoArgs[1].toUpperCase();
+				fileCall[0].contextTarget = { name: gotoArgs[2], trigger: gotoArgs[4] };
+				actionobj.push(...fileCall)
+			} else currentContext = { context: gotoArgs[1].toUpperCase(), contextTarget: { name: gotoArgs[2], trigger: gotoArgs[3] } };
 			trueActions = [];
 			continue;
 		}

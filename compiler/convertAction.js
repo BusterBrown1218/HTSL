@@ -34,7 +34,7 @@ export function convertJSON (json) {
         } else {
             script.push(`goto ${json[context].context.toLowerCase()} "${json[context].contextTarget.name}"`);
         }
-        let actions = json[context].actions
+        let actions = json[context].actions;
         for (let action in actions) {
             let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
             if (syntax) syntax = syntaxs.actions[syntax];
@@ -50,8 +50,10 @@ function convertComponent(obj, syntax, menu) {
     let properties = syntax.full.match(/<(.*?)>/g);
     let action = syntax.full;
     if (properties) properties.forEach((property) => {
-        if (menu[property.match(/<(.*)>/)[1]].type == "subactions") {
-            let actions = obj[property.match(/<(.*)>/)[1]];
+        let propertyName = property.match(/<(.*)>/)[1];
+        if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName].replace("$", "§");
+        if (menu[propertyName].type == "subactions") {
+            let actions = obj[propertyName];
             let subactions = [];
             for (let action in actions) {
                 let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
@@ -61,8 +63,8 @@ function convertComponent(obj, syntax, menu) {
                 subactions.push(convertComponent(actions[action], syntax, submenu));
             }
             action = action.replace(property, subactions.join("\n"));
-        } else if (menu[property.match(/<(.*)>/)[1]].type == "conditions") {
-            let conditions = obj[property.match(/<(.*)>/)[1]];
+        } else if (menu[propertyName].type == "conditions") {
+            let conditions = obj[propertyName];
             let conditionList = [];
             for (let condition in conditions) {
                 let syntax = Object.keys(syntaxs.conditions).find(n => syntaxs.conditions[n].type == conditions[condition].type);
@@ -72,12 +74,12 @@ function convertComponent(obj, syntax, menu) {
                 conditionList.push(convertComponent(conditions[condition], syntax, submenu));
             }
             action = action.replace(property, conditionList.join(", "));
-        } else if (menu[property.match(/<(.*)>/)[1]].type == "location") {
-            let location = obj[property.match(/<(.*)>/)[1]];
+        } else if (menu[propertyName].type == "location") {
+            let location = obj[propertyName];
             action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z}${location.yaw == 0 ? "" : " " + location.yaw}${location.pitch == 0 || location.pitch == 0 ? "" : " " + location.pitch}"`);
-        } else if (obj[property.match(/<(.*)>/)[1]] != null) action = action.replace(property, String(obj[property.match(/<(.*)>/)[1]]).includes(" ") ? `"${obj[property.match(/<(.*)>/)[1]]}"` : obj[property.match(/<(.*)>/)[1]]);
+        } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replace("§", "$");
         else action = action.replace(property, "null");
-    })
+    });
     return action;
 }
 

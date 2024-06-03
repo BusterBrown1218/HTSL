@@ -14,11 +14,19 @@ class Settings {
 	
 	@SwitchProperty({
 		name: "Save Imports",
-		description: 'Will keep the filename of your import inbetween imports so you don\'t have to type the same thing multiple times',
+		description: 'Will keep the folder of your import inbetween imports so you don\'t have to navigate to the same thing multiple times',
 		category: "General",
 		subcategory: "General",
 	})
 	saveimports = false;
+
+	@SwitchProperty({
+		name: "Load Message",
+		description: 'Toggles whether or not the load message shows. Doesn\'t disable update-check',
+		category: "General",
+		subcategory: "General",
+	})
+	loadMessage = true;
 
 	@SwitchProperty({
 		name: "Close GUI on Exit",
