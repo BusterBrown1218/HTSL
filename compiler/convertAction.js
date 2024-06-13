@@ -5,6 +5,12 @@ import _conditions from "../actions/conditions";
 
 const housingEditor = 'https://api.housingeditor.com'
 
+/**
+ * Converts a HousingEditor action to HTSL.
+ * @param {string} actionId Housing Editor Action ID
+ * @param {string} filename Filename to export to
+ * @returns 
+ */
 export function convertHE (actionId, filename) {
     if (actionId === 'test') return loadTestAction();
 
@@ -27,6 +33,11 @@ export function convertHE (actionId, filename) {
     })
 }
 
+/**
+ * Converts a JSON file to HTSL. 
+ * @param {object} json Json object to transform
+ * @returns {string} The new HTSL file.
+ */
 export function convertJSON (json) {
     let script = [];
     for (let context in json) {
@@ -100,6 +111,12 @@ function convertData(actionList, title, author) {
     return script;
 }
 
+/**
+ * Converts an individual JSON action to HTSL.
+ * @param {string} actionType Type of the action
+ * @param {object} actionData Data associated with the action 
+ * @returns {string} The new line
+ */
 function readActions(actionType, actionData) {
     let line;
     switch (actionType) {
@@ -224,6 +241,13 @@ function readActions(actionType, actionData) {
     return line;
 }
 
+/**
+ * Converts a JSON action conditional to HTSL.
+ * @param {[string, object]} condition A list with two parts; 
+ *                                     the string represents the type, 
+ *                                     the object represents the associated data.
+ * @returns {string} The action in HTSL form.
+ */
 function readConditions(condition) {
     const [conditionType, conditionData] = condition;
     switch (conditionType) {

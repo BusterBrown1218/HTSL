@@ -1,7 +1,8 @@
 /**
  * Contains metadata corresponding to HTSL actions and their corresponding Housing actions
- * @key {string} type The Housing ID for the action.
- * @param {string} full The corresponding HTSL code for the arguments.
+ * @typedef {object} HTSLActionData
+ * @property {string} type The Housing ID for the action.
+ * @property {string} full The corresponding HTSL code for the arguments.
  *                      This field also supports <argument_name> after the command name for arguments.
  */
 export default {

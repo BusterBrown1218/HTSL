@@ -1,19 +1,22 @@
+
 /**
- * This file contains the data for every Housing conditional.
- * 
- * Each key follows this pattern:
- * @param {string} condition_name What housing calls this Conditional
- * The rest of the keys are the options associated with the conditional.
- * The other keys follow this pattern:
- * @param {number} slot The slot the option is in.
- * @param {any} default_value The default value for this conditional.
- * @param {string} type The type of conditional. This field can have these values:
+ * Type definition for Conditions
+ * @typedef {object} ConditionalData
+ * @property {number} slot The slot the option is in.
+ * @property {any} default_value The default value for this conditional.
+ * @property {string} type The type of conditional. This field can have these values:
  *                      - "dynamic_option_select" means that the slot opens a new menu with any potential possibilities.
  *                      - "toggle" means this slot is togglable between `true` or `false`.
  *                      - "static_option_select" means that the slot opens a new menu with a certain set of possibilities.
  *                        This has an "options" field which is a list of strings with option names.
+ *                        @property {string[]} options List of options to be able to select from "static_option_select"
  *                      - "chat_input" means the slot requires you to type something in chat to fill it out.
  *                      - "anvil_input" means the slot requires you to name an item in an anvil to fill it out.
+ */
+/**
+ * This file contains the data for every Housing conditional.
+ * 
+ * Each key is an instance of {@link ConditionalData}.
  */
 export default {
     IN_GROUP: {
