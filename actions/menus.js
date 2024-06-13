@@ -1,5 +1,6 @@
 /**
  * Contains data on all actions and their menus.
+ * @const
  */
 export default {
     CHANGE_STAT: {

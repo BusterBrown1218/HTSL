@@ -17,6 +17,8 @@
  * This file contains the data for every Housing conditional.
  * 
  * Each key is an instance of {@link ConditionalData}.
+ * @const
+ * @type {ConditionalData[]}
  */
 export default {
     IN_GROUP: {

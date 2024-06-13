@@ -1,10 +1,17 @@
 /**
- * Contains metadata corresponding to HTSL actions and their corresponding Housing actions
+ * 
  * @typedef {object} HTSLActionData
+ * @type {object}
  * @property {string} type The Housing ID for the action.
  * @property {string} full The corresponding HTSL code for the arguments.
  *                      This field also supports <argument_name> after the command name for arguments.
  * 
+ * 
+ */
+/**
+ * Contains metadata corresponding to HTSL actions and their corresponding Housing actions
+ * @type {{actions: object.<string, HTSLActionData>}}
+ * @const
  */
 export default {
     actions: {
