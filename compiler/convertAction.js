@@ -57,6 +57,13 @@ export function convertJSON (json) {
     return script.join("\n");
 }
 
+/**
+ * Converts a JSON component to an HTSL action.
+ * @param {object} obj JSON object with the associated data of the action.
+ * @param {object} syntax Syntax responsible for the action, obtained from {@link syntaxs}
+ * @param {object} menu The menu context of the component, obtained from {@link menus}
+ * @returns {string} The corresponding HTSL action.
+ */
 function convertComponent(obj, syntax, menu) {
     let properties = syntax.full.match(/<(.*?)>/g);
     let action = syntax.full;
@@ -94,7 +101,13 @@ function convertComponent(obj, syntax, menu) {
     return action;
 }
 
-// Old HE code
+/**
+ * Old housing editor code for conversion to HTSL.
+ * @param {[string, object][]} actionList A list of actions to convert
+ * @param {string} title Title of the action 
+ * @param {string} author Author of the action.
+ * @returns HTSL script
+ */
 function convertData(actionList, title, author) {
     let script = [];
     script.push(`// Original action "${title}" by ${author}`);

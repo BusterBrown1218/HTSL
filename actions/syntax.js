@@ -4,6 +4,7 @@
  * @property {string} type The Housing ID for the action.
  * @property {string} full The corresponding HTSL code for the arguments.
  *                      This field also supports <argument_name> after the command name for arguments.
+ * 
  */
 export default {
     actions: {
