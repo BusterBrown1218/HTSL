@@ -1,4 +1,7 @@
-
+/**
+ * An object containing the action limit for each type of action.
+ * @const
+ */
 const limits = {
     "APPLY_LAYOUT": 5,
     "POTION_EFFECT": 22,

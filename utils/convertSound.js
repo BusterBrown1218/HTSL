@@ -1,3 +1,18 @@
+/**
+ * @typedef Sound
+ * @type {object}
+ * @property {string} name Name of the sound in Housing
+ * @property {string} path Path of the sound in Minecraft
+*/
+
+
+/**
+ * A list of sounds.
+ * @type {Sound[]} 
+ * @const
+ * @description This variable is a list of sound pairs. The `name` is the name of the sound in Housing,
+ *                                        and `path` is a path to the sound in Minecraft.
+*/
 const sounds = [
   { name: "Ambience Cave", path: "ambient.cave.cave" },
   { name: "Ambience Rain", path: "ambient.weather.rain" },

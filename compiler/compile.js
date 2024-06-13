@@ -9,6 +9,13 @@ export function isImporting() {
 	return working();
 }
 
+/**
+ * Compiles an HTSL program into a series of Actions.
+ * @param {string} fileName The name of the file to compile. 
+ * @param {string} dissallowedFiles Files to exclude from the compilation.
+ * @param {boolean} nested Whether to check for nested files or not. 
+ * @returns 
+ */
 export function compile(fileName, dissallowedFiles, nested) {
 	console.log(fileName);
 	try {
@@ -67,6 +74,12 @@ export function compile(fileName, dissallowedFiles, nested) {
 	}
 }
 
+/**
+ * Performs macro substitution on the given input text.
+ * @param {string} text Text to perform the substitution on.
+ * @param {object[]} macros A series of macros.
+ * @returns {string} Text with macros substituted.
+ */
 function replaceMacros(text, macros) {
 	macros.forEach(macro => {
 		let regex = new RegExp('\\b' + macro.name + '\\b', 'g');
@@ -81,6 +94,11 @@ function replaceMacros(text, macros) {
 	return text;
 }
 
+/**
+ * Transforms a string of each argument into a list of arguments.
+ * @param {string} input 
+ * @returns {string[]} A list of arguments.
+ */
 function getArgs(input) {
 	let conversions = [
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(.*)?/g, replacement: "$1 %stat.global/$2%" },
@@ -140,6 +158,11 @@ function getArgs(input) {
 	return result;
 }
 
+/**
+ * Evaluates an JS expression from the code.
+ * @param {string} expression The expression to evaluate
+ * @returns The result of the expression
+ */
 function evaluateExpression(expression) {
 	let result = "";
 	let inQuotes = false;
@@ -163,6 +186,11 @@ function evaluateExpression(expression) {
 	return result;
 }
 
+/**
+ * If a multiline expression is ahead (e.g parenthesis), this will parse each argument int oa list.
+ * @param {string} input 
+ * @returns {string[]} The multiline expressions in a list.
+ */
 function getMultiline(input) {
 	let result = [];
 	let depth = 0;

@@ -1,3 +1,7 @@
+/**
+ * Contains data on all actions and their menus.
+ * @const
+ */
 export default {
     CHANGE_STAT: {
         action_name: "Change Player Stat",
