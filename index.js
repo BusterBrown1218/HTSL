@@ -97,6 +97,12 @@ register("command", ...args => {
     }
 }).setName('htsl').setAliases(['ht']);
 
+/**
+ * Obtains a list of file names from a directory.
+ * @param {string} path The path to the directory to walk.
+ * @param {boolean} walk `true` if the function should walk deeper into directories.
+ * @returns 
+ */
 function readDir(path, walk) {
     let files = new java.io.File(path).listFiles();
     let fileNames = [];
