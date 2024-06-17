@@ -2,7 +2,7 @@ const C10PacketCreativeInventoryAction = Java.type("net.minecraft.network.play.c
 // https://wiki.vg/Protocol#Creative_Inventory_Action
 
 export default (itemStack, slot) => {
-	if (Player.getInventory().getStackInSlot(slot) != null && Player.getInventory().getStackInSlot(slot).getItemStack().func_179549_c(itemStack)) return;
+	if (Player.getInventory().getStackInSlot(slot - 5) != null && Player.getInventory().getStackInSlot(slot - 5).getItemStack().func_179549_c(itemStack)) return;
 	Client.sendPacket(
 		new C10PacketCreativeInventoryAction(
 			slot, // slot, 36=hotbar slot 1

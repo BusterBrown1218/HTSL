@@ -218,7 +218,7 @@ export default {
         },
         level: {
             slot: 12,
-            default_value: 10,
+            default_value: 1,
             type: "anvil_input"
         },
         override_existing_effects: {

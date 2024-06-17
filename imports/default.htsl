@@ -1,1 +1,3 @@
-chat "Does anyone even look at this?"
+loop 20 index {
+giveItem "stone"
+}

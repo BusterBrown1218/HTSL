@@ -103,10 +103,10 @@ register('guiRender', (x, y) => {
 	exportButton.setWidth(importButton.getWidth());
 	try {
 		if ((Settings.toggleFileExplorer && show) || !Settings.toggleFileExplorer) {
-			refreshFiles.setWidth(chestX - xBound - 10);
+			refreshFiles.setWidth(chestX - xBound - 10 < 10 ? 10 : chestX - xBound - 10);
 			refreshFiles.setX((chestX - xBound) / 2 + xBound - refreshFiles.getWidth() / 2);
 			refreshFiles.setY(input.getY());
-			backDir.setWidth(chestX - xBound - 10);
+			backDir.setWidth(chestX - xBound - 10 < 10 ? 10 : chestX - xBound - 10);
 			backDir.setX((chestX - xBound) / 2 + xBound - refreshFiles.getWidth() / 2);
 			backDir.setY(input.getY() - 25);
 
@@ -304,7 +304,6 @@ register('guiMouseClick', (x, y, mouseButton) => {
 		}
 		if (filteredFiles[index].endsWith('.htsl')) {
 			if (Player.asPlayerMP().player.field_71075_bZ.field_75098_d === false) ChatLib.command("gmc");
-			console.log(filteredFiles[index]);
 			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);
 			if (Settings.saveimports) {
 				input.setText(filteredFiles[index].substring(0, filteredFiles[index].length - 5));
@@ -323,7 +322,9 @@ register('guiMouseClick', (x, y, mouseButton) => {
 			}
 			let nbt = JSON.parse(FileLib.read('HTSL', `/imports/${subDir.replace("\\", "/") + filteredFiles[index]}`)).item;
 			let item = getItemFromNBT(nbt);
-			loadItemstack(item.getItemStack(), Player.getHeldItemIndex() + 36);
+			let slot = Player.getInventory().getItems().indexOf(null);
+			if (slot < 9) slot += 36;
+			loadItemstack(item.getItemStack(), slot);
 			World.playSound('random.click', 0.5, 1);
 		}
 	}
@@ -378,7 +379,7 @@ register('guiOpened', (gui) => {
 	if (!Player.getContainer()) return;
 	// for some reason this event triggers before the gui actually loads?? so we have to wait
 	setTimeout(() => {
-		if (!isInActionGui()) return;
+		if (!isInActionGui()) return wasInActionGui = false;
 		if (wasInActionGui) return;
 		if (!wasInActionGui && isInActionGui()) wasInActionGui = true;
 

@@ -195,7 +195,7 @@ register("packetReceived", (packet, event) => {
     "net.minecraft.network.play.server.S2FPacketSetSlot"
   ) {
     const containerName = Player.getContainer().getName();
-    if (containerName !== "Select an Item") return;
+    if (!["Select an Item", "Settings", "Action Settings"].includes(containerName) && packet.getClass() == "class net.minecraft.network.play.server.S2FPacketSetSlot") return;
     Navigator.isLoadingItem = false;
   }
 });

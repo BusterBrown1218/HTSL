@@ -49,6 +49,7 @@ export function loadAction(script) {
         }
         for (let i = 0; i < script[container].actions.length; i++) {
             addOperation({ type: 'click', slot: 50 }); // click "Add Action" Button
+            addOperation({ type: 'setGuiContext', context: "Add Action" });
             addOperation({ type: 'option', option: menus[script[container].actions[i].type].action_name });
             importComponent(script[container].actions[i], menus[script[container].actions[i].type]);
             addOperation({ type: 'returnToEditActions' });

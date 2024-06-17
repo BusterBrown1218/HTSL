@@ -17,7 +17,6 @@ export function isImporting() {
  * @returns 
  */
 export function compile(fileName, dissallowedFiles, nested) {
-	console.log(fileName);
 	try {
 		if (!dissallowedFiles) dissallowedFiles = [];
 		let importText;

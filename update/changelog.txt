@@ -1,5 +1,4 @@
 Update 1.1.2:
 - Bugfixes
+- /htsl giveitem <filename>
 - Minor QoL changes
-- goto now supports regions "goto region "region name" "Entry Actions"/"Exit Actions"
-- /htsl config

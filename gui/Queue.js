@@ -162,6 +162,7 @@ register("guiMouseClick", (x, y) => {
 export function addOperation(operation) {
   if (!Navigator.isWorking) {
     if (operation.type == "returnToEditActions") return;
+    Navigator.isLoadingItem = false;
     Navigator.isReady = true;
   }
   Navigator.isWorking = true;
@@ -171,6 +172,7 @@ export function forceOperation(operation) {
   if (!Navigator.isWorking) {
     if (operation.type == "returnToEditActions") return;
     Navigator.isReady = true;
+    Navigator.isLoadingItem = false;
   }
   Navigator.isWorking = true;
   queue.unshift(operation);

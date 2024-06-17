@@ -6,6 +6,8 @@ import { preProcess } from './compiler/compile';
 import { addOperation } from './gui/Queue';
 import Navigator from './gui/Navigator';
 import "./update/update";
+import getItemFromNBT from './utils/getItemFromNBT';
+import loadItemstack from './utils/loadItemstack';
 
 register("command", ...args => {
     let command;
@@ -79,6 +81,19 @@ register("command", ...args => {
     if (command === "version") {
         return ChatLib.chat(`&3[HTSL] &fVersion ${JSON.parse(FileLib.read("HTSL", "./metadata.json")).version}`);
     }
+    if (command === "giveitem") {
+        if (Player.asPlayerMP().player.field_71075_bZ.field_75098_d === false) {
+            World.playSound('mob.villager.no', 0.5, 1);
+            return ChatLib.chat(`&3[HTSL] &cMust be in creative mode to import an item!`);
+        }
+        args.shift();
+        let nbt = JSON.parse(FileLib.read('HTSL', `/imports/${args.join(" ")}.json`)).item;
+        let item = getItemFromNBT(nbt);
+        let slot = Player.getInventory().getItems().indexOf(null);
+        if (slot < 9) slot += 36;
+        loadItemstack(item.getItemStack(), slot);
+        return;
+    }
     if (command === 'help') {
         ChatLib.chat('&8&m-------------------------------------------------');
         ChatLib.chat('&6/htsl help &7Opens the HTSL help menu!')
@@ -91,6 +106,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl addfunctions <filename> &7Imports all the required functions to prepare for import!');
         ChatLib.chat('&6/htsl listscripts &7Lists all your scripts');
         ChatLib.chat('&6/htsl version &7Returns your current HTSL version');
+        ChatLib.chat('&6/htsl giveitem <filename> &7Gives you an item from your imports');
         ChatLib.chat('&8&m-------------------------------------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');
