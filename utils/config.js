@@ -72,6 +72,16 @@ class Settings {
 	})
 	guiTimeout = 60;
 
+	@SliderProperty({
+		name: "GUI Delay",
+		description: "Adds extra delay between clicks while importing. Not required, but it might help if imports freeze often. Measured in milliseconds",
+		category: "Importing/Exporting",
+		subcategory: "Importing/Exporting",
+		min: 0,
+		max: 1000
+	})
+	guiDelay = 0;
+
 	@SwitchProperty({
 		name: "Export Color Codes",
 		description: 'Exporting will check for color codes, but it will be slower',

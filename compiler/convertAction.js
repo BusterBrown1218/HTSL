@@ -93,6 +93,10 @@ function convertComponent(obj, syntax, menu) {
             }
             action = action.replace(property, conditionList.join(", "));
         } else if (menu[propertyName].type == "location") {
+            if (typeof obj[propertyName] == "string") {
+                action = action.replace(property, obj[propertyName].includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]);
+                return;
+            }
             let location = obj[propertyName];
             action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z}${location.yaw == 0 ? "" : " " + location.yaw}${location.pitch == 0 || location.pitch == 0 ? "" : " " + location.pitch}"`);
         } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replace("§", "$");

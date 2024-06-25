@@ -34,6 +34,10 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                         "pitch": 0,
                         "yaw": 0
                     }
+                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "House Spawn Location") {
+                    action[key] = "house_spawn_location";
+                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "Invokers Location") {
+                    action[key] = "invokers_location";
                 } else {
                     let temp = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/(~)?(-?\d+(\.\d+)?)/g);
                     action[key] = {

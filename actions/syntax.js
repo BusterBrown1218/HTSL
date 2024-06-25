@@ -51,6 +51,10 @@ export default {
             type: "CHANGE_PLAYER_GROUP",
             full: "changePlayerGroup <group> <demotion_protection>"
         },
+        changeGroup: {
+            type: "CHANGE_PLAYER_GROUP",
+            full: "changeGroup <group> <demotion_protection>"
+        },
         stat: {
             type: "CHANGE_STAT",
             full: "stat <stat> <mode> <amount>"
@@ -253,6 +257,10 @@ export default {
             type: "IN_GROUP",
             full: "hasGroup <required_group> <include_higher_groups>"
         },
+        inGroup: {
+            type: "IN_GROUP",
+            full: "inGroup <required_group> <include_higher_groups>"
+        },
         hasPermission: {
             type: "HAS_PERMISSION",
             full: "hasPermission <required_permission>"
@@ -260,6 +268,10 @@ export default {
         hasTeam: {
             type: "IN_TEAM",
             full: "hasTeam <required_team>"
+        },
+        inTeam: {
+            type: "IN_TEAM",
+            full: "inTeam <required_team>"
         },
         teamstat: {
             type: "TEAM_STAT",

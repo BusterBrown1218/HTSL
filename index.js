@@ -38,6 +38,11 @@ register("command", ...args => {
     if (command === 'saveitem') {
         if (args.length < 2) return ChatLib.chat("&3[HTSL] &cPlease enter a filename to save it to!");
         let itemHeld = Player.getHeldItem().getNBT().toString().replace(/["]/g, '\\$&');
+        let directory = args[1].match(/(.*)\//);
+        if (directory) {
+            if (!new java.io.File(`./config/ChatTriggers/modules/HTSL/imports/${directory[1]}`).exists())
+                return ChatLib.chat(`&3[HTSL] &cimports/&e${directory[1]}&c does not exist!`);
+        }
         FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`, `{"item": "${itemHeld}"}`);
         return ChatLib.chat(`&3[HTSL] &fSaved item to ${args[1]}.json`);
     }

@@ -144,12 +144,12 @@ function getArgs(input) {
 			macros.forEach((macro) => {
 				arg = arg.replace(macro.name, macro.value);
 			});
-			// try {
-			result.push(evaluateExpression(arg));
-			continue;
-			// } catch (e) {
-			// 	return false;
-			// }
+			try {
+				result.push(evaluateExpression(arg));
+				continue;
+			} catch (e) {
+				return false;
+			}
 		}
 		result.push(arg);
 	}
@@ -293,6 +293,7 @@ function splitOutsideBrackets(str) {
 }
 
 function componentFunc(args, syntax, menu) {
+	if (menu.action_name == "Go to House Spawn") return `Hypixel has deprecated &ehouseSpawn&c. You cannot use this action on &eline {line}`;
 	let params = [];
 	if (syntax.full.match(/\<(.*?)\>/g)) params = syntax.full.match(/\<(.*?)\>/g).map(n => n.substring(1, n.length - 1));
 	let component = { type: syntax.type };
@@ -310,13 +311,17 @@ function componentFunc(args, syntax, menu) {
 		}
 		// handle custom location location type
 		if (menu[params[j]].type == "location") {
-			if (!["house_spawn", "current_location", "invokers_location", "custom_coordinates"].includes(args[j].toLowerCase().replace(" ", "_"))) return `Invalid location &e${args[j]}&c on &eline {line}`;
-			if (args[j].toLowerCase().replace(" ", "_") == "custom_coordinates") {
+			if (!["house_spawn", "current_location", "invokers_location", "custom_coordinates", "house_spawn_location"].includes(args[j].toLowerCase().replace(/ +/g, "_"))) return `Invalid location &e${args[j]}&c on &eline {line}`;
+			if (args[j].toLowerCase().replace(/ +/g, "_") == "custom_coordinates") {
 				args[j] = {
 					type: "custom_coordinates",
 					coords: args[j + 1]
 				}
-			} else args[j] = { type: args[j] }
+			} else if (args[j].toLowerCase().replace(/ +/g, "_") == "house_spawn") {
+				args[j] = { type: "house_spawn_location" }
+			} else {
+				args[j] = { type: args[j] }
+			}
 		}
 		// handle toggles
 		if (menu[params[j]].type == "toggle") {

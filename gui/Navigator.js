@@ -92,6 +92,7 @@ register("guiRender", () => {
   if (container.getClassName() === "ContainerCreative") return;
   if (container.getName() === "Housing Menu") return;
   if (Navigator.itemsLoaded.lastItemAddedTimestamp === 0) return; // no items loaded yet so wait for items to load
+  if (Date.now() - Navigator.itemsLoaded.lastItemAddedTimestamp < Settings.guiDelay) return;
   if (container.getItems().splice(container.getSize() - 44, 9).filter(n => n).length == 0 && container.getClassName() !== "ContainerPlayer") return;
   if (Navigator.isLoadingItem) return;
   Navigator.isReady = true;

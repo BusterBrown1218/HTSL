@@ -93,11 +93,11 @@ function importComponent(component, menu) {
                 break;
             case "location":
                 let location = component[key];
-                if (location.type.toLowerCase().replace(" ", "_") == "custom_coordinates") {
+                if (location.type.toLowerCase().replace(/ +/g, "_") == "custom_coordinates") {
                     addOperation({ type: 'click', slot: 13 }); // Click "Custom Coordinates" Button
                     addOperation({ type: 'anvil', text: location.coords });    
                 } else {
-                    addOperation({ type: 'click', slot: 10 + ["house_spawn", "current_location", "invokers_location"].indexOf(location.type.toLowerCase().replace(" ", "_"))})
+                    addOperation({ type: 'click', slot: 10 + ["house_spawn_location", "invokers_location", "current_location"].indexOf(location.type.toLowerCase().replace(/ +/g, "_"))})
                 }
                 break;
             case "subactions":
