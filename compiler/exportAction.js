@@ -39,7 +39,8 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                 } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "Invokers Location") {
                     action[key] = "invokers_location";
                 } else {
-                    let temp = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/(~)?(-?\d+(\.\d+)?)/g);
+                    let temp = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/(~)?(-?(\d+)?(\.\d+)?)/g).filter(n => n);
+                    console.log(ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]));
                     action[key] = {
                         "relZ": temp[2].includes("~") ? 1 : 0,
                         "relY": temp[1].includes("~") ? 1 : 0,
