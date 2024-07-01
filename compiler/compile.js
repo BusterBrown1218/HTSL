@@ -2,6 +2,7 @@ import { loadAction, working } from "./loadAction";
 import menus from "../actions/menus";
 import conditions from "../actions/conditions";
 import syntaxes from "../actions/syntax";
+import Settings from "../utils/config";
 
 let macros = [];
 
@@ -20,8 +21,12 @@ export function compile(fileName, dissallowedFiles, nested) {
 	try {
 		if (!dissallowedFiles) dissallowedFiles = [];
 		let importText;
-		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
-			importText = FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`);
+
+		let path = Settings.workingDirectory + `/${fileName}.htsl`;
+		if (path == "$DEFAULT_FOLDER") path = `${Config.modulesFolder}/HTSL/imports/${fileName}.htsl`;
+		
+		if (FileLib.exists(path)) {
+			importText = FileLib.read(path);
 		} else {
 			return ChatLib.chat(`&3[HTSL] &cCouldn't find the file "&f${fileName}&c", please make sure it exists!`);
 		}
@@ -336,8 +341,11 @@ function componentFunc(args, syntax, menu) {
 			if (typeof args[j] == "object") {
 				args[j].type = "clickSlot";
 			} else {
-				if (!FileLib.exists("HTSL", `imports/${args[j]}.json`)) return `Unknown item &e${args[j]}&c on &eline {line}`;
-				args[j] = JSON.parse(FileLib.read("HTSL", `imports/${args[j]}.json`));
+				let path = Settings.workingDirectory + `/${args[j]}.json`;
+				if (path == "$DEFAULT_FOLDER") path = `${Config.modulesFolder}/HTSL/imports/${args[j]}.json`;
+				
+				if (!FileLib.exists(path)) return `Unknown item &e${args[j]}&c on &eline {line}`;
+				args[j] = JSON.parse(FileLib.read(path));
 				args[j].type = "customItem";
 			}
 		}

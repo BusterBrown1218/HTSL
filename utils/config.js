@@ -126,6 +126,13 @@ class Settings {
 	})
 	debounce = 10;
 
+	@TextProperty({
+		name: "Working Directory",
+		description: "Modifies the directory HTSL will import from. To use the default HTSL/imports directory, set to $DEFAULT_FOLDER",
+		category: "Import Menu",
+		subcategory: "Import Menu"
+	})
+	workingDirectory = "$DEFAULT_FOLDER"
 	
 	constructor() {
 		this.initialize(this);
