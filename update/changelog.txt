@@ -1,5 +1,6 @@
-Update 1.1.4:
+Patch 1.1.5:
 - Bugfixes
-- Deprecated houseSpawn (Hypixel)
-- Added optional click delay setting for importing
 - Minor QoL changes
+- Emergency reload button for debugging
+- Fixes for MacOS support (thanks @NorthFailer)
+- Separated save filename and save directory settings

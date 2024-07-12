@@ -1,3 +1,5 @@
+/// <reference types="../CTAutocomplete" />
+
 import './gui/LoadActionGUI';
 import Config from "./utils/config";
 import codeWindow from './gui/codeWindow';
