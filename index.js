@@ -38,12 +38,7 @@ register("command", ...args => {
     if (command === 'saveitem') {
         if (args.length < 2) return ChatLib.chat("&3[HTSL] &cPlease enter a filename to save it to!");
         let itemHeld = Player.getHeldItem().getNBT().toString().replace(/["]/g, '\\$&');
-        let directory = args[1].match(/(.*)\//);
-        if (directory) {
-            if (!new java.io.File(`./config/ChatTriggers/modules/HTSL/imports/${directory[1]}`).exists())
-                return ChatLib.chat(`&3[HTSL] &cimports/&e${directory[1]}&c does not exist!`);
-        }
-        FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`, `{"item": "${itemHeld}"}`);
+        FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.json`, `{"item": "${itemHeld}"}`, true);
         return ChatLib.chat(`&3[HTSL] &fSaved item to ${args[1]}.json`);
     }
     if (command === 'convert') {
@@ -57,7 +52,7 @@ register("command", ...args => {
             Navigator.isReady = true;
             preProcess(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`).split("\n")).filter(n => n.context == "FUNCTION").forEach((context, index) => {
                 if (index > 0) addOperation({ type: 'closeGui' });
-                if (index > 0) addOperation({ type: 'wait', time: 1000 });
+                if (index > 0) addOperation({ type: 'wait', time: 1500 });
                 addOperation({ type: 'chat', text: `/function edit ${context.contextTarget.name}`, func: context.contextTarget.name, command: true });
             });
             addOperation({ type: 'closeGui' });

@@ -405,7 +405,7 @@ function readFiles() {
 	if (Settings.toggleFileExplorer && !show) return;
 	try {
 		files = readDir(`./config/ChatTriggers/modules/HTSL/imports/${subDir.replace("\\", "/")}`, false).filter(n => n.endsWith(".htsl") || n.endsWith(".json") || !n.includes("."));
-		files.sort((a, b) => {
+		files.sort().sort((a, b) => {
 			let isDirA = a.endsWith('\\');
 			let isDirB = b.endsWith('\\');
 

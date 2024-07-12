@@ -246,7 +246,7 @@ function inputChat(text, func, command) {
 
 register("chat", (event) => {
   if (!Navigator.isWorking) return;
-  ChatLib.command(`function create ${Navigator.func}`);
+  ChatLib.say(Navigator.func);
   cancel(event);
 }).setCriteria("Could not find a function with that name!");
 
