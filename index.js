@@ -122,23 +122,45 @@ register("command", ...args => {
  * Obtains a list of file names from a directory.
  * @param {string} path The path to the directory to walk.
  * @param {boolean} walk `true` if the function should walk deeper into directories.
- * @returns 
+ * @returns
  */
 function readDir(path, walk) {
     let files = new java.io.File(path).listFiles();
     let fileNames = [];
-    let regex = new RegExp(path.replace(/\//g, "\\\\") + "(.*)");
+
     files.forEach(file => {
         if (file.isDirectory()) {
             if (walk) {
-                readDir(path + file.getName() + "/").forEach(newFile => fileNames.push((file.toString() + "\\" + newFile.toString()).match(regex)[1]));
+                readDir(path + file.getName() + "/", false).forEach(newFile => {
+                    const fileName = getMatchedFileName(path, `${file}\\${newFile}`);
+
+                    if (fileName) fileNames.push(fileName);
+                });
             } else {
-                fileNames.push(file.toString().match(regex)[1] + "\\");
+                const fileName = getMatchedFileName(path, file.toString());
+
+                if (fileName) fileNames.push(`${fileName}\\`);
             }
         } else {
-            let match = file.toString().match(regex);
-            if (match) fileNames.push(match[1]);
+            const fileName = getMatchedFileName(path, file.toString());
+
+            if (fileName) fileNames.push(fileName);
         }
     });
     return fileNames;
+}
+
+function getMatchedFileName(path, filePath) {
+    const formattedPath = path.replace(/\//g, "\\\\");
+    const fileFormattedMatchRegexp = new RegExp(`${formattedPath}(.*)`);
+    const formattedPathMatchArray = filePath.match(fileFormattedMatchRegexp);
+
+    if (formattedPathMatchArray) return formattedPathMatchArray[1];
+
+    const fileMatchRegexp = new RegExp(`${path}(.*)`);
+    const pathMatchArray = filePath.match(fileMatchRegexp);
+
+    if (pathMatchArray) return pathMatchArray[1];
+
+    return null;
 }
