@@ -21,15 +21,14 @@ export function loadAction(script) {
             addOperation({ type: 'closeGui' });
             switch (script[container].context) {
                 case "FUNCTION":
-                    addOperation({ type: 'chat', text: `/function edit ${script[container].contextTarget.name}`, func: script[container].contextTarget.name, command: true });
+                    addOperation({ type: 'chat', text: `/function edit ${script[container].contextTarget.name}`, func: "/function create " + script[container].contextTarget.name, command: true });
                     break;
                 case "EVENT":
                     addOperation({ type: 'chat', text: `/eventactions`, command: true });
                     addOperation({ type: 'option', option: script[container].contextTarget.name });
                     break;
                 case "COMMAND":
-                    addOperation({ type: 'chat', text: `/customcommands`, command: true });
-                    addOperation({ type: 'option', option: script[container].contextTarget.name.startsWith("/") ? script[container].contextTarget.name : "/" + script[container].contextTarget.name });
+                    addOperation({ type: 'chat', text: `/customcommands edit ${script[container].contextTarget.name}`, func: "/customcommands create " + script[container].contextTarget.name, command: true });
                     break;
                 case "NPC":
                     addOperation({ type: 'goto', name: script[container].contextTarget.name });

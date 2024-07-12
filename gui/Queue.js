@@ -128,9 +128,11 @@ function doneLoading() {
 
 const timeRemainingButton = new Button(0, 0, 0, 20, "Time Remaining:");
 const cancelButton = new Button(0, 100, 100, 20, "Cancel");
+const reloadButton = new Button(0, Renderer.screen.getHeight() - 20, 100, 20, "Reload CT");
 
 register("guiRender", (x, y) => {
   if (!Player.getContainer()) return;
+  reloadButton.render(x, y);
   if (queue.length === 0) return;
 
   timeRemainingButton.setWidth(200);
@@ -143,7 +145,7 @@ register("guiRender", (x, y) => {
   timeRemainingButton.setY(timeRemainingButton.getHeight() * 3);
   cancelButton.setY(timeRemainingButton.getHeight() * 3 + 20);
   timeRemainingButton.render(x, y);
-  cancelButton.render(x, y);
+  if (Settings.reloadButton) cancelButton.render(x, y);
 });
 
 register("guiMouseClick", (x, y) => {
@@ -156,6 +158,14 @@ register("guiMouseClick", (x, y) => {
     y < cancelButton.getY() + cancelButton.getHeight()
   ) {
     queue.splice(0, queue.length - 1);
+  }
+  if (Settings.reloadButton) if (
+    x > reloadButton.getX() &&
+    x < reloadButton.getX() + reloadButton.getWidth() &&
+    y > reloadButton.getY() &&
+    y < reloadButton.getY() + reloadButton.getHeight()
+  ) {
+    ChatLib.command("ct load", true);
   }
 });
 

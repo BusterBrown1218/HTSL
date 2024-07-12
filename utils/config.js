@@ -13,12 +13,20 @@ class Settings {
 	// General
 	
 	@SwitchProperty({
-		name: "Save Imports",
-		description: 'Will keep the folder of your import inbetween imports so you don\'t have to navigate to the same thing multiple times',
+		name: "Save Import Directories",
+		description: 'Will keep the folder of your import inbetween imports so you don\'t have to navigate to the same directory multiple times',
 		category: "General",
 		subcategory: "General",
 	})
-	saveimports = false;
+	saveDirectory = true;
+
+	@SwitchProperty({
+		name: "Save Import File Name",
+		description: 'Will keep the name of your import inbetween imports so you don\'t have to type the same name multiple times',
+		category: "General",
+		subcategory: "General",
+	})
+	saveFile = false;
 
 	@SwitchProperty({
 		name: "Load Message",
@@ -51,6 +59,14 @@ class Settings {
 		subcategory: "General",
 	})
 	cancelSounds = true;
+
+	@SwitchProperty({
+		name: "Emergency reload button",
+		description: 'Reloads chattriggers in case of softlock. Mainly use for debugging.',
+		category: "General",
+		subcategory: "General",
+	})
+	reloadButton = false;
 
 	// Importing/Exporting 
 

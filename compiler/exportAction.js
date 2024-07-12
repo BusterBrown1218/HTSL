@@ -40,7 +40,6 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                     action[key] = "invokers_location";
                 } else {
                     let temp = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/(~)?(-?(\d+)?(\.\d+)?)/g).filter(n => n);
-                    console.log(ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]));
                     action[key] = {
                         "relZ": temp[2].includes("~") ? 1 : 0,
                         "relY": temp[1].includes("~") ? 1 : 0,
@@ -179,6 +178,8 @@ function processPage(items, actionList, menuList, page) {
                 break;
             }
         }
+        if (ChatLib.removeFormatting(items[i].getName()) == "No Actions!") continue;
+        if (!menu) return false;
         if (["Change Player's Group", "Set Gamemode"].includes(menu.action_name) && ChatLib.removeFormatting(items[i].getLore()[3]) == "You are not allowed to edit this action!") {
             forceOperation({
                 type: "actionOrder", func: () => {
@@ -187,7 +188,6 @@ function processPage(items, actionList, menuList, page) {
             })
             continue;
         }
-        if (!menu) return false;
         if (Object.keys(menu).length > 1) {
             // operations forced to the front of the queue, so they need to be added backwards
 

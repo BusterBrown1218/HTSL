@@ -305,7 +305,7 @@ register('guiMouseClick', (x, y, mouseButton) => {
 		if (filteredFiles[index].endsWith('.htsl')) {
 			if (Player.asPlayerMP().player.field_71075_bZ.field_75098_d === false) ChatLib.command("gmc");
 			if (compile(subDir.replace("\\", "/") + filteredFiles[index].substring(0, filteredFiles[index].length - 5))) World.playSound('random.click', 0.5, 1);
-			if (Settings.saveimports) {
+			if (Settings.saveFiles) {
 				input.setText(filteredFiles[index].substring(0, filteredFiles[index].length - 5));
 				filteredFiles = files.filter(n => n.toLowerCase().includes(input.getText().toLowerCase()));
 			}
@@ -345,7 +345,7 @@ function handleInputClick(button, action, x, y) {
 		input.setCursorPosition(0);
 		input.setLineScrollOffset(0);
 		input.setIsFocused(false);
-		if (!Settings.saveImports || input.getText() == "default") input.setText('Enter File Name');
+		if (!Settings.saveFile || input.getText() == "default") input.setText('Enter File Name');
 	}
 }
 
@@ -383,7 +383,7 @@ register('guiOpened', (gui) => {
 		if (wasInActionGui) return;
 		if (!wasInActionGui && isInActionGui()) wasInActionGui = true;
 
-		if (!Settings.saveimports) subDir = "";
+		if (!Settings.saveDirectory) subDir = "";
 		readFiles();
 	}, 50);
 });
@@ -405,7 +405,7 @@ function readFiles() {
 	if (Settings.toggleFileExplorer && !show) return;
 	try {
 		files = readDir(`./config/ChatTriggers/modules/HTSL/imports/${subDir.replace(/\\+/g, "/")}`, false).filter(n => n.endsWith(".htsl") || n.endsWith(".json") || !n.includes("."));
-		files.sort((a, b) => {
+		files.sort().sort((a, b) => {
 			let isDirA = a.endsWith('\\');
 			let isDirB = b.endsWith('\\');
 
