@@ -132,7 +132,10 @@ const reloadButton = new Button(0, Renderer.screen.getHeight() - 20, 100, 20, "R
 
 register("guiRender", (x, y) => {
   if (!Player.getContainer()) return;
-  reloadButton.render(x, y);
+  if (Settings.reloadButton && queue.length > 0) {
+    reloadButton.setY(Renderer.screen.getHeight() - 20);
+    reloadButton.render(x, y);
+  }
   if (queue.length === 0) return;
 
   timeRemainingButton.setWidth(200);
@@ -145,7 +148,7 @@ register("guiRender", (x, y) => {
   timeRemainingButton.setY(timeRemainingButton.getHeight() * 3);
   cancelButton.setY(timeRemainingButton.getHeight() * 3 + 20);
   timeRemainingButton.render(x, y);
-  if (Settings.reloadButton) cancelButton.render(x, y);
+  cancelButton.render(x, y);
 });
 
 register("guiMouseClick", (x, y) => {
@@ -159,7 +162,7 @@ register("guiMouseClick", (x, y) => {
   ) {
     queue.splice(0, queue.length - 1);
   }
-  if (Settings.reloadButton) if (
+  if (Settings.reloadButton && queue.length > 0) if (
     x > reloadButton.getX() &&
     x < reloadButton.getX() + reloadButton.getWidth() &&
     y > reloadButton.getY() &&

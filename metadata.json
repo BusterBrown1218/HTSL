@@ -2,7 +2,7 @@
   "name": "HTSL",
   "creator": "BusterBrown1218",
   "description": "A Chat Triggers module made to make creating housing code easier!",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "entry": "index.js",
   "requires": ["axios", "Vigilance"]
 }

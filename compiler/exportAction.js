@@ -141,7 +141,7 @@ export default (fileName) => {
                 context: "DEFAULT",
                 contextTarget: {},
                 actions: actionobjs
-            }]));
+            }]), true);
         }
     });
 }

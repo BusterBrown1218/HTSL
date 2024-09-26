@@ -1,6 +1,3 @@
 Patch 1.1.5:
 - Bugfixes
 - Minor QoL changes
-- Emergency reload button for debugging
-- Fixes for MacOS support (thanks @NorthFailer)
-- Separated save filename and save directory settings

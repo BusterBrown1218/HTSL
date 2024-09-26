@@ -477,7 +477,7 @@ export default {
         },
         required_amount: {
             slot: 13,
-            default_value: "Any",
+            default_value: "Any Amount",
             type: "static_option_select",
             options: [
                 "Any Amount",
