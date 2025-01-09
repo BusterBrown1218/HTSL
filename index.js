@@ -10,6 +10,8 @@ import Navigator from './gui/Navigator';
 import "./update/update";
 import getItemFromNBT from './utils/getItemFromNBT';
 import loadItemstack from './utils/loadItemstack';
+import { loadAction } from './compiler/loadAction';
+import { compile } from './compiler/compile';
 
 register("command", ...args => {
     let command;
@@ -50,9 +52,11 @@ register("command", ...args => {
     }
     if (command === "addfunctions") {
         if (args.length == 1) return ChatLib.chat("&3[HTSL] &cPlease add a filename!");
-        if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`)) {
+        args.shift();
+        let file = args.join(" ");
+        if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${file}.htsl`)) {
             Navigator.isReady = true;
-            preProcess(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${args[1]}.htsl`).split("\n")).filter(n => n.context == "FUNCTION").forEach((context, index) => {
+            preProcess(FileLib.read(`./config/ChatTriggers/modules/HTSL/imports/${file}.htsl`).split("\n")).filter(n => n.context == "FUNCTION").forEach((context, index) => {
                 if (index > 0) addOperation({ type: 'closeGui' });
                 if (index > 0) addOperation({ type: 'wait', time: 1500 });
                 addOperation({ type: 'chat', text: `/function edit ${context.contextTarget.name}`, func: context.contextTarget.name, command: true });
@@ -96,6 +100,20 @@ register("command", ...args => {
         loadItemstack(item.getItemStack(), slot);
         return;
     }
+    if (command === "import") {
+        if (args.length == 1) return ChatLib.chat("&3[HTSL] &cPlease add a filename!");
+        args.shift();
+        let file = args.join(" ");
+        if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${file}.htsl`)) {
+            Navigator.isReady = true;
+            let actions = compile(file, [], true);
+            actions = actions.filter(n => n.context !== "DEFAULT");
+            loadAction(actions);
+            return;
+        } else {
+            return ChatLib.chat("&3[HTSL] &cFile not found!");
+        }
+    }
     if (command === 'help') {
         ChatLib.chat('&8&m-------------------------------------------------');
         ChatLib.chat('&6/htsl help &7Opens the HTSL help menu!')
@@ -109,6 +127,7 @@ register("command", ...args => {
         ChatLib.chat('&6/htsl listscripts &7Lists all your scripts');
         ChatLib.chat('&6/htsl version &7Returns your current HTSL version');
         ChatLib.chat('&6/htsl giveitem <filename> &7Gives you an item from your imports');
+        ChatLib.chat('&6/htsl import <filename> &7Imports given file (ignores default context)');
         ChatLib.chat('&8&m-------------------------------------------------');
     } else {
         ChatLib.chat('&3[HTSL] &fUnknown command! Try /htsl for help!');

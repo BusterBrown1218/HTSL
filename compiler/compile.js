@@ -3,7 +3,7 @@ import menus from "../actions/menus";
 import conditions from "../actions/conditions";
 import syntaxes from "../actions/syntax";
 
-let macros = [];
+let shortcuts = [];
 
 export function isImporting() {
 	return working();
@@ -27,7 +27,7 @@ export function compile(fileName, dissallowedFiles, nested) {
 		}
 		dissallowedFiles.push(fileName);
 		let noFiles = dissallowedFiles;
-		macros = [];
+		shortcuts = [];
 		if (!nested) ChatLib.chat("&3[HTSL] &fCompiling . . .");
 		let actionobj = preProcess(importText.split("\n"), noFiles);
 		if (typeof actionobj == "string") return ChatLib.chat(actionobj);
@@ -74,20 +74,20 @@ export function compile(fileName, dissallowedFiles, nested) {
 }
 
 /**
- * Performs macro substitution on the given input text.
+ * Performs shortcut substitution on the given input text.
  * @param {string} text Text to perform the substitution on.
- * @param {object[]} macros A series of macros.
- * @returns {string} Text with macros substituted.
+ * @param {object[]} shortcuts A series of shortcuts.
+ * @returns {string} Text with shortcuts substituted.
  */
-function replaceMacros(text, macros) {
-	macros.forEach(macro => {
-		let regex = new RegExp('\\b' + macro.name + '\\b', 'g');
+function replaceshortcuts(text, shortcuts) {
+	shortcuts.forEach(shortcut => {
+		let regex = new RegExp('\\b' + shortcut.name + '\\b', 'g');
 		text = text.replace(regex, (match, offset, string) => {
 			// Check if the match is inside quotes
 			let inQuotes = (string.charAt(offset - 1) === "'" || string.charAt(offset - 1) === '"') &&
 				(string.charAt(offset + match.length) === "'" || string.charAt(offset + match.length) === '"');
-			// If the match is not inside quotes, replace it with the macro value
-			return inQuotes ? match : macro.value;
+			// If the match is not inside quotes, replace it with the shortcut value
+			return inQuotes ? match : shortcut.value;
 		});
 	});
 	return text;
@@ -102,7 +102,7 @@ function getArgs(input) {
 	let conversions = [
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 %stat.global/$2$3%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +stat +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 %stat.player/$2$3%" },
-		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 \"%stat.team/$2 $3$4%\"" },		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 \"%random.int/$2 $3%\"" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 \"%stat.team/$2 $3$4%\"" }, { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 \"%random.int/$2 $3%\"" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +health/g, replacement: "$1 %player.health%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +maxHealth/g, replacement: "$1 %player.maxhealth%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +hunger/g, replacement: "$1 %player.hunger%" },
@@ -115,45 +115,73 @@ function getArgs(input) {
 		input = input.replace(conversion.regex, conversion.replacement);
 	}
 
-	let result = [];
-	let match;
-	let re = /"((?:\\"|[^"])*)"|{((?:\\{|[^}])*)}|(\S+)/g;
-	while ((match = re.exec(input)) !== null) {
-		let arg = match[1] || match[2] || match[3];
-		// Check if the argument is not in quotes or curly brackets
-		if (!match[1] && !match[2]) {
-			// macros
-			let macro = macros.find(m => m.name === arg);
-			if (macro) {
-				arg = getArgs(macro.value);
-				result.push(...arg);
+	// Loop through the input string and split it into arguments based on spaces, but quoted args go together
+	let args = [];
+	console.log(input);
+	let inQuotes = false;
+	let inCurlyBrackets = false;
+	let arg = "";
+	for (let i = 0; i < input.length; i++) {
+		if (input[i].match(/\s/) && !inQuotes && !inCurlyBrackets) {
+			// Add completed word to args list
+			// Shortcut handling
+			let shortcut = shortcuts.find(m => m.name === arg);
+			if (shortcut) {
+				arg = getArgs(shortcut.value);
+				args.push(...arg);
 				continue;
 			}
-			// slot choice for items
+			// Slot choice for items
 			let slotMatch = arg.match(/slot\_(\d+)/)
 			if (slotMatch) {
 				arg = { slot: Number(slotMatch[1]) };
 			}
-			// null handling
-			if (arg == "null") {
-				arg = null;
+			if (arg === "null") args.push(null); // User wants to ignore parameter
+			if (arg !== "") args.push(arg);
+			arg = "";
+		} else if (arg.length === 0) {
+			// Arg is beginning, check for combined args
+			if (input[i] === '"' && !(inQuotes || inCurlyBrackets)) {
+				inQuotes = true;
+			} else if (input[i] === '{' && !(inQuotes || inCurlyBrackets)) {
+				inCurlyBrackets = true;
+			} else if (input[i] === '\\' && ["\"", "(", "{"].includes(input[i + 1]) && !(inQuotes || inCurlyBrackets)) {
+				arg += input[i + 1];
+				i++;
+			} else {
+				arg += input[i];
 			}
-		} else if (match[2]) {
-			// If the argument is in curly brackets
-			macros.forEach((macro) => {
-				arg = arg.replace(macro.name, macro.value);
-			});
-			try {
-				result.push(evaluateExpression(arg));
-				continue;
-			} catch (e) {
-				return false;
+		} else if ((input[i + 1]?.match(/\s/) || i + 1 == input.length) && (inQuotes || inCurlyBrackets) && input[i - 1] !== "\\") {
+			// Word is ending, check if completed arg
+			if (input[i] === '"' && inQuotes) {
+				inQuotes = false;
+				args.push(arg);
+				arg = "";
+			} else if (input[i] === '}' && inCurlyBrackets) {
+				inCurlyBrackets = false;
+				// If the argument is in curly brackets
+				shortcuts.forEach((shortcut) => {
+					arg = arg.replace(shortcut.name, shortcut.value);
+				});
+				try {
+					args.push(evaluateExpression(arg));
+					arg = "";
+					continue;
+				} catch (e) {
+					return false;
+				}
+			} else {
+				arg += input[i];
+			}
+		} else {
+			arg += input[i];
+			if (i + 1 === input.length) {
+				args.push(arg);
+				arg = "";
 			}
 		}
-		result.push(arg);
 	}
-	// console.log(result);
-	return result;
+	return args;
 }
 
 /**
@@ -396,7 +424,7 @@ function componentFunc(args, syntax, menu) {
 
 function handleLoop(string) {
 	let [match, length, indexName] = string.split("\n")[0].match(/loop (\d+) ([^ ]*) {[^]*/);
-	if (macros.find(macro => macro.name == indexName)) throw {};
+	if (shortcuts.find(shortcut => shortcut.name == indexName)) throw {};
 	indexName = indexName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 	let newLines = [];
 	for (let i = 1; i <= Number(length); i++) {
@@ -428,7 +456,7 @@ export function preProcess(importActions, dissallowedFiles) {
 	let multilineComment = false;
 	let depth = 0;
 	for (let i = 0; i < importActions.length; i++) {
-		importActions[i] = replaceMacros(importActions[i].trim(), macros);
+		importActions[i] = replaceshortcuts(importActions[i].trim(), shortcuts);
 		if (multilineAction) multilineActionLength++;
 		if (importActions[i] == "") continue;
 		if (importActions[i].startsWith("//")) continue;
@@ -524,11 +552,11 @@ export function preProcess(importActions, dissallowedFiles) {
 		}
 
 		if (importActions[i].startsWith("define")) {
-			let macroName = importActions[i].split(/ +/)[1].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-			if (syntaxes[macroName] || ["goto", "//", "/*", "*/", "loop"].includes(macroName)) return ChatLib.chat(`&3[HTSL] &cInvalid macro name &e${importActions[i].split(/ +/)[1]}`);
-			if (macros.find(macro => macro.name == macroName)) return ChatLib.chat(`&3[HTSL] &cCannot have two macros of the same name!`);
-			macros.push({
-				name: macroName,
+			let shortcutName = importActions[i].split(/ +/)[1].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+			if (syntaxes[shortcutName] || ["goto", "//", "/*", "*/", "loop"].includes(shortcutName)) return ChatLib.chat(`&3[HTSL] &cInvalid shortcut name &e${importActions[i].split(/ +/)[1]}`);
+			if (shortcuts.find(shortcut => shortcut.name == shortcutName)) return ChatLib.chat(`&3[HTSL] &cCannot have two shortcuts of the same name!`);
+			shortcuts.push({
+				name: shortcutName,
 				value: importActions[i].substring(8 + importActions[i].split(/ +/)[1].length)
 			});
 			continue;

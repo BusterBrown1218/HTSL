@@ -19,20 +19,23 @@ function versionCompare(myVersion, minimumVersion) {
     return (v1.length >= v2.length);
 }
 
-try {
-    axios({
-        url: "https://raw.githubusercontent.com/BusterBrown1218/HTSL/main/metadata.json",
-        method: 'GET'
-    }).then(response => {
-        const latestVersion = response.data.version;
-        const currentVersion = JSON.parse(FileLib.read("HTSL", "./metadata.json")).version;
-        if (versionCompare(currentVersion, latestVersion)) {
-            if (Settings.loadMessage) ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
-            return;
-        }
-        ChatLib.chat(new Message(new TextComponent("&3[HTSL] &fNew HTSL version available!").setClick("open_url", "https://github.com/BusterBrown1218/HTSL/releases")));
-
-    });
-} catch (error) {
-    ChatLib.chat("&3[HTSL] &cError while checking version");
-}
+let load = register("worldLoad", () => {
+    try {
+        axios({
+            url: "https://raw.githubusercontent.com/BusterBrown1218/HTSL/main/metadata.json",
+            method: 'GET'
+        }).then(response => {
+            const latestVersion = response.data.version;
+            const currentVersion = JSON.parse(FileLib.read("HTSL", "./metadata.json")).version;
+            if (versionCompare(currentVersion, latestVersion)) {
+                if (Settings.loadMessage) ChatLib.chat(`&3[HTSL] &fLoaded successfully!`);
+                return;
+            }
+            ChatLib.chat(new Message(new TextComponent("&3[HTSL] &fNew HTSL version available!").setClick("open_url", "https://github.com/BusterBrown1218/HTSL/releases")));
+    
+        });
+    } catch (error) {
+        ChatLib.chat("&3[HTSL] &cError while checking version");
+    }
+    load.unregister();
+});

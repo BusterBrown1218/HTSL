@@ -1,3 +1,4 @@
-Patch 1.1.5:
+Patch 1.2.0:
+- Updated Chat input
+- New /htsl import <filename> command
 - Bugfixes
-- Minor QoL changes

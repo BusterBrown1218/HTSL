@@ -1,3 +1,4 @@
+/// <reference types="../../CTAutocomplete" />
 import Settings from '../utils/config';
 import utilInputAnvil from '../utils/inputAnvil';
 import loadItem from '../utils/loadItemstack';
@@ -79,11 +80,9 @@ function getChatInput() {
 register("chat", (event) => {
   if (!Navigator.isWorking) return;
   Navigator.isReady = true;
-  chatInput = new Message(EventLib.getMessage(event)).getMessageParts()[1].getClickValue();
+  chatInput = new Message(EventLib.getMessage(event)).getMessageParts()[2].getClickValue();
   cancel(event);
-}).setCriteria(
-  /->newLine<-Please enter the text you wish to set in chat!->newLine<- (?:\[PREVIOUS\] )?\[CANCEL\]/
-);
+}).setCriteria(/(?:.*) wish to set.->newLine<- \[PREVIOUS\] \[CANCEL\]/);
 
 register("guiRender", () => {
   if (Navigator.isReady) return;

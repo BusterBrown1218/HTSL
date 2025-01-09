@@ -173,6 +173,7 @@ register("guiMouseClick", (x, y) => {
 });
 
 export function addOperation(operation) {
+  // console.log(JSON.stringify(operation));
   if (!Navigator.isWorking) {
     if (operation.type == "returnToEditActions") return;
     Navigator.isLoadingItem = false;

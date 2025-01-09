@@ -70,7 +70,11 @@ function convertComponent(obj, syntax, menu) {
     if (properties) properties.forEach((property) => {
         let propertyName = property.match(/<(.*)>/)[1];
         if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName].replace("$", "§");
-        if (menu[propertyName].type == "subactions") {
+        if (propertyName === "match_any_condition") {
+            action = action.replace(property, obj[propertyName] ? "or" : "and");
+        } else if (propertyName === "mode") {
+            action = action.replace(property, reverseMode(obj[propertyName]));
+        } else if (menu[propertyName].type == "subactions") {
             let actions = obj[propertyName];
             let subactions = [];
             for (let action in actions) {
@@ -103,6 +107,33 @@ function convertComponent(obj, syntax, menu) {
         else action = action.replace(property, "null");
     });
     return action;
+}
+
+function reverseMode(mode) {
+    switch (mode) {
+        case "Equal":
+            return "==";
+        case "Less Than":
+            return "<";
+        case "Less Than or Equal":
+            return "<=";
+        case "Greater Than":
+            return ">";
+        case "Greater Than or Equal":
+            return ">=";
+        case "Increment":
+            return "+=";
+        case "Decrement":
+            return "-=";
+        case "Set":
+            return "=";
+        case "Multiply":
+            return "*=";
+        case "Divide":
+            return "/=";
+        default:
+            return mode;
+    }
 }
 
 /**
