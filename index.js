@@ -12,6 +12,7 @@ import getItemFromNBT from './utils/getItemFromNBT';
 import loadItemstack from './utils/loadItemstack';
 import { loadAction } from './compiler/loadAction';
 import { compile } from './compiler/compile';
+import Settings from './utils/config';
 
 register("command", ...args => {
     let command;
@@ -108,7 +109,7 @@ register("command", ...args => {
             Navigator.isReady = true;
             let actions = compile(file, [], true);
             actions = actions.filter(n => n.context !== "DEFAULT");
-            loadAction(actions);
+            loadAction(actions, Settings.deleteOnCommandImport);
             return;
         } else {
             return ChatLib.chat("&3[HTSL] &cFile not found!");

@@ -144,7 +144,7 @@ export default {
             type: "dynamic_option_select"
         },
         demotion_protection: {
-            slot: 10,
+            slot: 11,
             default_value: true,
             type: "toggle"
         }

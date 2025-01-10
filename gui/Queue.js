@@ -29,6 +29,11 @@ register("tick", () => {
       );
     return;
   }
+  if (Navigator.isDeleting && Navigator.isReady) {
+    const attemptResult = Navigator.deleteAction(Navigator.optionBeingSelected);
+    if (attemptResult === false) Navigator.isDeleting = false;
+    return;
+  }
 
   if (operationTimes.started === 0) operationTimes.started = Date.now();
   operationTimes.total++;
@@ -99,6 +104,8 @@ register("tick", () => {
       operation.func(Navigator.getChatInput());
       ChatLib.command("chatinput cancel");
       return;
+    case "deleteActions":
+      return Navigator.isDeleting = true;
   }
 });
 

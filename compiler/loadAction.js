@@ -8,7 +8,7 @@ export function working() {
     return isWorking();
 };
 
-export function loadAction(script) {
+export function loadAction(script, deleteExisting) {
     if (isWorking()) return false;
     let limits = actionLimits(script);
     if (typeof limits == "object") {
@@ -46,6 +46,9 @@ export function loadAction(script) {
                     break;
             }
         }
+        if (deleteExisting) {
+            addOperation({ type: 'deleteActions' });
+        }
         for (let i = 0; i < script[container].actions.length; i++) {
             addOperation({ type: 'click', slot: 50 }); // click "Add Action" Button
             addOperation({ type: 'setGuiContext', context: "Add Action" });
@@ -61,10 +64,10 @@ function importComponent(component, menu) {
     // Go through every setting in the menu
     addOperation({ type: 'setGuiContext', context: component.type });
     for (let key in component) {
-        if (key == "type") continue;
-        if (JSON.stringify(menu[key].default_value).toLowerCase() == JSON.stringify(component[key]).replace("_", " ").toLowerCase()) continue;
-        if (menu[key].default_value == component[key]) continue;
-        if (component[key] == undefined) continue;
+        if (key === "type") continue;
+        if (JSON.stringify(menu[key].default_value).toLowerCase() === JSON.stringify(component[key]).replace("_", " ").toLowerCase()) continue;
+        if (menu[key].default_value === component[key]) continue;
+        if (component[key] === undefined) continue;
         let setting = menu[key];
         addOperation({ type: 'click', slot: setting.slot });
         switch (setting.type) {

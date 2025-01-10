@@ -82,7 +82,7 @@ register("chat", (event) => {
   Navigator.isReady = true;
   chatInput = new Message(EventLib.getMessage(event)).getMessageParts()[2].getClickValue();
   cancel(event);
-}).setCriteria(/(?:.*) wish to set.->newLine<- \[PREVIOUS\] \[CANCEL\]/);
+}).setCriteria(/(?:.*) wish to set.->newLine<- (?:\[PREVIOUS\])?\s*\[CANCEL\]/);
 
 register("guiRender", () => {
   if (Navigator.isReady) return;
@@ -124,7 +124,7 @@ function setArrowToSlot(slotId) {
   drawArrow = true;
 }
 
-function click(slotId) {
+function click(slotId, button) {
   slotToClick = slotId;
   if (Settings.useSafeMode) {
     setArrowToSlot(slotId);
@@ -133,7 +133,7 @@ function click(slotId) {
       new C0EPacketClickWindow(
         Player.getContainer().getWindowId(),
         slotId,
-        0,
+        button ? button : 0,
         0,
         null,
         0
@@ -255,12 +255,20 @@ function setNotReady() {
   drawArrow = false;
 }
 
+function deleteAction() {
+  // Check for item in slot 10
+  const item = Player.getContainer().getStackInSlot(10);
+  if (!item) return false;
+  click(10, 1);
+}
+
 export default Navigator = {
   isWorking: false,
   isReady: false,
   isSelecting: false,
   isReturning: false,
   isLoadingItem: false,
+  isDeleting: false,
   guiIsLoading: true,
   goto: false,
   itemsLoaded: { items: {}, lastItemAddedTimestamp: 0 },
@@ -273,4 +281,5 @@ export default Navigator = {
   returnToEditActions,
   inputAnvil,
   inputChat,
+  deleteAction,
 };

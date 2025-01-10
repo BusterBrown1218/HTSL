@@ -117,7 +117,6 @@ function getArgs(input) {
 
 	// Loop through the input string and split it into arguments based on spaces, but quoted args go together
 	let args = [];
-	console.log(input);
 	let inQuotes = false;
 	let inCurlyBrackets = false;
 	let arg = "";
@@ -151,7 +150,7 @@ function getArgs(input) {
 			} else {
 				arg += input[i];
 			}
-		} else if ((input[i + 1]?.match(/\s/) || i + 1 == input.length) && (inQuotes || inCurlyBrackets) && input[i - 1] !== "\\") {
+		} else if ((input[i + 1]?.match(/\s/) || i + 1 === input.length) && (inQuotes || inCurlyBrackets) && input[i - 1] !== "\\") {
 			// Word is ending, check if completed arg
 			if (input[i] === '"' && inQuotes) {
 				inQuotes = false;
@@ -175,10 +174,11 @@ function getArgs(input) {
 			}
 		} else {
 			arg += input[i];
-			if (i + 1 === input.length) {
-				args.push(arg);
-				arg = "";
-			}
+			
+		}
+		if (i + 1 === input.length) {
+			args.push(arg);
+			arg = "";
 		}
 	}
 	return args;

@@ -37,6 +37,14 @@ class Settings {
 	loadMessage = true;
 
 	@SwitchProperty({
+		name: "Delete Existing Actions on Command Import",
+		description: 'Before importing using the command, HTSL will delete any existing actions in the first non-default context',
+		category: "General",
+		subcategory: "General",
+	})
+	deleteOnCommandImport = false;
+
+	@SwitchProperty({
 		name: "Close GUI on Exit",
 		description: 'Closes the GUI when it finishes an import or exits due to error/cancelation',
 		category: "General",

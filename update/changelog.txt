@@ -1,4 +1,4 @@
-Patch 1.2.0:
-- Updated Chat input
-- New /htsl import <filename> command
+Patch 1.2.1:
+- New Delete Actions on Command Import setting
+- More fixed chat inputs
 - Bugfixes
