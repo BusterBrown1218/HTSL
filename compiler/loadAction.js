@@ -8,6 +8,11 @@ export function working() {
     return isWorking();
 };
 
+/**
+ * Loads in and automatically imports action data
+ * @param {*} script JSON Object containing action data to import
+ * @param {*} deleteExisting Whether or not to have the macro delete existing items before ready
+ */
 export function loadAction(script, deleteExisting) {
     if (isWorking()) return false;
     let limits = actionLimits(script);
@@ -60,6 +65,11 @@ export function loadAction(script, deleteExisting) {
     addOperation({ type: 'done' });
 }
 
+/**
+ * Importing an individual component given the action data and the menu format
+ * @param {*} component JSON Object for an individual action/condition
+ * @param {*} menu JSON Object determining the format of the action/condition GUI
+ */
 function importComponent(component, menu) {
     // Go through every setting in the menu
     addOperation({ type: 'setGuiContext', context: component.type });

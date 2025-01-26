@@ -7,6 +7,13 @@ import Settings from "../utils/config";
 let actionobjs;
 let subactions;
 
+/**
+ * Function to collect data from an individual action
+ * @param {*} menu JSON Object containing the format for the action's GUI
+ * @param {[Item]} submenuItems Items currently in the GUI
+ * @param {*} actionkey JSON Object containing the properties of the action data
+ * @param {*} callback Callback function to indicate when the action is finished processing
+ */
 function processMenu(menu, submenuItems, actionkey, callback) {
     let action = { type: actionkey };
     forceOperation({
@@ -128,6 +135,10 @@ function processMenu(menu, submenuItems, actionkey, callback) {
     }
 }
 
+/**
+ * Exports action data to HTSL file
+ * @param {string} fileName File name to which to write exported HTSL code
+ */
 export default (fileName) => {
     let items = Player.getContainer().getItems();
     items = items.splice(0, Player.getContainer().getSize() - 9 - 36);
@@ -146,6 +157,14 @@ export default (fileName) => {
     });
 }
 
+/**
+ * Collects the data from an ingame page of actions
+ * @param {[Item]} items List of items in the menu available 
+ * @param {*} actionList JSON Object dictating the formatting of actions
+ * @param {*} menuList JSON Object dictating the formatting of the ingame menu for each action
+ * @param {Number} page Which page number is currently being exported, allows the macro to return to the page consistently
+ * @returns {boolean} Whether or not page processing will run successfully
+ */
 function processPage(items, actionList, menuList, page) {
     forceOperation({
         type: "donePage", func: () => {

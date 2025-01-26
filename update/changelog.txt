@@ -1,4 +1,2 @@
-Patch 1.2.1:
-- New Delete Actions on Command Import setting
-- More fixed chat inputs
+Patch 1.2.2:
 - Bugfixes

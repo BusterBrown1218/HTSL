@@ -94,7 +94,7 @@ function replaceshortcuts(text, shortcuts) {
 }
 
 /**
- * Transforms a string of each argument into a list of arguments.
+ * Transforms a string of each argument into a list of arguments, accounting for special HTSL formatting.
  * @param {string} input 
  * @returns {string[]} A list of arguments.
  */
@@ -128,15 +128,16 @@ function getArgs(input) {
 			if (shortcut) {
 				arg = getArgs(shortcut.value);
 				args.push(...arg);
+				arg = "";
 				continue;
 			}
 			// Slot choice for items
-			let slotMatch = arg.match(/slot\_(\d+)/)
+			let slotMatch = arg.match(/slot\_(\d+)/);
 			if (slotMatch) {
 				arg = { slot: Number(slotMatch[1]) };
 			}
 			if (arg === "null") args.push(null); // User wants to ignore parameter
-			if (arg !== "") args.push(arg);
+			else if (arg !== "") args.push(arg);
 			arg = "";
 		} else if (arg.length === 0) {
 			// Arg is beginning, check for combined args
@@ -167,7 +168,7 @@ function getArgs(input) {
 					arg = "";
 					continue;
 				} catch (e) {
-					return false;
+					return false; // Invalid expression
 				}
 			} else {
 				arg += input[i];
@@ -177,10 +178,27 @@ function getArgs(input) {
 			
 		}
 		if (i + 1 === input.length) {
-			args.push(arg);
+			let shortcut = shortcuts.find(m => m.name === arg);
+			if (shortcut) {
+				arg = getArgs(shortcut.value);
+				args.push(...arg);
+				arg = "";
+				continue;
+			}
+			// Slot choice for items
+			let slotMatch = arg.match(/slot\_(\d+)/);
+			if (slotMatch) {
+				arg = { slot: Number(slotMatch[1]) };
+				args.push(arg);
+				arg = "";
+				continue;
+			}
+			if (arg === "null") args.push(null); // User wants to ignore parameter
+			else if (arg !== "") args.push(arg);
 			arg = "";
 		}
 	}
+	console.log(args);
 	return args;
 }
 
@@ -190,26 +208,8 @@ function getArgs(input) {
  * @returns The result of the expression
  */
 function evaluateExpression(expression) {
-	let result = "";
-	let inQuotes = false;
-
-	for (let i = 0; i < expression.length; i++) {
-		if (expression[i] === '"') {
-			inQuotes = !inQuotes;  // Toggle the inQuotes flag
-		}
-		if (inQuotes || !/[a-zA-Z]/.test(expression[i])) {
-			// If we're inside quotes or the character is not a letter, keep it
-			result += expression[i];
-		}
-	}
-
-	expression = result;
-
-	// Evaluate the expression
-	let func = new Function('return ' + expression);
-	result = func();
-
-	return result;
+	let func = new Function('return ' + expression.replaceAll("(", "evaluateExpression("));
+	return func().toString().replaceAll("evalExpression(", "(");
 }
 
 /**
@@ -246,6 +246,11 @@ function getMultiline(input) {
 	return result;
 }
 
+/**
+ * Collapses possible ways of writing operators into 1 format
+ * @param {string} operator The operation
+ * @returns The formated version of the operation
+ */
 function validOperator(operator) {
 	switch (operator) {
 		case "inc":
@@ -273,6 +278,11 @@ function validOperator(operator) {
 	return operator.toUpperCase();
 }
 
+/**
+ * Collapses possible ways of writing comparators into 1 format
+ * @param {string} comparator The comparator
+ * @returns The formated version of the comparator
+ */
 function validComparator(comparator) {
 	switch (comparator.toLowerCase()) {
 		case "=":

@@ -109,6 +109,11 @@ function convertComponent(obj, syntax, menu) {
     return action;
 }
 
+/**
+ * Changes text operators and comparators into script-like strings
+ * @param {string} mode String representation of an operator or comparator
+ * @returns {string} Operator put into simpler characters (ex. Equal -> ==)
+ */
 function reverseMode(mode) {
     switch (mode) {
         case "Equal":
