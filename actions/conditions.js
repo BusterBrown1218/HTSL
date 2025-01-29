@@ -10,8 +10,7 @@
  *                      - "static_option_select" means that the slot opens a new menu with a certain set of possibilities.
  *                        This has an "options" field which is a list of strings with option names.
  *                        @property {string[]} options List of options to be able to select from "static_option_select"
- *                      - "chat_input" means the slot requires you to type something in chat to fill it out.
- *                      - "anvil_input" means the slot requires you to name an item in an anvil to fill it out.
+ *                      - "string_input" means the slot requires you to type something in chat/anvil to fill it out.
  */
 /**
  * This file contains the data for every Housing conditional.
@@ -39,7 +38,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -56,7 +55,7 @@ export default {
         amount: {
             slot: 12,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     GLOBAL_STAT: {
@@ -64,7 +63,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -81,7 +80,7 @@ export default {
         amount: {
             slot: 12,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     HAS_PERMISSION: {
@@ -176,6 +175,8 @@ export default {
                 "Armor",
                 "Hotbar",
                 "Inventory",
+                "Cursor",
+                "Crafting Grid",
                 "Anywhere"
             ]
         },
@@ -247,7 +248,7 @@ export default {
         amount: {
             slot: 11,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     MAX_HEALTH: {
@@ -267,7 +268,7 @@ export default {
         amount: {
             slot: 11,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     HUNGER_LEVEL: {
@@ -287,7 +288,7 @@ export default {
         amount: {
             slot: 11,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     GAMEMODE: {
@@ -308,7 +309,7 @@ export default {
         placeholder: {
             slot: 10,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -325,7 +326,7 @@ export default {
         amount: {
             slot: 12,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     IN_TEAM: {
@@ -341,7 +342,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         team: {
             slot: 11,
@@ -363,7 +364,7 @@ export default {
         amount: {
             slot: 13,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     PVP_ENABLED: {
@@ -431,7 +432,7 @@ export default {
         amount: {
             slot: 11,
             default_value: null,
-            type: "anvil_input"
+            type: "string_input"
         } 
     },
     BLOCK_TYPE: {
@@ -472,6 +473,8 @@ export default {
                 "Armor",
                 "Hotbar",
                 "Inventory",
+                "Cursor",
+                "Crafting Grid",
                 "Anywhere"
             ]
         },

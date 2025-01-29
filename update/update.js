@@ -39,3 +39,13 @@ let load = register("worldLoad", () => {
     }
     load.unregister();
 });
+
+function directoryExists(directoryPath) {
+    let dir = new java.io.File(directoryPath);
+    return dir.exists() && dir.isDirectory();
+}
+
+if (!directoryExists("./config/ChatTriggers/modules/HTSL/imports")) {
+    FileLib.write("HTSL", "./imports/default.htsl", "if (!stat kills == 10) {\nchat \"&ahello!\"\n}\nif (stat kills == 10, hasItem \"Stone\" \"Metadata\" \"Cursor\" \"Any Amount\") {\nchat \"&bhellon't!\"\n}\nlaunchTarget \"custom_coordinates\" \"^ ^ ^5\" 10\ndropItem \"Stone\" \"invokers_location\" false true true false\npause 10\nchangeVelocity 3 5 3", true);FileLib.write("HTSL", "./imports/default.htsl", "if (!stat kills == 10) {\nchat \"&ahello!\"\n}\nif (stat kills == 10, hasItem \"Stone\" \"Metadata\" \"Cursor\" \"Any Amount\") {\nchat \"&bhellon't!\"\n}\nlaunchTarget \"custom_coordinates\" \"^ ^ ^5\" 10\ndropItem \"Stone\" \"invokers_location\" false true true false\npause 10\nchangeVelocity 3 5 3", true);
+    FileLib.write("HTSL", "./imports/stone.json", "{\"item\": \"{id:\\\"minecraft:stone\\\",Count:1b,Damage:0s}\"}", true);
+}

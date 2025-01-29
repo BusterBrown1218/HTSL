@@ -38,12 +38,13 @@ register("tick", () => {
   if (operationTimes.started === 0) operationTimes.started = Date.now();
   operationTimes.total++;
   if (Navigator.goto) operationTimes.started += 0.05;
+  let timeRemaining = Math.round(
+    (((Date.now() - operationTimes.started) / operationTimes.total) *
+      queue.length) /
+    1000
+  );
   timeRemainingButton.setText(
-    `Time Remaining: ${Math.round(
-      (((Date.now() - operationTimes.started) / operationTimes.total) *
-        queue.length) /
-      1000
-    )} seconds`
+    `Time Remaining: ${Math.floor(timeRemaining / 60)}m ${timeRemaining % 60}s`
   );
 
   let operation = queue.shift();
@@ -56,8 +57,8 @@ register("tick", () => {
   switch (operation.type) {
     case "click":
       return Navigator.click(operation.slot);
-    case "anvil":
-      return Navigator.inputAnvil(operation.text);;
+    case "input":
+      return Navigator.input(operation.text);
     case "returnToEditActions":
       if (!Player.getContainer()) return;
       return Navigator.returnToEditActions();

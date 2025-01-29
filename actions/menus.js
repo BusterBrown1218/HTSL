@@ -8,7 +8,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -25,7 +25,7 @@ export default {
         amount: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     CONDITIONAL: {
@@ -56,7 +56,7 @@ export default {
         message: {
             slot: 10,
             default_value: "Hello!",
-            type: "chat_input"
+            type: "string_input"
         }
     },
     PLAY_SOUND: {
@@ -69,12 +69,12 @@ export default {
         volume: {
             slot: 11,
             default_value: 0.7,
-            type: "anvil_input"
+            type: "string_input"
         },
         pitch: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         },
         location: {
             slot: 13,
@@ -110,27 +110,27 @@ export default {
         title: {
             slot: 10,
             default_value: "Hello World!",
-            type: "chat_input"
+            type: "string_input"
         },
         subtitle: {
             slot: 11,
             default_value: "",
-            type: "chat_input"
+            type: "string_input"
         },
         fade_in: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         },
         stay: {
             slot: 13,
             default_value: 5,
-            type: "anvil_input"
+            type: "string_input"
         },
         fade_out: {
             slot: 14,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     EXIT: {
@@ -163,7 +163,7 @@ export default {
         message: {
             slot: 10,
             default_value: "Hello World!",
-            type: "chat_input"
+            type: "string_input"
         }
     },
     RESET_INVENTORY: {
@@ -214,15 +214,20 @@ export default {
         duration: {
             slot: 11,
             default_value: 60,
-            type: "anvil_input"
+            type: "string_input"
         },
         level: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         },
         override_existing_effects: {
             slot: 13,
+            default_value: false,
+            type: "toggle"
+        },
+        show_potion_icon: {
+            slot: 14,
             default_value: false,
             type: "toggle"
         }
@@ -243,7 +248,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -260,7 +265,7 @@ export default {
         amount: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         },
         team: {
             slot: 13,
@@ -281,7 +286,7 @@ export default {
         ticks_to_wait: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     ENCHANT_HELD_ITEM: {
@@ -294,7 +299,7 @@ export default {
         level: {
             slot: 11,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     APPLY_LAYOUT: {
@@ -355,7 +360,7 @@ export default {
         reason: {
             slot: 10,
             default_value: "Failed!",
-            type: "chat_input"
+            type: "string_input"
         }
     },
     FAIL_PARKOUR: {
@@ -363,7 +368,7 @@ export default {
         reason: {
             slot: 10,
             default_value: "Failed!",
-            type: "chat_input"
+            type: "string_input"
         }
     },
     TELEPORT_PLAYER: {
@@ -372,6 +377,11 @@ export default {
             slot: 10,
             default_value: null,
             type: "location"
+        },
+        prevent_teleport_inside_blocks: {
+            slot: 11,
+            default_value: false,
+            type: "toggle"
         }
     },
     CHANGE_GLOBAL_STAT: {
@@ -379,7 +389,7 @@ export default {
         stat: {
             slot: 10,
             default_value: "Kills",
-            type: "chat_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -396,7 +406,7 @@ export default {
         amount: {
             slot: 12,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     SEND_TO_LOBBY: {
@@ -434,7 +444,7 @@ export default {
         levels: {
             slot: 10,
             default_value: 1,
-            type: "anvil_input"
+            type: "string_input"
         }
     },
     CLEAR_EFFECTS: {
@@ -445,7 +455,7 @@ export default {
         max_health: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -470,7 +480,7 @@ export default {
         max_health: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -495,7 +505,7 @@ export default {
         health: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -515,7 +525,7 @@ export default {
         health: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -535,7 +545,7 @@ export default {
         hunger: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -555,7 +565,7 @@ export default {
         hunger: {
             slot: 10,
             default_value: 20,
-            type: "anvil_input"
+            type: "string_input"
         },
         mode: {
             slot: 11,
@@ -578,5 +588,69 @@ export default {
     },
     CONSUME_ITEM: {
         action_name: "Use/Remove Held Item"
+    },
+    DROP_ITEM: {
+        action_name: "Drop Item",
+        item: {
+            slot: 10,
+            default_value: null,
+            type: "item"
+        },
+        location: {
+            slot: 11,
+            default_value: null,
+            type: "location"
+        },
+        drop_naturally: {
+            slot: 12,
+            default_value: false,
+            type: "toggle"
+        },
+        disable_item_merging: {
+            slot: 13,
+            default_value: false,
+            type: "toggle"
+        },
+        prioritize_player: {
+            slot: 14,
+            default_value: false,
+            type: "toggle"
+        },
+        fallback_to_inventory: {
+            slot: 15,
+            default_value: false,
+            type: "toggle"
+        }
+    },
+    CHANGE_VELOCITY: {
+        action_name: "Change Velocity",
+        x: {
+            slot: 10,
+            default_value: 10,
+            type: "string_input"
+        },
+        y: {
+            slot: 11,
+            default_value: 10,
+            type: "string_input"
+        },
+        z: {
+            slot: 12,
+            default_value: 10,
+            type: "string_input"
+        }
+    },
+    LAUNCH_TO_TARGET: {
+        action_name: "Launch to Target",
+        location: {
+            slot: 10,
+            default_value: null,
+            type: "location"
+        },
+        strength: {
+            slot: 11,
+            default_value: 2,
+            type: "string_input"
+        }
     }
 }

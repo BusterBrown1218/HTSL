@@ -21,7 +21,7 @@ export default {
         },
         applyPotion: {
             type: "POTION_EFFECT",
-            full: "applyPotion <effect> <duration> <level> <override_existing_effects>"
+            full: "applyPotion <effect> <duration> <level> <override_existing_effects> <show_potion_icon>"
         },
         balanceTeam: {
             type: "BALANCE_PLAYER_TEAM",
@@ -157,7 +157,7 @@ export default {
         },
         tp: {
             type: "TELEPORT_PLAYER",
-            full: "tp <location>"
+            full: "tp <location> <prevent_teleport_inside_blocks>"
         },
         function: {
             type: "TRIGGER_FUNCTION",
@@ -166,6 +166,18 @@ export default {
         consumeItem: {
             type: "USE_HELD_ITEM",
             full: "consumeItem"
+        },
+        dropItem: {
+            type: "DROP_ITEM",
+            full: "dropItem <item> <location> <drop_naturally> <disable_item_merging> <prioritize_player> <fallback_to_inventory>"
+        },
+        changeVelocity: {
+            type: "CHANGE_VELOCITY",
+            full: "changeVelocity <x> <y> <z>"
+        },
+        launchTarget: {
+            type: "LAUNCH_TO_TARGET",
+            full: "launchTarget <location> <strength>"
         },
         if: {
             type: "CONDITIONAL",

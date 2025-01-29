@@ -2,7 +2,6 @@ import { addOperation, forceOperation } from "../gui/Queue"
 import { convertJSON } from "./convertAction";
 import menus from "../actions/menus";
 import conditions from "../actions/conditions";
-import Settings from "../utils/config";
 
 let actionobjs;
 let subactions;
@@ -14,8 +13,9 @@ let subactions;
  * @param {*} actionkey JSON Object containing the properties of the action data
  * @param {*} callback Callback function to indicate when the action is finished processing
  */
-function processMenu(menu, submenuItems, actionkey, callback) {
+function processMenu(menu, submenuItems, actionkey, callback, condition) {
     let action = { type: actionkey };
+    if (condition) menu.inverted = {default_value: false, slot: 9, type: "toggle"};
     forceOperation({
         type: "actionOrder", func: () => {
             callback(action);
@@ -26,44 +26,27 @@ function processMenu(menu, submenuItems, actionkey, callback) {
         if (key == "action_name" || key == "condition_name") continue;
         switch (menu[key].type) {
             case "toggle":
-                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "Enabled";
-                if (key == "match_any_condition") action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[6]) == "Enabled";
+                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Enabled";
+                if (["drop_naturally"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[7]) == "Enabled";
+                if (["match_any_condition", "prioritize_player", "fallback_to_inventory", "show_potion_icon", "prevent_teleport_inside_blocks"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[6]) == "Enabled";
+                if (["inverted", "disable_item_merging"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5]) == "Enabled";
                 break;
             case "location":
-                if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "Not Set") {
-                    action[key] = {
-                        "relZ": 1,
-                        "relY": 1,
-                        "relX": 1,
-                        "x": 0,
-                        "y": 0,
-                        "z": 0,
-                        "pitch": 0,
-                        "yaw": 0
-                    }
-                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "House Spawn Location") {
+                if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Not Set") {
+                    action[key] = '"~ ~ ~"';
+                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "House Spawn Location") {
                     action[key] = "house_spawn_location";
-                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]) == "Invokers Location") {
+                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Invokers Location") {
                     action[key] = "invokers_location";
                 } else {
-                    let temp = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/(~)?(-?(\d+)?(\.\d+)?)/g).filter(n => n);
-                    action[key] = {
-                        "relZ": temp[2].includes("~") ? 1 : 0,
-                        "relY": temp[1].includes("~") ? 1 : 0,
-                        "relX": temp[0].includes("~") ? 1 : 0,
-                        "x": temp[0].includes("~") ? temp[0].substring(1) : temp[0],
-                        "y": temp[1].includes("~") ? temp[1].substring(1) : temp[1],
-                        "z": temp[2].includes("~") ? temp[2].substring(1) : temp[2],
-                        "pitch": temp[4] ? temp[4] : 0,
-                        "yaw": temp[3] ? temp[3] : 0
-                    }
+                    action[key] = '"custom_coordinates" "' + ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).replaceAll(",", "") + '"';
                 }
                 break;
             case "item":
                 action[key] = null;
                 break;
             case "conditions":
-                if (ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]).match(/No Conditions/)) {
+                if (ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).match(/No Conditions/)) {
                     action[key] = null;
                 } else {
                     forceOperation({
@@ -76,14 +59,14 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                     forceOperation({
                         type: "export", func: (submenuItems) => {
                             subactions = [];
-                            processPage(submenuItems, subactions, conditions, 0);
+                            processPage(submenuItems, subactions, conditions, 0, true);
                         }
                     });
-                    forceOperation({ type: "click", slot: menu[key].slot });
+                    forceOperation({ type: "click", slot: menu[key].slot + (condition === true ? 1 : 0) });
                 }
                 break;
             case "subactions":
-                if (ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[5]).match(/No Actions/)) {
+                if (ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5]).match(/No Actions/)) {
                     action[key] = null;
                     forceOperation({
                         type: "doneSub", func: () => {
@@ -107,26 +90,13 @@ function processMenu(menu, submenuItems, actionkey, callback) {
                     forceOperation({ type: "click", slot: menu[key].slot });
                 }
                 break;
-            case "chat_input":
-                if (Settings.exportColorCodes) {
-                    if (submenuItems[menu[key].slot].getLore()[3].substring(6) == "") {
-                        action[key] = null;
-                    } else {
-                        forceOperation({ type: "back" });
-                        forceOperation({
-                            type: "chat_input", func: (text) => {
-                                action[key] = text;
-                            }
-                        });
-                        forceOperation({ type: "click", slot: menu[key].slot });
-                    }
-                } else {
-                    action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]);
-                    if (action[key] == "Not Set") action[key] = null;
-                }
+            case "string_input":
+                action[key] = submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3].substring(6);
+                if (["ticks_to_wait"].includes(key)) action[key] = submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5].substring(6);
+                if (action[key] == "Not Set") action[key] = null;
                 break;
             default:
-                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[3]);
+                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]);
                 if (action[key] == "Not Set") action[key] = null;
                 if (key == "ticks_to_wait") action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[5]);
                 if (key == "team" && Object.keys(menu).length > 2) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[6]);
@@ -165,7 +135,7 @@ export default (fileName) => {
  * @param {Number} page Which page number is currently being exported, allows the macro to return to the page consistently
  * @returns {boolean} Whether or not page processing will run successfully
  */
-function processPage(items, actionList, menuList, page) {
+function processPage(items, actionList, menuList, page, condition) {
     forceOperation({
         type: "donePage", func: () => {
             if (Player.getContainer().getItems()[Player.getContainer().getSize() - 37]) if (ChatLib.removeFormatting(Player.getContainer().getItems()[Player.getContainer().getSize() - 37].getName()) == "Next Page") {
@@ -173,7 +143,7 @@ function processPage(items, actionList, menuList, page) {
                 nextItems = nextItems.splice(0, Player.getContainer().getSize() - 9 - 36);
                 forceOperation({
                     type: "export", func: (subMenuItems) => {
-                        processPage(subMenuItems, actionList, menuList, page + 1);
+                        processPage(subMenuItems, actionList, menuList, page + 1, condition);
                     }
                 });
                 forceOperation({ type: "click", slot: Player.getContainer().getSize() - 37 });
@@ -220,7 +190,7 @@ function processPage(items, actionList, menuList, page) {
                 type: "export", func: (submenuItems) => {
                     processMenu(menu, submenuItems, actionkey, (action) => {
                         actionList.push(action);
-                    });
+                    }, condition);
                 }
             });
             forceOperation({ type: "click", slot: i });

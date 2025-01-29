@@ -1,3 +1,10 @@
-loop 20 index {
-giveItem "stone"
+if (!stat kills == 10) {
+chat "&ahello!"
 }
+if (stat kills == 10, hasItem "Stone" "Metadata" "Cursor" "Any Amount") {
+chat "&bhellon't!"
+}
+launchTarget "custom_coordinates" "^ ^ ^5" 10
+dropItem "Stone" "invokers_location" false true true false
+pause 10
+changeVelocity 3 5 3

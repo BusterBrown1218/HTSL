@@ -71,16 +71,12 @@ register("packetSent", (packet, event) => {
   else slotToClick = -1;
 }).setFilteredClass(C0EPacketClickWindow);
 
-let chatInput = "";
-
-function getChatInput() {
-  return chatInput;
-}
+let inputMode = "anvil";
 
 register("chat", (event) => {
   if (!Navigator.isWorking) return;
   Navigator.isReady = true;
-  chatInput = new Message(EventLib.getMessage(event)).getMessageParts()[2].getClickValue();
+  inputMode = "chat";
   cancel(event);
 }).setCriteria(/(?:.*) wish to set.->newLine<- (?:\[PREVIOUS\])?\s*\[CANCEL\]/);
 
@@ -223,7 +219,11 @@ function selectOption(optionName) {
 
 const goBack = () => click(Player.getContainer().getSize() - 5 - 36); // click the back button on all size guis
 
-function inputAnvil(text) {
+function input(text) {
+  if (inputMode === "chat") {
+    inputMode = "anvil";
+    return inputChat(text);
+  }
   slotToClick = 2;
   utilInputAnvil(text, true);
   setNotReady();
@@ -272,14 +272,13 @@ export default Navigator = {
   guiIsLoading: true,
   goto: false,
   itemsLoaded: { items: {}, lastItemAddedTimestamp: 0 },
-  getChatInput,
   selectOption,
   selectItem,
   setSelecting,
   click,
   goBack,
   returnToEditActions,
-  inputAnvil,
+  input,
   inputChat,
   deleteAction,
 };

@@ -1,3 +1,5 @@
+import syntax from "../actions/syntax";
+
 const gui = new Gui();
 let guiText;
 let cursorLine = 0;
@@ -149,48 +151,8 @@ export default (fileName) => {
 
 }
 
-const keywords = [
-    "stat",
-    "applyLayout",
-    "applyPotion",
-    "cancelEvent",
-    "globalstat",
-    "changeHealth",
-    "changePlayerGroup",
-    "clearEffects",
-    "actionBar",
-    "title",
-    "failParkour",
-    "fullHeal",
-    "xpLevel",
-    "giveItem",
-    "houseSpawn",
-    "kill",
-    "parkCheck",
-    "sound",
-    "removeItem",
-    "resetInventory",
-    "chat",
-    "lobby",
-    "compassTarget",
-    "gamemode",
-    "hungerLevel",
-    "maxHealth",
-    "tp",
-    "function",
-    "consumeItem",
-    "enchant",
-    "displayMenu",
-    "closeMenu",
-    "pause",
-    "setTeam",
-    "teamstat",
-    "balanceTeam",
-    "if",
-    "goto"
-];
-const conditions = ["stat", "globalstat", "hasPotion", "doingParkour", "hasItem", "inRegion", "hasPermission", "hasGroup", "damageCause", "damageAmount", "blockType", "isSneaking", "gamemode", "placeholder", "hunger", "health", "maxHealth", "teamstat", "hasTeam", "isFlying", "fishingEnv", "isItem", "canPvp", "portal"];
-
+const keywords = Object.keys(syntax.actions);
+const conditions = Object.keys(syntax.conditions);
 
 function syntaxHighlight(line) {
     if (line.startsWith("//")) return "&2" + line;

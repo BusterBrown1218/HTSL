@@ -1,2 +1,5 @@
-Patch 1.2.2:
+Patch 1.2.3:
+- New Housing actions/settings
+- New "!" syntax to notate inverted conditions
+- Removed export color setting, unnecessary now.
 - Bugfixes

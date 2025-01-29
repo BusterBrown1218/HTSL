@@ -198,7 +198,6 @@ function getArgs(input) {
 			arg = "";
 		}
 	}
-	console.log(args);
 	return args;
 }
 
@@ -354,6 +353,7 @@ function componentFunc(args, syntax, menu) {
 					type: "custom_coordinates",
 					coords: args[j + 1]
 				}
+				args.splice(j + 1, 1);
 			} else if (args[j].toLowerCase().replace(/ +/g, "_") == "house_spawn") {
 				args[j] = { type: "house_spawn_location" }
 			} else {
@@ -385,6 +385,13 @@ function componentFunc(args, syntax, menu) {
 			for (let i = 0; i < conditionsArg.length; i++) {
 				let conditionArgs = getArgs(conditionsArg[i].trim());
 				if (typeof conditionArgs == "boolean" && !conditionArgs) return `Something went wrong with expression evaluation on &eline {line}`;
+				// Inverted check
+				let inverted = false;
+				if (conditionArgs[0].startsWith("!")) {
+					inverted = true;
+					conditionArgs[0] = conditionArgs[0].substring(1);
+				}
+				
 				let keyword = conditionArgs.shift();
 				if (keyword == "" || !keyword) continue;
 				if (syntaxes.conditions[keyword]) {
@@ -392,6 +399,7 @@ function componentFunc(args, syntax, menu) {
 					let comp = componentFunc(conditionArgs, subsyntax, conditions[subsyntax.type]);
 					if (typeof comp == "string") return comp;
 					if (comp) {
+						if (inverted) comp.inverted = true;
 						conditionList.push(comp);
 					} else {
 						return `Unknown condition &e${args[j]}&c on &eline {line}`;

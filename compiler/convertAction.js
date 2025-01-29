@@ -64,13 +64,19 @@ export function convertJSON (json) {
  * @param {object} menu The menu context of the component, obtained from {@link menus}
  * @returns {string} The corresponding HTSL action.
  */
-function convertComponent(obj, syntax, menu) {
-    let properties = syntax.full.match(/<(.*?)>/g);
+function convertComponent(obj, syntax, menu, condition) {
     let action = syntax.full;
+    if (condition) {
+        menu.inverted = {default_value: false, slot: 9, type: "toggle"};
+        action = "<inverted>" + action;
+    }
+    let properties = action.match(/<(.*?)>/g);
     if (properties) properties.forEach((property) => {
         let propertyName = property.match(/<(.*)>/)[1];
-        if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName].replace("$", "§");
-        if (propertyName === "match_any_condition") {
+        if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName];
+        if (propertyName === "inverted" && condition) {
+            action = action.replace(property, obj[propertyName] == true ? "!" : "");
+        } else if (propertyName === "match_any_condition") {
             action = action.replace(property, obj[propertyName] ? "or" : "and");
         } else if (propertyName === "mode") {
             action = action.replace(property, reverseMode(obj[propertyName]));
@@ -93,17 +99,13 @@ function convertComponent(obj, syntax, menu) {
                 if (syntax) syntax = syntaxs.conditions[syntax];
                     else continue;
                 let submenu = _conditions[syntax.type];
-                conditionList.push(convertComponent(conditions[condition], syntax, submenu));
+                conditionList.push(convertComponent(conditions[condition], syntax, submenu, true));
             }
             action = action.replace(property, conditionList.join(", "));
         } else if (menu[propertyName].type == "location") {
-            if (typeof obj[propertyName] == "string") {
-                action = action.replace(property, obj[propertyName].includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]);
+                action = action.replace(property, obj[propertyName]);
                 return;
-            }
-            let location = obj[propertyName];
-            action = action.replace(property, `custom_coordinates "${location.relX == 0 ? "" : "~"}${location.x} ${location.relY == 0 ? "" : "~"}${location.y} ${location.relZ == 0 ? "" : "~"}${location.z}${location.yaw == 0 ? "" : " " + location.yaw}${location.pitch == 0 || location.pitch == 0 ? "" : " " + location.pitch}"`);
-        } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replace("§", "$");
+        } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replaceAll("§", "&");
         else action = action.replace(property, "null");
     });
     return action;

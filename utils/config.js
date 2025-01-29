@@ -105,14 +105,6 @@ class Settings {
 		max: 1000
 	})
 	guiDelay = 0;
-
-	@SwitchProperty({
-		name: "Export Color Codes",
-		description: 'Exporting will check for color codes, but it will be slower',
-		category: "Importing/Exporting",
-		subcategory: "Importing/Exporting",
-	})
-	exportColorCodes = true;
 	
 	// Import Menu
 

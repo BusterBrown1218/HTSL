@@ -70,28 +70,26 @@ export function loadAction(script, deleteExisting) {
  * @param {*} component JSON Object for an individual action/condition
  * @param {*} menu JSON Object determining the format of the action/condition GUI
  */
-function importComponent(component, menu) {
+function importComponent(component, menu, condition) {
     // Go through every setting in the menu
     addOperation({ type: 'setGuiContext', context: component.type });
+    if (condition) menu.inverted = {default_value: false, slot: 9, type: "toggle"};
     for (let key in component) {
         if (key === "type") continue;
         if (JSON.stringify(menu[key].default_value).toLowerCase() === JSON.stringify(component[key]).replace("_", " ").toLowerCase()) continue;
         if (menu[key].default_value === component[key]) continue;
         if (component[key] === undefined) continue;
         let setting = menu[key];
-        addOperation({ type: 'click', slot: setting.slot });
+        addOperation({ type: 'click', slot: setting.slot + (condition === true ? 1 : 0) });
         switch (setting.type) {
-            case "chat_input":
-                addOperation({ type: 'chat', text: component[key] });
-                break;
-            case "anvil_input":
-                addOperation({ type: 'anvil', text: component[key] });
+            case "string_input":
+                addOperation({ type: 'input', text: component[key] });
                 break;
             case "conditions":
                 for (let condition in component[key]) {
                     addOperation({ type: 'click', slot: 50 }); // click "Add Condition" Button
                     addOperation({ type: 'option', option: conditions[component[key][condition].type].condition_name });
-                    importComponent(component[key][condition], conditions[component[key][condition].type]);
+                    importComponent(component[key][condition], conditions[component[key][condition].type], true);
                     addOperation({ type: 'returnToEditActions' });
                 }
                 addOperation({ type: 'back' });
@@ -107,7 +105,7 @@ function importComponent(component, menu) {
                 let location = component[key];
                 if (location.type.toLowerCase().replace(/ +/g, "_") == "custom_coordinates") {
                     addOperation({ type: 'click', slot: 13 }); // Click "Custom Coordinates" Button
-                    addOperation({ type: 'anvil', text: location.coords });    
+                    addOperation({ type: 'input', text: location.coords });    
                 } else {
                     addOperation({ type: 'click', slot: 10 + ["house_spawn_location", "invokers_location", "current_location"].indexOf(location.type.toLowerCase().replace(/ +/g, "_"))})
                 }
@@ -134,12 +132,12 @@ function importComponent(component, menu) {
                 break;
             case "sound":
                 addOperation({ type: 'click', slot: 48 }); // click "Custom Sound" Button
-                addOperation({ type: 'chat', text: convertSound(component[key]) });
+                addOperation({ type: 'input', text: convertSound(component[key]) });
                 break;
             case "slot":
                 if (/(\%.*\%)|(\d+)/.test(component[key])) {
                     addOperation({ type: 'click', slot: 8 }); // click "Manual Input" Button
-                    addOperation({ type: 'anvil', text: component[key] });
+                    addOperation({ type: 'input', text: component[key] });
                 } else {
                     addOperation({ type: 'option', option: component[key] });
                 }
