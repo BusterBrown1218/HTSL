@@ -3,15 +3,17 @@ import syntaxs from "../actions/syntax";
 import menus from "../actions/menus";
 import _conditions from "../actions/conditions";
 
+import Settings from "../utils/config";
+
 const housingEditor = 'https://api.housingeditor.com'
 
 /**
  * Converts a HousingEditor action to HTSL.
  * @param {string} actionId Housing Editor Action ID
- * @param {string} filename Filename to export to
+ * @param {string} fileName Filename to export to
  * @returns 
  */
-export function convertHE (actionId, filename) {
+export function convertHE (actionId, fileName) {
     if (actionId === 'test') return loadTestAction();
 
     axios({
@@ -19,7 +21,11 @@ export function convertHE (actionId, filename) {
         method: 'GET',
     }).then(response => {
         const json = response.data;
-        FileLib.write(`./config/ChatTriggers/modules/HTSL/imports/${filename}.htsl`, convertData(json.actionData, json.post?.title, json.author?.name));
+
+        let path = Settings.workingDirectory + `/${fileName}.htsl`;;
+	if (path == "$DEFAULT_FOLDER") path = `${Config.modulesFolder}/HTSL/imports/${fileName}.htsl`;
+        
+        FileLib.write(path, convertData(json.actionData, json.post?.title, json.author?.name));
     }).catch(error => {
         if (!error.response) return ChatLib.chat('&cError: ' + error);
         const response = error.response;

@@ -118,7 +118,10 @@ export default (fileName) => {
 
     addOperation({
         type: "doneExport", func: () => {
-            FileLib.write("HTSL", `imports/${fileName}.htsl`, convertJSON([{
+            let path = Settings.workingDirectory + `/${fileName}.htsl`;;
+		    if (path == "$DEFAULT_FOLDER") path = `${Config.modulesFolder}/HTSL/imports/${fileName}.htsl`;
+            
+            FileLib.write(path, convertJSON([{
                 context: "DEFAULT",
                 contextTarget: {},
                 actions: actionobjs
