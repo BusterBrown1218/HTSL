@@ -33,13 +33,13 @@ function processMenu(menu, submenuItems, actionkey, callback, condition) {
                 break;
             case "location":
                 if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Not Set") {
-                    action[key] = '"~ ~ ~"';
+                    action[key] = "invokers_location";
                 } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "House Spawn Location") {
                     action[key] = "house_spawn_location";
                 } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Invokers Location") {
                     action[key] = "invokers_location";
                 } else {
-                    action[key] = '"custom_coordinates" "' + ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).replaceAll(",", "") + '"';
+                    action[key] = '"custom_coordinates" "' + ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).replaceAll(/(?:,|yaw: |pitch: )/g, "") + '"';
                 }
                 break;
             case "item":
@@ -59,7 +59,7 @@ function processMenu(menu, submenuItems, actionkey, callback, condition) {
                     forceOperation({
                         type: "export", func: (submenuItems) => {
                             subactions = [];
-                            processPage(submenuItems, subactions, conditions, 0, true);
+                            processPage(submenuItems, subactions, conditions, true);
                         }
                     });
                     forceOperation({ type: "click", slot: menu[key].slot + (condition === true ? 1 : 0) });
@@ -114,7 +114,7 @@ export default (fileName) => {
     items = items.splice(0, Player.getContainer().getSize() - 9 - 36);
     actionobjs = [];
 
-    if (!processPage(items, actionobjs, menus, 0)) return false;
+    if (!processPage(items, actionobjs, menus)) return false;
 
     addOperation({
         type: "doneExport", func: () => {
@@ -135,7 +135,7 @@ export default (fileName) => {
  * @param {Number} page Which page number is currently being exported, allows the macro to return to the page consistently
  * @returns {boolean} Whether or not page processing will run successfully
  */
-function processPage(items, actionList, menuList, page, condition) {
+function processPage(items, actionList, menuList, condition) {
     forceOperation({
         type: "donePage", func: () => {
             if (Player.getContainer().getItems()[Player.getContainer().getSize() - 37]) if (ChatLib.removeFormatting(Player.getContainer().getItems()[Player.getContainer().getSize() - 37].getName()) == "Next Page") {
@@ -143,7 +143,7 @@ function processPage(items, actionList, menuList, page, condition) {
                 nextItems = nextItems.splice(0, Player.getContainer().getSize() - 9 - 36);
                 forceOperation({
                     type: "export", func: (subMenuItems) => {
-                        processPage(subMenuItems, actionList, menuList, page + 1, condition);
+                        processPage(subMenuItems, actionList, menuList, condition);
                     }
                 });
                 forceOperation({ type: "click", slot: Player.getContainer().getSize() - 37 });
@@ -179,11 +179,6 @@ function processPage(items, actionList, menuList, page, condition) {
         }
         if (Object.keys(menu).length > 1) {
             // operations forced to the front of the queue, so they need to be added backwards
-
-            // get back on the right page
-            for (let j = 0; j < page; j++) {
-                forceOperation({ type: "click", slot: Player.getContainer().getSize() - 37 })
-            }
 
             forceOperation({ type: "back" });
             forceOperation({

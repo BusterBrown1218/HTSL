@@ -17,7 +17,7 @@ export function loadAction(script, deleteExisting) {
     if (isWorking()) return false;
     let limits = actionLimits(script);
     if (typeof limits == "object") {
-        ChatLib.chat(`&3[HTSL] &cScript exceeds &e${limits.actionType}&c action limit in &e${limits.context.type.toLowerCase()} ${limits.context.type == "DEFAULT" ? "&ccontext" : limits.context.name + " &ccontext"}`);
+        ChatLib.chat(`&3[HTSL] &cScript exceeds &e${limits.actionType}&c action limit in &e${limits.context.type.toLowerCase()} ${limits.context.type.startsWith("DEFAULT") ? "&ccontext" : limits.context.name + " &ccontext"}`);
         return false;
     }
     for (let container in script) {

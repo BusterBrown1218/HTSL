@@ -13,7 +13,7 @@ const limits = {
     "CHANGE_TEAM_STAT": 10,
     "CLEAR_EFFECTS": 5,
     "CLOSE_MENU": 1,
-    "CONDITIONAL": 15,
+    "CONDITIONAL": 30,
     "ACTION_BAR": 5,
     "DISPLAY_MENU": 10,
     "TITLE": 5,
@@ -45,37 +45,48 @@ const limits = {
 };
 
 export default function checkLimits(obj) {
-    let counts = {};
-
-    // Recursive function to count action types
-    function countActions(actions, context, parentActionType) {
-        if (actions) actions.forEach(action => {
-            if (action.type) {
-                counts[`${context.type}_${context.name}`] = counts[context.type] || {};
-                counts[`${context.type}_${context.name}`][action.type] = (counts[`${context.type}_${context.name}`][action.type] || 0) + 1;
-                if (counts[`${context.type}_${context.name}`][action.type] > limits[action.type]) {
-                    throw { context: context, actionType: action.type };
-                }
-            }
-            ['if_actions', 'else_actions', 'actions'].forEach(subAction => {
-                if (action[subAction]) {
-                    let subContext = { type: action.type, name: subAction };
-                    let subObj = action[subAction].map(a => ({ context: subContext.name, contextTarget: { name: subContext.type }, actions: [a] }));
-                    let result = checkLimits(subObj);
-                    if (result !== true) {
-                        throw result;
-                    }
-                }
-            });
-        });
+    for (let context in obj) {
+        let result = checkContainer(obj[context].actions, { type: obj[context].context, name: obj[context].contextTarget.name });
+        if (typeof result === "object") return result;
     }
+    return true;
+}
 
-    try {
-        if (obj) obj.forEach(item => {
-            countActions(item.actions, { type: item.context, name: item.contextTarget.name || 'default' });
-        });
-    } catch (e) {
-        return e;
+function checkContainer(obj, context) {
+    let typeCounts = {};
+
+    if (!obj) return true;
+
+    for (let i = 0; i < obj.length; i++) {
+        let type = obj[i].type;
+        if (typeCounts[type]) {
+            typeCounts[type]++;
+        } else {
+            typeCounts[type] = 1;
+        }
+        if (type === "CONDITIONAL") {
+            let result = checkContainer(obj[i].if_actions, { type: context.type + ": CONDITIONAL" });
+            if (typeof result !== "boolean") {
+                return result;
+            }
+            result = checkContainer(obj[i].else_actions, { type: context.type + ": CONDITIONAL" });
+            if (typeof result !== "boolean") {
+                return result;
+            }
+        }
+        if (type === "RANDOM_ACTION") {
+            let result = checkContainer(obj[i].actions, { type: context.type + ": CONDITIONAL" });
+            if (typeof result !== "boolean") {
+                return result;
+            }
+        }
+    }
+    
+    for (let type in typeCounts) {
+        let count = typeCounts[type];
+        if (limits[type] && count > limits[type]) {
+            return { actionType: type, context };
+        }
     }
 
     return true;
