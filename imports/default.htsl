@@ -1,10 +1,10 @@
-if (!stat kills == 10) {
-chat "&ahello!"
-}
-if (stat kills == 10, hasItem "Stone" "Metadata" "Cursor" "Any Amount") {
-chat "&bhellon't!"
-}
-launchTarget "custom_coordinates" "^ ^ ^5" 10
-dropItem "Stone" "invokers_location" false true true false
-pause 10
-changeVelocity 3 5 3
+playerWeather "Raining"
+playerTime 1000
+
+// Does anyone even read this?
+teamstat test Blue set 12
+teamvar test Blue set 12 false
+globalstat test set 12
+globalvar test set 12 false
+stat test set 12
+var test set 12 false

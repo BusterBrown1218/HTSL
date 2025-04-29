@@ -33,15 +33,30 @@ export default {
             type: "toggle"
         }
     },
-    PLAYER_STAT: {
-        condition_name: "Player Stat Requirement",
-        stat: {
+    VARIABLE_REQUIREMENT: {
+        condition_name: "Variable Requirement",
+        holder: {
             slot: 10,
+            default_value: "Player",
+            type: "static_option_select",
+            options: [
+                "Player",
+                "Global",
+                "Team"
+            ]
+        },
+        team: {
+            slot: 11,
+            default_value: "None",
+            type: "dynamic_option_select"
+        },
+        variable: {
+            slot: 12,
             default_value: "Kills",
             type: "string_input"
         },
         mode: {
-            slot: 11,
+            slot: 13,
             default_value: "EQUAL",
             type: "static_option_select",
             options: [
@@ -53,32 +68,12 @@ export default {
             ]
         },
         amount: {
-            slot: 12,
+            slot: 14,
             default_value: null,
             type: "string_input"
-        }
-    },
-    GLOBAL_STAT: {
-        condition_name: "Global Stat Requirement",
-        stat: {
-            slot: 10,
-            default_value: "Kills",
-            type: "string_input"
         },
-        mode: {
-            slot: 11,
-            default_value: "EQUAL",
-            type: "static_option_select",
-            options: [
-                "Less Than",
-                "Less Than or Equal",
-                "Equal",
-                "Greater Than or Equal",
-                "Greater Than"
-            ]
-        },
-        amount: {
-            slot: 12,
+        fallback_value: {
+            slot: 15,
             default_value: null,
             type: "string_input"
         }
@@ -335,36 +330,6 @@ export default {
             slot: 10,
             default_value: "None",
             type: "dynamic_option_select"
-        }
-    },
-    TEAM_STAT: {
-        condition_name: "Team Stat Requirement",
-        stat: {
-            slot: 10,
-            default_value: "Kills",
-            type: "string_input"
-        },
-        team: {
-            slot: 11,
-            default_value: "None",
-            type: "dynamic_option_select"
-        },
-        mode: {
-            slot: 12,
-            default_value: "EQUAL",
-            type: "static_option_select",
-            options: [
-                "Less Than",
-                "Less Than or Equal",
-                "Equal",
-                "Greater Than or Equal",
-                "Greater Than"
-            ]
-        },
-        amount: {
-            slot: 13,
-            default_value: null,
-            type: "string_input"
         }
     },
     PVP_ENABLED: {

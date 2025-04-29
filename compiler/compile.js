@@ -17,7 +17,7 @@ export function isImporting() {
  * @returns 
  */
 export function compile(fileName, dissallowedFiles, nested) {
-	try {
+	// try {
 		if (!dissallowedFiles) dissallowedFiles = [];
 		let importText;
 		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
@@ -66,11 +66,11 @@ export function compile(fileName, dissallowedFiles, nested) {
 		if (!nested) {
 			if (!loadAction(actionobj)) return false;
 		} else return actionobj.map(n => { n.compiled = true; return n });
-	} catch (error) {
-		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-		ChatLib.chat(error);
-		console.error(error);
-	}
+	// } catch (error) {
+	// 	ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
+	// 	ChatLib.chat(error);
+	// 	console.error(error);
+	// }
 }
 
 /**
@@ -118,10 +118,11 @@ function getArgs(input) {
 	// Loop through the input string and split it into arguments based on spaces, but quoted args go together
 	let args = [];
 	let inQuotes = false;
+	let inPercents = false;
 	let inCurlyBrackets = false;
 	let arg = "";
 	for (let i = 0; i < input.length; i++) {
-		if (input[i].match(/\s/) && !inQuotes && !inCurlyBrackets) {
+		if (input[i].match(/\s/) && !inQuotes && !inCurlyBrackets && !inPercents) {
 			// Add completed word to args list
 			// Shortcut handling
 			let shortcut = shortcuts.find(m => m.name === arg);
@@ -141,20 +142,31 @@ function getArgs(input) {
 			arg = "";
 		} else if (arg.length === 0) {
 			// Arg is beginning, check for combined args
-			if (input[i] === '"' && !(inQuotes || inCurlyBrackets)) {
+			let notWrapped = !(inQuotes || inCurlyBrackets || inPercents);
+			if (input[i] === '"' && notWrapped) {
 				inQuotes = true;
-			} else if (input[i] === '{' && !(inQuotes || inCurlyBrackets)) {
+				arg += input[i];
+			} else if (input[i] === '{' && notWrapped) {
 				inCurlyBrackets = true;
-			} else if (input[i] === '\\' && ["\"", "(", "{"].includes(input[i + 1]) && !(inQuotes || inCurlyBrackets)) {
+			} else if (input[i] === "%" && notWrapped) {
+				inPercents = true;
+				arg += input[i];
+			} else if (input[i] === '\\' && ["\"", "(", "{", "%"].includes(input[i + 1]) && notWrapped) {
 				arg += input[i + 1];
 				i++;
 			} else {
 				arg += input[i];
 			}
-		} else if ((input[i + 1]?.match(/\s/) || i + 1 === input.length) && (inQuotes || inCurlyBrackets) && input[i - 1] !== "\\") {
+		} else if ((input[i + 1]?.match(/\s/) || i + 1 === input.length) && (inQuotes || inCurlyBrackets || inPercents) && input[i - 1] !== "\\") {
 			// Word is ending, check if completed arg
 			if (input[i] === '"' && inQuotes) {
 				inQuotes = false;
+				arg += input[i];
+				args.push(arg);
+				arg = "";
+			} else if (input[i] === "%" && inPercents) {
+				inPercents = false;
+				arg += input[i];
 				args.push(arg);
 				arg = "";
 			} else if (input[i] === '}' && inCurlyBrackets) {
@@ -175,7 +187,6 @@ function getArgs(input) {
 			}
 		} else {
 			arg += input[i];
-			
 		}
 		if (i + 1 === input.length) {
 			let shortcut = shortcuts.find(m => m.name === arg);
@@ -273,7 +284,7 @@ function validOperator(operator) {
 			operator = "divide";
 			break;
 	}
-	if (!['increment', 'decrement', 'set', 'multiply', 'divide'].includes(operator.toLowerCase())) return `Unknown operator &e${operator}&c on &eline {line}`;
+	if (!['increment', 'decrement', 'set', 'multiply', 'divide', "unset"].includes(operator.toLowerCase())) return `Unknown operator &e${operator}&c on &eline {line}`;
 	return operator.toUpperCase();
 }
 
@@ -333,8 +344,27 @@ function componentFunc(args, syntax, menu) {
 	let params = [];
 	if (syntax.full.match(/\<(.*?)\>/g)) params = syntax.full.match(/\<(.*?)\>/g).map(n => n.substring(1, n.length - 1));
 	let component = { type: syntax.type };
+	
+	if (["CHANGE_VARIABLE", "VARIABLE_REQUIREMENT"].includes(syntax.type)) {
+		params.splice(0, 0, "holder");
+		if (["teamstat", "teamvar"].includes(syntax.from)) {
+			args.splice(0, 0, "Team");
+		} else {
+			args.splice(0, 0, syntax.from.startsWith("global") ? "Global" : "Player");
+		}
+		if (syntax.from.endsWith("stat")) {
+			if (args[4].startsWith('"') && args[4].endsWith('"')) { // Remove quotes around amounts
+				args[4] = args[4].substring(1, args[4].length - 1);
+			}
+			params.push(syntax.type === "CHANGE_VARIABLE"? "automatic_unset" : "fallback_value");
+			args.push(syntax.type === "CHANGE_VARIABLE"? "true" : null);
+		}
+	}
 	for (let j = 0; j < params.length; j++) {
 		if (!args[j]) continue;
+		if (args[j].startsWith('"') && args[j].endsWith('"') && params[j] !== "amount") {
+			args[j] = args[j].substring(1, args[j].length - 1);
+		}
 		// handle operator aliases
 		if (menu[params[j]].type == "static_option_select" && menu[params[j]].options?.includes("Increment")) {
 			args[j] = validOperator(args[j]);

@@ -3,18 +3,34 @@
  * @const
  */
 export default {
-    CHANGE_STAT: {
-        action_name: "Change Player Stat",
-        stat: {
+    CHANGE_VARIABLE: {
+        action_name: "Change Variable",
+        holder: {
             slot: 10,
+            default_value: "Player",
+            type: "static_option_select",
+            options: [
+                "Player",
+                "Global",
+                "Team"
+            ]
+        },
+        team: {
+            slot: 11,
+            default_value: "None",
+            type: "dynamic_option_select"
+        },
+        variable: {
+            slot: 12,
             default_value: "Kills",
             type: "string_input"
         },
         mode: {
-            slot: 11,
+            slot: 13,
             default_value: "INCREMENT",
             type: "static_option_select",
             options: [
+                "Unset",
                 "Increment",
                 "Decrement",
                 "Set",
@@ -23,9 +39,14 @@ export default {
             ]
         },
         amount: {
-            slot: 12,
-            default_value: 1,
+            slot: 14,
+            default_value: "1L",
             type: "string_input"
+        },
+        automatic_unset: {
+            slot: 15,
+            default_value: false,
+            type: "toggle"
         }
     },
     CONDITIONAL: {
@@ -243,36 +264,6 @@ export default {
             type: "dynamic_option_select"
         }
     },
-    CHANGE_TEAM_STAT: {
-        action_name: "Change Team Stat",
-        stat: {
-            slot: 10,
-            default_value: "Kills",
-            type: "string_input"
-        },
-        mode: {
-            slot: 11,
-            default_value: "INCREMENT",
-            type: "static_option_select",
-            options: [
-                "Increment",
-                "Decrement",
-                "Set",
-                "Multiply",
-                "Divide"
-            ]
-        },
-        amount: {
-            slot: 12,
-            default_value: 1,
-            type: "string_input"
-        },
-        team: {
-            slot: 13,
-            default_value: "None",
-            type: "dynamic_option_select"
-        }
-    },
     SET_PLAYER_TEAM: {
         action_name: "Set Player Team",
         team: {
@@ -382,31 +373,6 @@ export default {
             slot: 11,
             default_value: false,
             type: "toggle"
-        }
-    },
-    CHANGE_GLOBAL_STAT: {
-        action_name: "Change Global Stat",
-        stat: {
-            slot: 10,
-            default_value: "Kills",
-            type: "string_input"
-        },
-        mode: {
-            slot: 11,
-            default_value: "INCREMENT",
-            type: "static_option_select",
-            options: [
-                "Increment",
-                "Decrement",
-                "Set",
-                "Multiply",
-                "Divide"
-            ]
-        },
-        amount: {
-            slot: 12,
-            default_value: 1,
-            type: "string_input"
         }
     },
     SEND_TO_LOBBY: {
@@ -651,6 +617,26 @@ export default {
             slot: 11,
             default_value: 2,
             type: "string_input"
+        }
+    },
+    SET_PLAYER_WEATHER: {
+        action_name: "Set Player Weather",
+        weather: {
+            slot: 10,
+            default_value: null,
+            type: "static_option_select",
+            options: [
+                "Sunny",
+                "Raining"
+            ]
+        }
+    },
+    SET_PLAYER_TIME: {
+        action_name: "Set Player Time",
+        time: {
+            slot: 10,
+            default_value: null,
+            type: "custom_time"
         }
     }
 }

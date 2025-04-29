@@ -46,6 +46,6 @@ function directoryExists(directoryPath) {
 }
 
 if (!directoryExists("./config/ChatTriggers/modules/HTSL/imports")) {
-    FileLib.write("HTSL", "./imports/default.htsl", "if (!stat kills == 10) {\nchat \"&ahello!\"\n}\nif (stat kills == 10, hasItem \"Stone\" \"Metadata\" \"Cursor\" \"Any Amount\") {\nchat \"&bhellon't!\"\n}\nlaunchTarget \"custom_coordinates\" \"^ ^ ^5\" 10\ndropItem \"Stone\" \"invokers_location\" false true true false\npause 10\nchangeVelocity 3 5 3", true);FileLib.write("HTSL", "./imports/default.htsl", "if (!stat kills == 10) {\nchat \"&ahello!\"\n}\nif (stat kills == 10, hasItem \"Stone\" \"Metadata\" \"Cursor\" \"Any Amount\") {\nchat \"&bhellon't!\"\n}\nlaunchTarget \"custom_coordinates\" \"^ ^ ^5\" 10\ndropItem \"Stone\" \"invokers_location\" false true true false\npause 10\nchangeVelocity 3 5 3", true);
+    FileLib.write("HTSL", "./imports/default.htsl", "playerWeather Raining\nplayerTime 1000\n\n// Does anyone even read this?\nteamstat test Blue set 12\nteamvar test Blue set 12 false\nglobalstat test set 12\nglobalvar test set 12 false\nstat test set 12\nvar test set 12 false", true);
     FileLib.write("HTSL", "./imports/stone.json", "{\"item\": \"{id:\\\"minecraft:stone\\\",Count:1b,Damage:0s}\"}", true);
 }

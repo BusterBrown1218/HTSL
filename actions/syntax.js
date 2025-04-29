@@ -32,8 +32,14 @@ export default {
             full: "cancelEvent"
         },
         globalstat: {
-            type: "CHANGE_GLOBAL_STAT",
-            full: "globalstat <stat> <mode> <amount>"
+            type: "CHANGE_VARIABLE",
+            full: "globalstat <variable> <mode> <amount>",
+            from: "globalstat"
+        },
+        globalvar: {
+            type: "CHANGE_VARIABLE",
+            full: "globalvar <variable> <mode> <amount> <automatic_unset>",
+            from: "globalvar"
         },
         changeHealth: {
             type: "SET_HEALTH",
@@ -56,12 +62,24 @@ export default {
             full: "changeGroup <group> <demotion_protection>"
         },
         stat: {
-            type: "CHANGE_STAT",
-            full: "stat <stat> <mode> <amount>"
+            type: "CHANGE_VARIABLE",
+            full: "stat <variable> <mode> <amount>",
+            from: "stat"
+        },
+        var: {
+            type: "CHANGE_VARIABLE",
+            full: "var <variable> <mode> <amount> <automatic_unset>",
+            from: "var"
         },
         teamstat: {
-            type: "CHANGE_TEAM_STAT",
-            full: "teamstat <stat> <team> <mode> <amount>"
+            type: "CHANGE_VARIABLE",
+            full: "teamstat <variable> <team> <mode> <amount>",
+            from: "teamstat"
+        },
+        teamvar: {
+            type: "CHANGE_VARIABLE",
+            full: "teamvar <variable> <team> <mode> <amount> <automatic_unset>",
+            from: "teamvar"
         },
         clearEffects: {
             type: "CLEAR_EFFECTS",
@@ -186,6 +204,14 @@ export default {
         random: {
             type: "RANDOM_ACTION",
             full: "random {\n<actions>\n}"
+        },
+        playerWeather: {
+            type: "SET_PLAYER_WEATHER",
+            full: "playerWeather <weather>"
+        },
+        playerTime: {
+            type: "SET_PLAYER_TIME",
+            full: "playerTime <time>"
         }
     },
     conditions: {
@@ -210,8 +236,14 @@ export default {
             full: "fishingEnv <environment>"
         },
         globalstat: {
-            type: "GLOBAL_STAT",
-            full: "globalstat <stat> <mode> <amount>"
+            type: "VARIABLE_REQUIREMENT",
+            full: "globalstat <variable> <mode> <amount>",
+            from: "globalstat"
+        },
+        globalvar: {
+            type: "VARIABLE_REQUIREMENT",
+            full: "globalvar <variable> <mode> <amount> <fallback_value>",
+            from: "globalvar"
         },
         hasItem: {
             type: "HAS_ITEM",
@@ -250,8 +282,14 @@ export default {
             full: "hunger <mode> <amount>"
         },
         stat: {
-            type: "PLAYER_STAT",
-            full: "stat <stat> <mode> <amount>"
+            type: "VARIABLE_REQUIREMENT",
+            full: "stat <variable> <mode> <amount>",
+            from: "stat"
+        },
+        var: {
+            type: "VARIABLE_REQUIREMENT",
+            full: "var <variable> <mode> <amount> <fallback_value>",
+            from: "var"
         },
         portal: {
             type: "PORTAL_TYPE",
@@ -286,8 +324,14 @@ export default {
             full: "inTeam <required_team>"
         },
         teamstat: {
-            type: "TEAM_STAT",
-            full: "teamstat <stat> <team> <mode> <amount>"
+            type: "VARIABLE_REQUIREMENT",
+            full: "teamstat <variable> <team> <mode> <amount>",
+            from: "teamstat"
+        },
+        teamvar: {
+            type: "VARIABLE_REQUIREMENT",
+            full: "teamstat <variable> <team> <mode> <amount> <fallback_value>",
+            from: "teamvar"
         },
         inRegion: {
             type: "IN_REGION",

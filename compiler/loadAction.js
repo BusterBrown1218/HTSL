@@ -80,7 +80,13 @@ function importComponent(component, menu, condition) {
         if (menu[key].default_value === component[key]) continue;
         if (component[key] === undefined) continue;
         let setting = menu[key];
-        addOperation({ type: 'click', slot: setting.slot + (condition === true ? 1 : 0) });
+        let change = condition === true ? 1 : 0;
+        if (["CHANGE_VARIABLE", "VARIABLE_REQUIREMENT"].includes(component.type) && component.team === undefined) {
+            if (component.holder !== undefined && !["holder"].includes(key)) {
+                change -= 1;
+            }
+        }
+        addOperation({ type: 'click', slot: setting.slot + change });
         switch (setting.type) {
             case "string_input":
                 addOperation({ type: 'input', text: component[key] });
@@ -142,6 +148,9 @@ function importComponent(component, menu, condition) {
                     addOperation({ type: 'option', option: component[key] });
                 }
                 break;
+            case "custom_time":
+                addOperation({ type: 'click', slot: 48 }); // click "Custom Time"
+                addOperation({ type: 'input', text: component[key] });
         }
     }
 

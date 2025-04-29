@@ -78,7 +78,7 @@ register("chat", (event) => {
   Navigator.isReady = true;
   inputMode = "chat";
   cancel(event);
-}).setCriteria(/(?:.*) wish to set.->newLine<- (?:\[PREVIOUS\])?\s*\[CANCEL\]/);
+}).setCriteria(/(?:.*) wish to set.->newLine<- (?:\[PREVIOUS\])?\s*(?:\[RESET\])?\s*\[CANCEL\]/);
 
 register("guiRender", () => {
   if (Navigator.isReady) return;
