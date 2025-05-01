@@ -221,7 +221,7 @@ export default {
         },
         damageAmount: {
             type: "DAMAGE_AMOUNT",
-            full: "damageAmount <compare_value> <compare_value>"
+            full: "damageAmount <comparator> <compare_value>"
         },
         damageCause: {
             type: "DAMAGE_CAUSE",
@@ -237,12 +237,12 @@ export default {
         },
         globalstat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "globalstat <variable> <compare_value> <compare_value>",
+            full: "globalstat <variable> <comparator> <compare_value>",
             from: "globalstat"
         },
         globalvar: {
             type: "VARIABLE_REQUIREMENT",
-            full: "globalvar <variable> <compare_value> <compare_value> <fallback_value>",
+            full: "globalvar <variable> <comparator> <compare_value> <fallback_value>",
             from: "globalvar"
         },
         hasItem: {
@@ -275,20 +275,20 @@ export default {
         },
         health: {
             type: "HEALTH",
-            full: "health <compare_value> <compare_value>"
+            full: "health <comparator> <compare_value>"
         },
         hunger: {
             type: "HUNGER_LEVEL",
-            full: "hunger <compare_value> <compare_value>"
+            full: "hunger <comparator> <compare_value>"
         },
         stat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "stat <variable> <compare_value> <compare_value>",
+            full: "stat <variable> <comparator> <compare_value>",
             from: "stat"
         },
         var: {
             type: "VARIABLE_REQUIREMENT",
-            full: "var <variable> <compare_value> <compare_value> <fallback_value>",
+            full: "var <variable> <comparator> <compare_value> <fallback_value>",
             from: "var"
         },
         portal: {
@@ -325,12 +325,12 @@ export default {
         },
         teamstat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "teamstat <variable> <team> <compare_value> <compare_value>",
+            full: "teamstat <variable> <team> <comparator> <compare_value>",
             from: "teamstat"
         },
         teamvar: {
             type: "VARIABLE_REQUIREMENT",
-            full: "teamstat <variable> <team> <compare_value> <compare_value> <fallback_value>",
+            full: "teamstat <variable> <team> <comparator> <compare_value> <fallback_value>",
             from: "teamvar"
         },
         inRegion: {
