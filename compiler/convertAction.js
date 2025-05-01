@@ -85,7 +85,6 @@ function convertComponent(obj, syntax, menu, condition) {
     let properties = action.match(/<(.*?)>/g);
     if (properties) properties.forEach((property) => {
         let propertyName = property.match(/<(.*)>/)[1];
-        console.log(propertyName, JSON.stringify(obj[propertyName]));
         if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName];
         if (propertyName === "inverted" && condition) {
             action = action.replace(property, obj[propertyName] == true ? "!" : "");

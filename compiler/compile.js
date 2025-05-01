@@ -17,7 +17,7 @@ export function isImporting() {
  * @returns 
  */
 export function compile(fileName, dissallowedFiles, nested) {
-	// try {
+	try {
 		if (!dissallowedFiles) dissallowedFiles = [];
 		let importText;
 		if (FileLib.exists(`./config/ChatTriggers/modules/HTSL/imports/${fileName}.htsl`)) {
@@ -66,11 +66,11 @@ export function compile(fileName, dissallowedFiles, nested) {
 		if (!nested) {
 			if (!loadAction(actionobj)) return false;
 		} else return actionobj.map(n => { n.compiled = true; return n });
-	// } catch (error) {
-	// 	ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
-	// 	ChatLib.chat(error);
-	// 	console.error(error);
-	// }
+	} catch (error) {
+		ChatLib.chat(`&3[HTSL] &eEncountered an unknown error, please seek support about the following error:`);
+		ChatLib.chat(error);
+		console.error(error);
+	}
 }
 
 /**
@@ -365,7 +365,6 @@ function componentFunc(args, syntax, menu) {
 		if (typeof args[j] == "string") if (args[j].startsWith('"') && args[j].endsWith('"') && params[j] !== "value") {
 			args[j] = args[j].substring(1, args[j].length - 1);
 		}
-		console.log(params[j]);
 		// handle operator aliases
 		if (menu[params[j]].type == "static_option_select" && menu[params[j]].options?.includes("Increment")) {
 			args[j] = validOperator(args[j]);
