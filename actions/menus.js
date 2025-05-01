@@ -38,7 +38,7 @@ export default {
                 "Divide"
             ]
         },
-        amount: {
+        value: {
             slot: 14,
             default_value: "1L",
             type: "string_input"
@@ -138,7 +138,7 @@ export default {
             default_value: "",
             type: "string_input"
         },
-        fade_in: {
+        fadein: {
             slot: 12,
             default_value: 1,
             type: "string_input"
@@ -148,7 +148,7 @@ export default {
             default_value: 5,
             type: "string_input"
         },
-        fade_out: {
+        fadeout: {
             slot: 14,
             default_value: 1,
             type: "string_input"
@@ -508,7 +508,7 @@ export default {
     },
     SET_HUNGER_LEVEL: {
         action_name: "Change Hunger Level",
-        hunger: {
+        level: {
             slot: 10,
             default_value: 20,
             type: "string_input"
@@ -528,7 +528,7 @@ export default {
     },
     CHANGE_HUNGER_LEVEL: {
         action_name: "Change Hunger Level",
-        hunger: {
+        level: {
             slot: 10,
             default_value: 20,
             type: "string_input"
@@ -590,17 +590,17 @@ export default {
     },
     CHANGE_VELOCITY: {
         action_name: "Change Velocity",
-        x: {
+        x_direction: {
             slot: 10,
             default_value: 10,
             type: "string_input"
         },
-        y: {
+        y_direction: {
             slot: 11,
             default_value: 10,
             type: "string_input"
         },
-        z: {
+        z_direction: {
             slot: 12,
             default_value: 10,
             type: "string_input"
@@ -608,12 +608,12 @@ export default {
     },
     LAUNCH_TO_TARGET: {
         action_name: "Launch to Target",
-        location: {
+        target_location: {
             slot: 10,
             default_value: null,
             type: "location"
         },
-        strength: {
+        launch_strength: {
             slot: 11,
             default_value: 2,
             type: "string_input"

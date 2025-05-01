@@ -20,7 +20,8 @@ register("tick", () => {
   if (!Navigator.isReady) return;
   if (queue.length === 0) return;
   timeWithoutOperation = 0;
-  if (Navigator.isReturning) return Navigator.returnToEditActions();
+  if (Navigator.isReturningToEdit) return Navigator.returnToEditActions();
+  if (Navigator.isReturningToSettings) return Navigator.returnToActionSettings();
   if (Navigator.isSelecting) {
     const attemptResult = Navigator.selectOption(Navigator.optionBeingSelected);
     if (attemptResult === false)
@@ -62,6 +63,9 @@ register("tick", () => {
     case "returnToEditActions":
       if (!Player.getContainer()) return;
       return Navigator.returnToEditActions();
+    case "returnToActionSettings":
+      if (!Player.getContainer()) return;
+      return Navigator.returnToActionSettings();
     case "back":
       return Navigator.goBack();
     case "option":

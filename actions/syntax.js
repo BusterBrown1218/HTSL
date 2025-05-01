@@ -33,12 +33,12 @@ export default {
         },
         globalstat: {
             type: "CHANGE_VARIABLE",
-            full: "globalstat <variable> <mode> <amount>",
+            full: "globalstat <variable> <mode> <value>",
             from: "globalstat"
         },
         globalvar: {
             type: "CHANGE_VARIABLE",
-            full: "globalvar <variable> <mode> <amount> <automatic_unset>",
+            full: "globalvar <variable> <mode> <value> <automatic_unset>",
             from: "globalvar"
         },
         changeHealth: {
@@ -47,7 +47,7 @@ export default {
         },
         hungerLevel: {
             type: "SET_HUNGER_LEVEL",
-            full: "hungerLevel <mode> <hunger>"
+            full: "hungerLevel <mode> <level>"
         },
         maxHealth: {
             type: "SET_MAX_HEALTH",
@@ -63,22 +63,22 @@ export default {
         },
         stat: {
             type: "CHANGE_VARIABLE",
-            full: "stat <variable> <mode> <amount>",
+            full: "stat <variable> <mode> <value>",
             from: "stat"
         },
         var: {
             type: "CHANGE_VARIABLE",
-            full: "var <variable> <mode> <amount> <automatic_unset>",
+            full: "var <variable> <mode> <value> <automatic_unset>",
             from: "var"
         },
         teamstat: {
             type: "CHANGE_VARIABLE",
-            full: "teamstat <variable> <team> <mode> <amount>",
+            full: "teamstat <variable> <team> <mode> <value>",
             from: "teamstat"
         },
         teamvar: {
             type: "CHANGE_VARIABLE",
-            full: "teamvar <variable> <team> <mode> <amount> <automatic_unset>",
+            full: "teamvar <variable> <team> <mode> <value> <automatic_unset>",
             from: "teamvar"
         },
         clearEffects: {
@@ -99,7 +99,7 @@ export default {
         },
         title: {
             type: "TITLE",
-            full: "title <title> <subtitle> <fade_in> <stay> <fade_out>"
+            full: "title <title> <subtitle> <fadein> <stay> <fadeout>"
         },
         enchant: {
             type: "ENCHANT_HELD_ITEM",
@@ -191,11 +191,11 @@ export default {
         },
         changeVelocity: {
             type: "CHANGE_VELOCITY",
-            full: "changeVelocity <x> <y> <z>"
+            full: "changeVelocity <x_direction> <y_direction> <z_direction>"
         },
         launchTarget: {
             type: "LAUNCH_TO_TARGET",
-            full: "launchTarget <location> <strength>"
+            full: "launchTarget <target_location> <launch_strength>"
         },
         if: {
             type: "CONDITIONAL",
@@ -221,7 +221,7 @@ export default {
         },
         damageAmount: {
             type: "DAMAGE_AMOUNT",
-            full: "damageAmount <mode> <amount>"
+            full: "damageAmount <compare_value> <compare_value>"
         },
         damageCause: {
             type: "DAMAGE_CAUSE",
@@ -237,12 +237,12 @@ export default {
         },
         globalstat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "globalstat <variable> <mode> <amount>",
+            full: "globalstat <variable> <compare_value> <compare_value>",
             from: "globalstat"
         },
         globalvar: {
             type: "VARIABLE_REQUIREMENT",
-            full: "globalvar <variable> <mode> <amount> <fallback_value>",
+            full: "globalvar <variable> <compare_value> <compare_value> <fallback_value>",
             from: "globalvar"
         },
         hasItem: {
@@ -263,11 +263,11 @@ export default {
         },
         maxHealth: {
             type: "MAX_HEALTH",
-            full: "maxHealth <mode> <amount>"
+            full: "maxHealth <comparator> <compare_value>"
         },
         placeholder: {
             type: "PLACEHOLDER_NUMBER",
-            full: "placeholder <placeholder> <mode> <amount>"
+            full: "placeholder <placeholder> <comparator> <compare_value>"
         },
         isFlying: {
             type: "FLYING",
@@ -275,20 +275,20 @@ export default {
         },
         health: {
             type: "HEALTH",
-            full: "health <mode> <amount>"
+            full: "health <compare_value> <compare_value>"
         },
         hunger: {
             type: "HUNGER_LEVEL",
-            full: "hunger <mode> <amount>"
+            full: "hunger <compare_value> <compare_value>"
         },
         stat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "stat <variable> <mode> <amount>",
+            full: "stat <variable> <compare_value> <compare_value>",
             from: "stat"
         },
         var: {
             type: "VARIABLE_REQUIREMENT",
-            full: "var <variable> <mode> <amount> <fallback_value>",
+            full: "var <variable> <compare_value> <compare_value> <fallback_value>",
             from: "var"
         },
         portal: {
@@ -325,12 +325,12 @@ export default {
         },
         teamstat: {
             type: "VARIABLE_REQUIREMENT",
-            full: "teamstat <variable> <team> <mode> <amount>",
+            full: "teamstat <variable> <team> <compare_value> <compare_value>",
             from: "teamstat"
         },
         teamvar: {
             type: "VARIABLE_REQUIREMENT",
-            full: "teamstat <variable> <team> <mode> <amount> <fallback_value>",
+            full: "teamstat <variable> <team> <compare_value> <compare_value> <fallback_value>",
             from: "teamvar"
         },
         inRegion: {

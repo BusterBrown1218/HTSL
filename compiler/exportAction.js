@@ -7,105 +7,6 @@ let actionobjs;
 let subactions;
 
 /**
- * Function to collect data from an individual action
- * @param {*} menu JSON Object containing the format for the action's GUI
- * @param {[Item]} submenuItems Items currently in the GUI
- * @param {*} actionkey JSON Object containing the properties of the action data
- * @param {*} callback Callback function to indicate when the action is finished processing
- */
-function processMenu(menu, submenuItems, actionkey, callback, condition) {
-    let action = { type: actionkey };
-    if (condition) menu.inverted = {default_value: false, slot: 9, type: "toggle"};
-    forceOperation({
-        type: "actionOrder", func: () => {
-            callback(action);
-        }
-    });
-    for (let j = 0; j < Object.keys(menu).length; j++) {
-        let key = Object.keys(menu)[j];
-        if (key == "action_name" || key == "condition_name") continue;
-        switch (menu[key].type) {
-            case "toggle":
-                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Enabled";
-                if (["drop_naturally"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[7]) == "Enabled";
-                if (["match_any_condition", "prioritize_player", "fallback_to_inventory", "show_potion_icon", "prevent_teleport_inside_blocks"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[6]) == "Enabled";
-                if (["inverted", "disable_item_merging"].includes(key)) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5]) == "Enabled";
-                break;
-            case "location":
-                if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Not Set") {
-                    action[key] = "invokers_location";
-                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "House Spawn Location") {
-                    action[key] = "house_spawn_location";
-                } else if (action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]) == "Invokers Location") {
-                    action[key] = "invokers_location";
-                } else {
-                    action[key] = '"custom_coordinates" "' + ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).replaceAll(/(?:,|yaw: |pitch: )/g, "") + '"';
-                }
-                break;
-            case "item":
-                action[key] = null;
-                break;
-            case "conditions":
-                if (ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]).match(/No Conditions/)) {
-                    action[key] = null;
-                } else {
-                    forceOperation({
-                        type: "doneSub", func: () => {
-                            action[key] = subactions;
-                            subactions = [];
-                        }
-                    });
-                    forceOperation({ type: "back" });
-                    forceOperation({
-                        type: "export", func: (submenuItems) => {
-                            subactions = [];
-                            processPage(submenuItems, subactions, conditions, true);
-                        }
-                    });
-                    forceOperation({ type: "click", slot: menu[key].slot + (condition === true ? 1 : 0) });
-                }
-                break;
-            case "subactions":
-                if (ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5]).match(/No Actions/)) {
-                    action[key] = null;
-                    forceOperation({
-                        type: "doneSub", func: () => {
-                            subactions = [];
-                        }
-                    });
-                } else {
-                    forceOperation({
-                        type: "doneSub", func: () => {
-                            action[key] = subactions;
-                            subactions = [];
-                        }
-                    });
-                    forceOperation({ type: "back" });
-                    forceOperation({
-                        type: "export", func: (submenuItems) => {
-                            subactions = [];
-                            processPage(submenuItems, subactions, menus, 0);
-                        }
-                    });
-                    forceOperation({ type: "click", slot: menu[key].slot });
-                }
-                break;
-            case "string_input":
-                action[key] = submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3].substring(6);
-                if (["ticks_to_wait"].includes(key)) action[key] = submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[5].substring(6);
-                if (action[key] == "Not Set") action[key] = null;
-                break;
-            default:
-                action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot + (condition === true ? 1 : 0)].getLore()[3]);
-                if (action[key] == "Not Set") action[key] = null;
-                if (key == "ticks_to_wait") action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[5]);
-                if (key == "team" && Object.keys(menu).length > 2) action[key] = ChatLib.removeFormatting(submenuItems[menu[key].slot].getLore()[6]);
-                break;
-        }
-    }
-}
-
-/**
  * Exports action data to HTSL file
  * @param {string} fileName File name to which to write exported HTSL code
  */
@@ -114,7 +15,7 @@ export default (fileName) => {
     items = items.splice(0, Player.getContainer().getSize() - 9 - 36);
     actionobjs = [];
 
-    if (!processPage(items, actionobjs, menus)) return false;
+    if (!processPage(items, actionobjs, menus, false)) return false;
 
     addOperation({
         type: "doneExport", func: () => {
@@ -133,6 +34,7 @@ export default (fileName) => {
  * @param {*} actionList JSON Object dictating the formatting of actions
  * @param {*} menuList JSON Object dictating the formatting of the ingame menu for each action
  * @param {Number} page Which page number is currently being exported, allows the macro to return to the page consistently
+ * @param {boolean} condition Indicate if the current page being processed contains conditions
  * @returns {boolean} Whether or not page processing will run successfully
  */
 function processPage(items, actionList, menuList, condition) {
@@ -169,26 +71,54 @@ function processPage(items, actionList, menuList, condition) {
         }
         if (ChatLib.removeFormatting(items[i].getName()) == "No Actions!") continue;
         if (!menu) return false;
-        if (["Change Player's Group", "Set Gamemode"].includes(menu.action_name) && ChatLib.removeFormatting(items[i].getLore()[3]) == "You are not allowed to edit this action!") {
-            forceOperation({
-                type: "actionOrder", func: () => {
-                    actionList.push({ type: actionkey });
-                }
-            })
-            continue;
-        }
         if (Object.keys(menu).length > 1) {
             // operations forced to the front of the queue, so they need to be added backwards
+            let lore = Object.values(items[i].getLore());
+            let actionobj = { type: actionkey };
+            if (["CONDITIONAL", "RANDOM_ACTION"].includes(actionkey)) forceOperation({ type: "back" });
+            for (let line of lore) {
+                if (line === "§5§o§7§oInverted" && condition && lore.indexOf(line) !== lore.length - 1) { // Condition is inverted
+                    actionobj["inverted"] = true;
+                    continue;
+                }
+                let match = line.match(/^§5§o§7(.*): ?§?f?(.*)?$/);
+                if (!match) continue;
+                let [property, value] = [match[1].toLowerCase().replaceAll(" ", "_"), match[2]?.replaceAll("§", "&")];
+                if (property.endsWith("_name")) continue;
+                if (value === "Not Set") {
+                    actionobj[property] = null;
+                }
 
-            forceOperation({ type: "back" });
+                switch (menu[property].type) {
+                    case "conditions":
+                    case "subactions":
+                        forceOperation({ type: "returnToActionSettings" });
+                        forceOperation({
+                            type: "export", func: (subMenuItems) => {
+                                subactions = [];
+                                processPage(subMenuItems, subactions, menu[property].type === "conditions" ? conditions : menus, menu[property].type === "conditions");
+                                actionobj[property] = subactions;
+                            }
+                        });
+                        forceOperation({ type: "click", slot: menu[property].slot });
+                        break;
+                    case "toggle":
+                        actionobj[property] = value === "&aEnabled";
+                        break;
+                    case "item":
+                        actionobj[property] = null;
+                        break;
+                    default:
+                        actionobj[property] = value;
+                        break;
+                }
+            }
+            if (["CONDITIONAL", "RANDOM_ACTION"].includes(actionkey)) forceOperation({ type: "click", slot: i });
             forceOperation({
-                type: "export", func: (submenuItems) => {
-                    processMenu(menu, submenuItems, actionkey, (action) => {
-                        actionList.push(action);
-                    }, condition);
+                type: "actionOrder", func: () => {
+                    actionList.push(actionobj);
                 }
             });
-            forceOperation({ type: "click", slot: i });
         } else {
             forceOperation({
                 type: "actionOrder", func: () => {

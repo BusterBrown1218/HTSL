@@ -140,10 +140,14 @@ function click(slotId, button) {
 }
 
 function returnToEditActions() {
-  Navigator.isReturning = true;
-  const containerName = Player.getContainer().getName();
-  if (containerName.match(/Edit |Actions: /))
-    return (Navigator.isReturning = false);
+  Navigator.isReturningToEdit = true;
+  if (["Edit Actions", "Edit Conditions"].includes(Player.getContainer().getName())) return Navigator.isReturningToEdit = false;
+  goBack();
+}
+
+function returnToActionSettings() {
+  Navigator.isReturningToSettings = true;
+  if (Player.getContainer().getName() === "Action Settings") return Navigator.isReturningToSettings = false;
   goBack();
 }
 
@@ -266,7 +270,8 @@ export default Navigator = {
   isWorking: false,
   isReady: false,
   isSelecting: false,
-  isReturning: false,
+  isReturningToEdit: false,
+  isReturningToSettings: false,
   isLoadingItem: false,
   isDeleting: false,
   guiIsLoading: true,
@@ -278,6 +283,7 @@ export default Navigator = {
   click,
   goBack,
   returnToEditActions,
+  returnToActionSettings,
   input,
   inputChat,
   deleteAction,

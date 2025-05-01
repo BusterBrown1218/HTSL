@@ -82,7 +82,7 @@ function importComponent(component, menu, condition) {
         let setting = menu[key];
         let change = condition === true ? 1 : 0;
         if (["CHANGE_VARIABLE", "VARIABLE_REQUIREMENT"].includes(component.type) && component.team === undefined) {
-            if (component.holder !== undefined && !["holder"].includes(key)) {
+            if (component.holder !== undefined && !["holder", "inverted"].includes(key)) {
                 change -= 1;
             }
         }

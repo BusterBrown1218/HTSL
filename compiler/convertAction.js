@@ -11,7 +11,7 @@ const housingEditor = 'https://api.housingeditor.com'
  * @param {string} filename Filename to export to
  * @returns 
  */
-export function convertHE (actionId, filename) {
+export function convertHE(actionId, filename) {
     if (actionId === 'test') return loadTestAction();
 
     axios({
@@ -38,18 +38,30 @@ export function convertHE (actionId, filename) {
  * @param {object} json Json object to transform
  * @returns {string} The new HTSL file.
  */
-export function convertJSON (json) {
+export function convertJSON(json) {
     let script = [];
     for (let context in json) {
-        if (json[context].context == "DEFAULT") { 
+        if (json[context].context == "DEFAULT") {
         } else {
             script.push(`goto ${json[context].context.toLowerCase()} "${json[context].contextTarget.name}"`);
         }
         let actions = json[context].actions;
         for (let action in actions) {
             let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
-            if (syntax) syntax = syntaxs.actions[syntax];
-                else continue;
+            if (actions[action].type === "CHANGE_VARIABLE") {
+                switch (actions[action]["holder"]) {
+                    case "Player":
+                        syntax = syntaxs.actions["var"];
+                        break;
+                    case "Global":
+                        syntax = syntaxs.actions["globalvar"];
+                        break;
+                    case "Team":
+                        syntax = syntaxs.actions["teamvar"];
+                        break;
+                }
+            } else if (syntax) syntax = syntaxs.actions[syntax];
+            else continue;
             let menu = menus[syntax.type];
             script.push(convertComponent(actions[action], syntax, menu));
         }
@@ -67,12 +79,13 @@ export function convertJSON (json) {
 function convertComponent(obj, syntax, menu, condition) {
     let action = syntax.full;
     if (condition) {
-        menu.inverted = {default_value: false, slot: 9, type: "toggle"};
+        menu.inverted = { default_value: false, slot: 9, type: "toggle" };
         action = "<inverted>" + action;
     }
     let properties = action.match(/<(.*?)>/g);
     if (properties) properties.forEach((property) => {
         let propertyName = property.match(/<(.*)>/)[1];
+        console.log(propertyName, JSON.stringify(obj[propertyName]));
         if (typeof obj[propertyName] == "string") obj[propertyName] = obj[propertyName];
         if (propertyName === "inverted" && condition) {
             action = action.replace(property, obj[propertyName] == true ? "!" : "");
@@ -85,8 +98,20 @@ function convertComponent(obj, syntax, menu, condition) {
             let subactions = [];
             for (let action in actions) {
                 let syntax = Object.keys(syntaxs.actions).find(n => syntaxs.actions[n].type == actions[action].type);
-                if (syntax) syntax = syntaxs.actions[syntax];
-                    else continue;
+                if (actions[action].type === "CHANGE_VARIABLE") {
+                    switch (actions[action]["holder"]) {
+                        case "Player":
+                            syntax = syntaxs.actions["var"];
+                            break;
+                        case "Global":
+                            syntax = syntaxs.actions["globalvar"];
+                            break;
+                        case "Team":
+                            syntax = syntaxs.actions["teamvar"];
+                            break;
+                    }
+                } else if (syntax) syntax = syntaxs.actions[syntax];
+                else continue;
                 let submenu = menus[syntax.type];
                 subactions.push(convertComponent(actions[action], syntax, submenu));
             }
@@ -96,15 +121,27 @@ function convertComponent(obj, syntax, menu, condition) {
             let conditionList = [];
             for (let condition in conditions) {
                 let syntax = Object.keys(syntaxs.conditions).find(n => syntaxs.conditions[n].type == conditions[condition].type);
-                if (syntax) syntax = syntaxs.conditions[syntax];
-                    else continue;
+                if (conditions[condition].type === "VARIABLE_REQUIREMENT") {
+                    switch (conditions[condition]["holder"]) {
+                        case "Player":
+                            syntax = syntaxs.conditions["var"];
+                            break;
+                        case "Global":
+                            syntax = syntaxs.conditions["globalvar"];
+                            break;
+                        case "Team":
+                            syntax = syntaxs.conditions["teamvar"];
+                            break;
+                    }
+                } else if (syntax) syntax = syntaxs.conditions[syntax];
+                else continue;
                 let submenu = _conditions[syntax.type];
                 conditionList.push(convertComponent(conditions[condition], syntax, submenu, true));
             }
             action = action.replace(property, conditionList.join(", "));
         } else if (menu[propertyName].type == "location") {
-                action = action.replace(property, obj[propertyName]);
-                return;
+            action = action.replace(property, obj[propertyName]);
+            return;
         } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replaceAll("§", "&");
         else action = action.replace(property, "null");
     });
@@ -237,7 +274,7 @@ function readActions(actionType, actionData) {
         case "fail_parkour": line = `failParkour "${actionData.reason}"`;
             break;
         case "set_player_team": line = `setTeam "${actionData.team}"`;
-        break;
+            break;
         case "full_heal": line = `fullHeal`;
             break;
         case "give_experience_levels": line = `xpLevel "${actionData.levels}"`;
@@ -289,7 +326,7 @@ function readActions(actionType, actionData) {
             break;
         case "display_menu": line = `displayMenu "${actionData.menu}"`;
             break;
-            case "balance_player_team": line = `balanceTeam`;
+        case "balance_player_team": line = `balanceTeam`;
             break;
     }
 

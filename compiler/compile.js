@@ -353,18 +353,19 @@ function componentFunc(args, syntax, menu) {
 			args.splice(0, 0, syntax.from.startsWith("global") ? "Global" : "Player");
 		}
 		if (syntax.from.endsWith("stat")) {
-			if (args[4].startsWith('"') && args[4].endsWith('"')) { // Remove quotes around amounts
-				args[4] = args[4].substring(1, args[4].length - 1);
+			if (args[3].startsWith('"') && args[3].endsWith('"')) { // Remove quotes around amounts
+				args[3] = args[3].substring(1, args[3].length - 1) + "L";
 			}
 			params.push(syntax.type === "CHANGE_VARIABLE"? "automatic_unset" : "fallback_value");
-			args.push(syntax.type === "CHANGE_VARIABLE"? "true" : null);
+			args.push(syntax.type === "CHANGE_VARIABLE"? "true" : "0L");
 		}
 	}
 	for (let j = 0; j < params.length; j++) {
 		if (!args[j]) continue;
-		if (args[j].startsWith('"') && args[j].endsWith('"') && params[j] !== "amount") {
+		if (typeof args[j] == "string") if (args[j].startsWith('"') && args[j].endsWith('"') && params[j] !== "value") {
 			args[j] = args[j].substring(1, args[j].length - 1);
 		}
+		console.log(params[j]);
 		// handle operator aliases
 		if (menu[params[j]].type == "static_option_select" && menu[params[j]].options?.includes("Increment")) {
 			args[j] = validOperator(args[j]);
@@ -582,11 +583,14 @@ export function preProcess(importActions, dissallowedFiles) {
 				actionList: trueActions
 			});
 			let gotoArgs = getArgs(importActions[i]);
+			for (let j = 0; j < gotoArgs.length; j++) {
+				if (gotoArgs[j].match(/^"(?:.*)"$/)) gotoArgs[j] = gotoArgs[j].substring(1, gotoArgs[j].length - 1);
+			}
 			if (gotoArgs.length == 5 && gotoArgs[3] == "as") {
 				if (dissallowedFiles.includes(gotoArgs[4])) return `&3[HTSL] &cNested file calls detected`;
 				let fileCall = compile(gotoArgs[4], dissallowedFiles, true);
 				fileCall[0].context = gotoArgs[1].toUpperCase();
-				fileCall[0].contextTarget = { name: gotoArgs[2] };
+				fileCall[0].contextTarget = { name: gotoArgs[2].match(/^"(?:.*)"$/) };
 				actionobj.push(...fileCall);
 			} else if (gotoArgs.length == 6 && gotoArgs[2] == "region" && gotoArgs[4] == "as") {
 				if (dissallowedFiles.includes(gotoArgs[4])) return `&3[HTSL] &cNested file calls detected`;

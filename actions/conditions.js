@@ -55,7 +55,7 @@ export default {
             default_value: "Kills",
             type: "string_input"
         },
-        mode: {
+        comparator: {
             slot: 13,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -67,7 +67,7 @@ export default {
                 "Greater Than"
             ]
         },
-        amount: {
+        compare_value: {
             slot: 14,
             default_value: null,
             type: "string_input"
@@ -228,7 +228,7 @@ export default {
     },
     HEALTH: {
         condition_name: "Player Health",
-        mode: {
+        comparator: {
             slot: 10,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -240,7 +240,7 @@ export default {
                 "Greater Than"
             ]
         },
-        amount: {
+        compare_value: {
             slot: 11,
             default_value: null,
             type: "string_input"
@@ -248,7 +248,7 @@ export default {
     },
     MAX_HEALTH: {
         condition_name: "Max Player Health",
-        mode: {
+        comparator: {
             slot: 10,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -260,7 +260,7 @@ export default {
                 "Greater Than"
             ]
         },
-        amount: {
+        compare_value: {
             slot: 11,
             default_value: null,
             type: "string_input"
@@ -268,7 +268,7 @@ export default {
     },
     HUNGER_LEVEL: {
         condition_name: "Player Hunger",
-        mode: {
+        comparator: {
             slot: 10,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -280,7 +280,7 @@ export default {
                 "Greater Than"
             ]
         },
-        amount: {
+        compare_value: {
             slot: 11,
             default_value: null,
             type: "string_input"
@@ -306,7 +306,7 @@ export default {
             default_value: null,
             type: "string_input"
         },
-        mode: {
+        comparator: {
             slot: 11,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -318,7 +318,7 @@ export default {
                 "Greater Than"
             ]
         },
-        amount: {
+        compare_value: {
             slot: 12,
             default_value: null,
             type: "string_input"
@@ -382,7 +382,7 @@ export default {
     },
     DAMAGE_AMOUNT: {
         condition_name: "Damage Amount",
-        mode: {
+        comparator: {
             slot: 10,
             default_value: "EQUAL",
             type: "static_option_select",
@@ -394,7 +394,7 @@ export default {
                 "Greater Than"
             ]
         }, 
-        amount: {
+        compare_value: {
             slot: 11,
             default_value: null,
             type: "string_input"
