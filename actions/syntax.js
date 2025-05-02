@@ -212,6 +212,10 @@ export default {
         playerTime: {
             type: "SET_PLAYER_TIME",
             full: "playerTime <time>"
+        },
+        displayNametag: {
+            type: "TOGGLE_NAMETAG_DISPLAY",
+            full: "displayNametag <display_nametag>"
         }
     },
     conditions: {

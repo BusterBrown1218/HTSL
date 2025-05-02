@@ -638,5 +638,13 @@ export default {
             default_value: null,
             type: "custom_time"
         }
+    },
+    TOGGLE_NAMETAG_DISPLAY: {
+        action_name: "Toggle Nametag Display",
+        display_nametag: {
+            slot: 10,
+            default_value: null,
+            type: "toggle"
+        }
     }
 }

@@ -8,3 +8,5 @@ globalstat test set 12
 globalvar test set 12 false
 stat test set 12
 var test set 12 false
+
+displayNametag false

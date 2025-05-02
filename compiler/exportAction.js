@@ -75,29 +75,65 @@ function processPage(items, actionList, menuList, condition) {
             // operations forced to the front of the queue, so they need to be added backwards
             let lore = Object.values(items[i].getLore());
             let actionobj = { type: actionkey };
-            if (["CONDITIONAL", "RANDOM_ACTION"].includes(actionkey)) forceOperation({ type: "back" });
+            let inAction = false;
             for (let line of lore) {
                 if (line === "§5§o§7§oInverted" && condition && lore.indexOf(line) !== lore.length - 1) { // Condition is inverted
                     actionobj["inverted"] = true;
                     continue;
                 }
-                let match = line.match(/^§5§o§7(.*): ?§?f?(.*)?$/);
+                let match = line.match(/^§5§o§7([^:]*): ?§?f?(.*)?$/);
                 if (!match) continue;
                 let [property, value] = [match[1].toLowerCase().replaceAll(" ", "_"), match[2]?.replaceAll("§", "&")];
                 if (property.endsWith("_name")) continue;
                 if (value === "Not Set") {
                     actionobj[property] = null;
+                    continue;
+                }
+
+                if (value?.length >= 30 && value?.endsWith("&7...")) { // Preview is truncated
+                    if (!inAction) {
+                        forceOperation({ type: "back" });
+                        inAction = true;
+                    }
+                    forceOperation({
+                        type: "export", func: (settingItems) => {
+                            let itemLore = Object.values(settingItems[menu[property].slot].getLore());
+                            let currentValueIndex = itemLore.indexOf("§5§o§7Current Value:");
+                            let currentValue = itemLore.splice(currentValueIndex + 1, itemLore.lastIndexOf("§5§o") - currentValueIndex - 1)
+                                .map(n => n.substring(6).replaceAll("§", "&"))
+                                .join(" ").substring(2);
+
+                            if (menu[property].type === "location") {
+                                if (currentValue === "House Spawn Location") actionobj[property] = "house_spawn";
+                                else if (currentValue === "Invokers Location") actionobj[property] = "invokers_location";
+                                else actionobj[property] = `"custom_coordinates" "${currentValue.replaceAll(/(?:,|yaw: |pitch: )/g, "")}"`;
+                            } else actionobj[property] = currentValue 
+                        }
+                    });
                 }
 
                 switch (menu[property].type) {
                     case "conditions":
                     case "subactions":
+                        if (lore[lore.indexOf(line) + 1] === "§5§o§7 - §cNone") { // Check if there are any conditions/subactions
+                            actionobj[property] = [];
+                            break;
+                        }
+                        if (!inAction) {
+                            forceOperation({ type: "back" });
+                            inAction = true;
+                        }
+                        forceOperation({
+                            type: "doneSub", func: () => {
+                                actionobj[property] = subactions;
+                                subactions = [];
+                            }
+                        });
                         forceOperation({ type: "returnToActionSettings" });
                         forceOperation({
                             type: "export", func: (subMenuItems) => {
                                 subactions = [];
                                 processPage(subMenuItems, subactions, menu[property].type === "conditions" ? conditions : menus, menu[property].type === "conditions");
-                                actionobj[property] = subactions;
                             }
                         });
                         forceOperation({ type: "click", slot: menu[property].slot });
@@ -108,12 +144,17 @@ function processPage(items, actionList, menuList, condition) {
                     case "item":
                         actionobj[property] = null;
                         break;
+                    case "location":
+                        if (value === "House Spawn Location") actionobj[property] = "house_spawn";
+                        else if (value === "Invokers Location") actionobj[property] = "invokers_location";
+                        else actionobj[property] = `"custom_coordinates" "${value.replaceAll(/(?:,|yaw: |pitch: )/g, "")}"`;
+                        break;
                     default:
                         actionobj[property] = value;
                         break;
                 }
             }
-            if (["CONDITIONAL", "RANDOM_ACTION"].includes(actionkey)) forceOperation({ type: "click", slot: i });
+            if (inAction) forceOperation({ type: "click", slot: i });
             forceOperation({
                 type: "actionOrder", func: () => {
                     actionList.push(actionobj);
