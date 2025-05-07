@@ -81,16 +81,16 @@ export function compile(fileName, dissallowedFiles, nested) {
  */
 function replaceshortcuts(text, shortcuts) {
 	shortcuts.forEach(shortcut => {
-		let regex = new RegExp('\\b' + shortcut.name + '\\b', 'g');
+		let regex = new RegExp('\\s' + shortcut.name + '\\s', 'g');
 		text = text.replace(regex, (match, offset, string) => {
 			// Check if the match is inside quotes
 			let inQuotes = (string.charAt(offset - 1) === "'" || string.charAt(offset - 1) === '"') &&
 				(string.charAt(offset + match.length) === "'" || string.charAt(offset + match.length) === '"');
 			// If the match is not inside quotes, replace it with the shortcut value
-			return inQuotes ? match : shortcut.value;
+			return inQuotes ? ` ${match} ` : ` ${shortcut.value} `;
 		});
 	});
-	return text;
+	return ` ${text} `;
 }
 
 /**
@@ -173,10 +173,27 @@ function getArgs(input) {
 				inCurlyBrackets = false;
 				// If the argument is in curly brackets
 				shortcuts.forEach((shortcut) => {
-					arg = arg.replace(shortcut.name, shortcut.value);
+					arg = arg.replaceAll(shortcut.name, shortcut.value);
 				});
 				try {
-					args.push(evaluateExpression(arg));
+					arg = evaluateExpression(arg);
+					let shortcut = shortcuts.find(m => m.name === arg);
+					if (shortcut) {
+						arg = getArgs(shortcut.value);
+						args.push(...arg);
+						arg = "";
+						continue;
+					}
+					// Slot choice for items
+					let slotMatch = arg.match(/slot\_(\d+)/);
+					if (slotMatch) {
+						arg = { slot: Number(slotMatch[1]) };
+						args.push(arg);
+						arg = "";
+						continue;
+					}
+					if (arg === "null") args.push(null); // User wants to ignore parameter
+					else if (arg !== "") args.push(arg);
 					arg = "";
 					continue;
 				} catch (e) {
@@ -218,7 +235,7 @@ function getArgs(input) {
  * @returns The result of the expression
  */
 function evaluateExpression(expression) {
-	let func = new Function('return ' + expression.replaceAll("(", "evaluateExpression("));
+	let func = new Function('return ' + String(expression).replaceAll("(", "evaluateExpression("));
 	return func().toString().replaceAll("evalExpression(", "(");
 }
 
@@ -344,7 +361,7 @@ function componentFunc(args, syntax, menu) {
 	let params = [];
 	if (syntax.full.match(/\<(.*?)\>/g)) params = syntax.full.match(/\<(.*?)\>/g).map(n => n.substring(1, n.length - 1));
 	let component = { type: syntax.type };
-	
+
 	if (["CHANGE_VARIABLE", "VARIABLE_REQUIREMENT"].includes(syntax.type)) {
 		params.splice(0, 0, "holder");
 		if (["teamstat", "teamvar"].includes(syntax.from)) {
@@ -354,10 +371,13 @@ function componentFunc(args, syntax, menu) {
 		}
 		if (syntax.from.endsWith("stat")) {
 			if (args[3].startsWith('"') && args[3].endsWith('"')) { // Remove quotes around amounts
-				args[3] = args[3].substring(1, args[3].length - 1) + "L";
+				args[3] = args[3].substring(1, args[3].length - 1);
 			}
-			params.push(syntax.type === "CHANGE_VARIABLE"? "automatic_unset" : "fallback_value");
-			args.push(syntax.type === "CHANGE_VARIABLE"? "true" : "0L");
+			params.push(syntax.type === "CHANGE_VARIABLE" ? "automatic_unset" : "fallback_value");
+			args.push(syntax.type === "CHANGE_VARIABLE" ? "true" : "0L");
+		}
+		if (args[1].length > 16) {
+			return `Variable key &e${args[1]} &cis too long on &eline {line}&c. The limit is 16 characters`;
 		}
 	}
 	for (let j = 0; j < params.length; j++) {
@@ -379,6 +399,9 @@ function componentFunc(args, syntax, menu) {
 		if (menu[params[j]].type == "location") {
 			if (!["house_spawn", "current_location", "invokers_location", "custom_coordinates", "house_spawn_location"].includes(args[j].toLowerCase().replace(/ +/g, "_"))) return `Invalid location &e${args[j]}&c on &eline {line}`;
 			if (args[j].toLowerCase().replace(/ +/g, "_") == "custom_coordinates") {
+				if (args[j + 1].startsWith('"') && args[j + 1].endsWith('"')) { // Remove quotes around amounts
+					args[j + 1] = args[j + 1].substring(1, args[j + 1].length - 1);
+				}
 				args[j] = {
 					type: "custom_coordinates",
 					coords: args[j + 1]
@@ -421,7 +444,7 @@ function componentFunc(args, syntax, menu) {
 					inverted = true;
 					conditionArgs[0] = conditionArgs[0].substring(1);
 				}
-				
+
 				let keyword = conditionArgs.shift();
 				if (keyword == "" || !keyword) continue;
 				if (syntaxes.conditions[keyword]) {
@@ -504,7 +527,7 @@ export function preProcess(importActions, dissallowedFiles) {
 	let multilineComment = false;
 	let depth = 0;
 	for (let i = 0; i < importActions.length; i++) {
-		importActions[i] = replaceshortcuts(importActions[i].trim(), shortcuts);
+		importActions[i] = replaceshortcuts(importActions[i].trim(), shortcuts).trim();
 		if (multilineAction) multilineActionLength++;
 		if (importActions[i] == "") continue;
 		if (importActions[i].startsWith("//")) continue;

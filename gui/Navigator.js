@@ -141,7 +141,6 @@ function click(slotId, button) {
 
 function returnToEditActions() {
   Navigator.isReturningToEdit = true;
-  console.log(Player.getContainer().getName())
   if (Player.getContainer().getName().match(/Edit |Actions:/)) return Navigator.isReturningToEdit = false;
   goBack();
 }

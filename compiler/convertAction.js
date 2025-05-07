@@ -90,7 +90,7 @@ function convertComponent(obj, syntax, menu, condition) {
             action = action.replace(property, obj[propertyName] == true ? "!" : "");
         } else if (propertyName === "match_any_condition") {
             action = action.replace(property, obj[propertyName] ? "or" : "and");
-        } else if (propertyName === "mode") {
+        } else if (["mode", "comparator"].includes(propertyName)) {
             action = action.replace(property, reverseMode(obj[propertyName]));
         } else if (menu[propertyName].type == "subactions") {
             let actions = obj[propertyName];
@@ -114,7 +114,7 @@ function convertComponent(obj, syntax, menu, condition) {
                 let submenu = menus[syntax.type];
                 subactions.push(convertComponent(actions[action], syntax, submenu));
             }
-            action = action.replace(property, subactions.join("\n"));
+            action = action.replace(property, subactions.map(n => "    " + n).join("\n"));
         } else if (menu[propertyName].type == "conditions") {
             let conditions = obj[propertyName];
             let conditionList = [];

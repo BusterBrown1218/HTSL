@@ -569,7 +569,7 @@ export default {
         },
         drop_naturally: {
             slot: 12,
-            default_value: false,
+            default_value: true,
             type: "toggle"
         },
         disable_item_merging: {

@@ -9,6 +9,8 @@ const limits = {
     "CANCEL_EVENT": 1,
     "CHANGE_PLAYER_GROUP": 1,
     "CHANGE_VARIABLE": 25,
+    "CHANGE_VELOCATIY": 5,
+    "LAUNCH_TO_TARGET": 5,
     "CLEAR_EFFECTS": 5,
     "CLOSE_MENU": 1,
     "CONDITIONAL": 30,
