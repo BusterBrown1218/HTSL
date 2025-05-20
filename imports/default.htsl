@@ -10,3 +10,7 @@ stat test set 12
 var test set 12 false
 
 displayNametag false
+
+var kills = var deaths 0 true
+var kills = globalvar deaths 0 true
+var kills = teamvar Blue deaths 0 true

@@ -141,10 +141,27 @@ function convertComponent(obj, syntax, menu, condition) {
         } else if (menu[propertyName].type == "location") {
             action = action.replace(property, obj[propertyName]);
             return;
-        } else if (obj[propertyName] != null) action = action.replace(property, String(obj[propertyName]).includes(" ") ? `"${obj[propertyName]}"` : obj[propertyName]).replaceAll("§", "&");
-        else action = action.replace(property, "null");
+        } else if (obj[propertyName] != null) {
+            obj[propertyName] = String(obj[propertyName]).replaceAll(/("|\\)/g, "\\$1");
+            action = action.replace(property, hasUncontainedSpace(String(obj[propertyName])) ? `"${obj[propertyName]}"` : obj[propertyName]).replaceAll("§", "&");
+        } else action = action.replace(property, "null");
     });
     return action;
+}
+
+function hasUncontainedSpace(str) {
+    let inQuote = false, inPercent = false;
+    for (let i = 0; i < str.length; i++) {
+        // Only toggle inQuote if the quote is not escaped
+        if (str[i] === '"' && !inPercent && (i === 0 || str[i - 1] !== '\\')) {
+            inQuote = !inQuote;
+        } else if (str[i] === '%' && !inQuote) {
+            inPercent = !inPercent;
+        } else if (str[i] === ' ' && !inQuote && !inPercent) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**

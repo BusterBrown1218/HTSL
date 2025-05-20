@@ -643,7 +643,7 @@ export default {
         action_name: "Toggle Nametag Display",
         display_nametag: {
             slot: 10,
-            default_value: null,
+            default_value: true,
             type: "toggle"
         }
     }

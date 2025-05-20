@@ -150,6 +150,7 @@ function processPage(items, actionList, menuList, condition) {
                         else actionobj[property] = `"custom_coordinates" "${value.replaceAll(/(?:,|yaw: |pitch: )/g, "")}"`;
                         break;
                     default:
+                        if (!(value.startsWith("\"") && value.endsWith("\""))) value = value.replaceAll(",", "");
                         actionobj[property] = value;
                         break;
                 }

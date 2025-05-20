@@ -102,7 +102,11 @@ function getArgs(input) {
 	let conversions = [
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalstat +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 %stat.global/$2$3%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +stat +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 %stat.player/$2$3%" },
-		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 \"%stat.team/$2 $3$4%\"" }, { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 \"%random.int/$2 $3%\"" },
+		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamstat +(.*)? +(?:"([^"]*)"|([^ ]*))/g, replacement: "$1 \"%stat.team/$2 $3$4%\"" },
+        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +randomint +(.*)? +?(.*)?/g, replacement: "$1 \"%random.int/$2 $3%\"" },
+        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +var +([^ ]*)? *([^ ]*)? ?(.*)?/g, replacement: "$1 %var.player/$2 $3% $4"},
+        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +globalvar +([^ ]*)? *([^ ]*)? ?(.*)?/g, replacement: "$1 %var.global/$2 $3% $4"},
+        { regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +teamvar +([^ ]*)? +([^ ]*)? *([^ ]*)? ?(.*)?/g, replacement: "$1 %var.team/$3 $2 $4% $5"},
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +health/g, replacement: "$1 %player.health%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +maxHealth/g, replacement: "$1 %player.maxhealth%" },
 		{ regex: /(=|>|<|set|dec|mult|div|ment|inc|multiply|divide|equal|Less Than|Less Than or Equal|Greater Than|Greater Than or Equal) +hunger/g, replacement: "$1 %player.hunger%" },
@@ -151,7 +155,7 @@ function getArgs(input) {
 			} else if (input[i] === "%" && notWrapped) {
 				inPercents = true;
 				arg += input[i];
-			} else if (input[i] === '\\' && ["\"", "(", "{", "%"].includes(input[i + 1]) && notWrapped) {
+			} else if (input[i] === '\\' && ["\"", "(", "{", "%", "\\"].includes(input[i + 1])) {
 				arg += input[i + 1];
 				i++;
 			} else {
@@ -200,9 +204,13 @@ function getArgs(input) {
 					return false; // Invalid expression
 				}
 			} else {
-				arg += input[i];
+                if (input[i] === "\\" && ["\"", "(", "{", "%", "\\"].includes(input[i + 1])) i++;
+
+                arg += input[i];
 			}
 		} else {
+            if (input[i] === "\\" && ["\"", "(", "{", "%", "\\"].includes(input[i + 1])) i++;
+
 			arg += input[i];
 		}
 		if (i + 1 === input.length) {
