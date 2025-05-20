@@ -84,7 +84,7 @@ class Settings {
 		category: "Importing/Exporting",
 		subcategory: "Importing/Exporting",
 	})
-	useSafeMode = true;
+	useSafeMode = false;
 
 	@SliderProperty({
 		name: "GUI Timeout",
