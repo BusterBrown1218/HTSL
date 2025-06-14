@@ -405,19 +405,19 @@ function readFiles() {
 	if (Settings.toggleFileExplorer && !show) return;
 	try {
 		files = readDir(`./config/ChatTriggers/modules/HTSL/imports/${subDir.replace(/\\+/g, "/")}`, false).filter(n => n.endsWith(".htsl") || n.endsWith(".json") || !n.includes("."));
-		files.sort().sort((a, b) => {
-			let isDirA = a.endsWith('\\');
-			let isDirB = b.endsWith('\\');
+		files.sort((a, b) => {
+			const isDirA = a.endsWith('\\');
+			const isDirB = b.endsWith('\\');
 
-			if (isDirA && !isDirB) return -1;
-			if (!isDirA && isDirB) return 1;
+			if (isDirA !== isDirB) return isDirA ? -1 : 1;
 
-			let extA = a.split('.').pop();
-			let extB = b.split('.').pop();
+			const extA = a.split('.').pop();
+			const extB = b.split('.').pop();
+
 			if (extA < extB) return -1;
 			if (extA > extB) return 1;
 
-			return 0;
+			return a.localeCompare(b);
 		});
 		if (input.getText() != "Enter File Name") filteredFiles = files.filter(n => n.toLowerCase().includes(input.getText().toLowerCase()));
 		else filteredFiles = files;
