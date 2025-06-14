@@ -1,5 +1,3 @@
-# SAFE MODE IS THE DEFAULT SETTING AND IS ENCOURAGED
- 
 Installation instructions:
 1. Download zip from releases
 2. Extract zip to "./minecraft/config/ChatTriggers/modules/HTSL/
