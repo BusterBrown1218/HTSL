@@ -253,6 +253,12 @@ register("chat", (event) => {
   cancel(event);
 }).setCriteria("Could not find a function with that name!");
 
+register("chat", (event) => {
+  if (!Navigator.isWorking) return;
+  ChatLib.say(Navigator.func);
+  cancel(event);
+}).setCriteria("Could not find a custom menu with that title!");
+
 function setNotReady() {
   Navigator.itemsLoaded = { items: {}, lastItemAddedTimestamp: 0 };
   Navigator.isReady = false;

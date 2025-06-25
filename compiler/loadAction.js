@@ -49,6 +49,11 @@ export function loadAction(script, deleteExisting) {
                     addOperation({ type: 'chat', text: `/region edit ${script[container].contextTarget.name}`, command: true });
                     addOperation({ type: 'option', option: script[container].contextTarget.trigger });
                     break;
+                case "GUI":
+                case "CUSTOMMENU":
+                    addOperation({ type: 'chat', text: `/custommenu edit ${script[container].contextTarget.name}`, command: true, func: "/custommenu create " + script[container].contextTarget.name });
+                    addOperation({ type: 'click', slot: 15 });
+                    addOperation({ type: 'click', slot: parseInt(script[container].contextTarget.trigger) });
             }
         }
         if (deleteExisting) {
@@ -129,13 +134,6 @@ function importComponent(component, menu, condition) {
                 addOperation({ type: 'item', item: component[key] });
                 break;
             // Action exceptions that cannot fit under other options
-            case "enchantment":
-                if (component[key] < 50) addOperation({ type: 'click', slot: component[key] + 10 })
-                else {
-                    addOperation({ type: 'click', slot: 53 }); // click next page
-                    addOperation({ type: 'click', slot: component[key] - 40 });
-                }
-                break;
             case "sound":
                 addOperation({ type: 'click', slot: 48 }); // click "Custom Sound" Button
                 addOperation({ type: 'input', text: convertSound(component[key]) });

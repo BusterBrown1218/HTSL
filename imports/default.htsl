@@ -14,3 +14,6 @@ displayNametag false
 var kills = var deaths 0 true
 var kills = globalvar deaths 0 true
 var kills = teamvar Blue deaths 0 true
+
+goto gui "Test" 0
+chat "Hello World!"

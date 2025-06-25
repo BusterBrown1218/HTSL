@@ -622,7 +622,7 @@ export function preProcess(importActions, dissallowedFiles) {
 				fileCall[0].context = gotoArgs[1].toUpperCase();
 				fileCall[0].contextTarget = { name: gotoArgs[2].match(/^"(?:.*)"$/) };
 				actionobj.push(...fileCall);
-			} else if (gotoArgs.length == 6 && gotoArgs[2] == "region" && gotoArgs[4] == "as") {
+			} else if (gotoArgs.length == 6 && ["region", "gui", "custommenu"].includes(gotoArgs[2]) && gotoArgs[4] == "as") {
 				if (dissallowedFiles.includes(gotoArgs[4])) return `&3[HTSL] &cNested file calls detected`;
 				let fileCall = compile(gotoArgs[4], dissallowedFiles, true);
 				fileCall[0].context = gotoArgs[1].toUpperCase();

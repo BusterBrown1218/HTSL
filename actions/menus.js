@@ -285,7 +285,32 @@ export default {
         enchantment: {
             slot: 10,
             default_value: null,
-            type: "enchantment"
+            type: "static_option_select",
+            options: [
+                "Protection",
+                "Fire Protection",
+                "Feather Falling",
+                "Blast Protection",
+                "Projectile Protection",
+                "Respiration",
+                "Aqua Affinity",
+                "Thorns",
+                "Depth Strider",
+                "Sharpness",
+                "Smite",
+                "Bane Of Arthropods",
+                "Knockback",
+                "Fire Aspect",
+                "Looting",
+                "Efficiency",
+                "Silk Touch",
+                "Unbreaking",
+                "Fortune",
+                "Power",
+                "Punch",
+                "Flame",
+                "Infinity"
+            ]
         },
         level: {
             slot: 11,
