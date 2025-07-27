@@ -11,12 +11,29 @@ let subactions;
  * @param {string} fileName File name to which to write exported HTSL code
  */
 export default (fileName) => {
+    function getUniqueName(baseFileName) {
+        let counter = 1;
+        const originalName = baseFileName;
+
+        while (FileLib.exists("HTSL", `imports/${baseFileName}.htsl`)) {
+            baseFileName = `${originalName}_${counter}`;
+            counter++;
+        }
+
+        return baseFileName;
+    }
+
+    let containerName = Player.getContainer().getName();
+    if (containerName == 'Edit Actions') containerName = containerName.replace(' ', '_');
+    else containerName = containerName.replace('Actions: ', '');
+
     let items = Player.getContainer().getItems();
     items = items.splice(0, Player.getContainer().getSize() - 9 - 36);
     actionobjs = [];
 
     if (!processPage(items, actionobjs, menus, false)) return false;
 
+    fileName = getUniqueName(containerName);
     addOperation({
         type: "doneExport", func: () => {
             FileLib.write("HTSL", `imports/${fileName}.htsl`, convertJSON([{
@@ -26,6 +43,7 @@ export default (fileName) => {
             }]), true);
         }
     });
+    ChatLib.chat(`&3[HTSL] &fSaved export to 'imports/${fileName}.htsl'!`);
 }
 
 /**
