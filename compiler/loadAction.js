@@ -51,8 +51,27 @@ export function loadAction(script, deleteExisting) {
                     break;
                 case "GUI":
                 case "CUSTOMMENU":
-                    addOperation({ type: 'chat', text: `/custommenu edit ${script[container].contextTarget.name}`, command: true, func: "/custommenu create " + script[container].contextTarget.name });
+                    addOperation({ type: 'chat', text: `/custommenu edit ${script[container].contextTarget.name}`, command: true, func: "/custommenu create " + script[container].contextTarget.name});
                     addOperation({ type: 'click', slot: 15 });
+
+                    let itemArg = `${script[container].contextTarget.etc}`.trim() || '';
+                    if (itemArg !== 'undefined') {
+                        if (!FileLib.exists("HTSL", `imports/${itemArg}.json`)) {
+                            ChatLib.chat(`Unknown item &e${itemArg}`);
+                            return;
+                        }
+                        let itemData = FileLib.read("HTSL", `imports/${itemArg}.json`);
+                        itemData = JSON.parse(itemData);
+                        let item = {
+                            item: itemData.item,
+                            type: "customItem",
+                            slot: 18
+                        };
+
+                        addOperation({ type: 'click', slot: parseInt(script[container].contextTarget.trigger) });
+                        addOperation({ type: 'item', item: item });
+                    }
+                    
                     addOperation({ type: 'click', slot: parseInt(script[container].contextTarget.trigger) });
             }
         }

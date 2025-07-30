@@ -628,7 +628,7 @@ export function preProcess(importActions, dissallowedFiles) {
 				fileCall[0].context = gotoArgs[1].toUpperCase();
 				fileCall[0].contextTarget = { name: gotoArgs[2], trigger: gotoArgs[4] };
 				actionobj.push(...fileCall)
-			} else currentContext = { context: gotoArgs[1].toUpperCase(), contextTarget: { name: gotoArgs[2], trigger: gotoArgs[3] } };
+			} else currentContext = { context: gotoArgs[1].toUpperCase(), contextTarget: { name: gotoArgs[2], trigger: gotoArgs[3], etc: gotoArgs[4], etc2: gotoArgs[5] } };
 			trueActions = [];
 			continue;
 		}

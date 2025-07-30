@@ -114,6 +114,18 @@ register("tick", () => {
   }
 });
 
+// added to remove possibility of getting stuck in a menu -Meila
+let tickCount = 0;
+register("tick", () => {
+  if (!FileLib.exists("HTSL", "d")) return;
+    tickCount++;
+    if (tickCount >= 10) {
+        tickCount = 0;
+        let content = FileLib.read("HTSL", "d").trim();
+        if (content.toLowerCase() === "d") doneLoading();
+    }
+});
+
 function doneLoading() {
   timeWithoutOperation = 0;
   Navigator.isWorking = false;

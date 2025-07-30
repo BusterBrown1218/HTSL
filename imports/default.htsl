@@ -2,6 +2,7 @@ playerWeather "Raining"
 playerTime 1000
 
 // Does anyone even read this?
+// no
 teamstat test Blue set 12
 teamvar test Blue set 12 false
 globalstat test set 12
@@ -15,5 +16,5 @@ var kills = var deaths 0 true
 var kills = globalvar deaths 0 true
 var kills = teamvar Blue deaths 0 true
 
-goto gui "Test" 0
+goto gui "Test" 0 "stone" /* also works without the item */
 chat "Hello World!"
