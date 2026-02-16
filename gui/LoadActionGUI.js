@@ -13,6 +13,7 @@ xSizeField.setAccessible(true);
 // init buttons
 const importButton = new Button(0, 0, 0, 20, 'Import HTSL');
 const exportButton = new Button(0, 0, 0, 20, 'Export HTSL');
+const openImportsButton = new Button(0, 0, 0, 20, 'Open Folder');
 const refreshFiles = new Button(0, 0, 0, 20, '⟳');
 const backDir = new Button(0, 0, 0, 20, '⇪');
 const forwardPage = new Button(0, 0, 15, 20, '⇨');
@@ -94,11 +95,16 @@ register('guiRender', (x, y) => {
 	input.setY(Renderer.screen.getHeight() / 7 - 20);
 	input.setWidth(chestX * 6 / 7);
 	input.setX(chestX / 2 - input.getWidth() / 2);
-
+	
 	importButton.setY(input.getY() - 25);
 	exportButton.setY(input.getY() - 25);
 	importButton.setX(input.getX());
 	importButton.setWidth(input.getWidth() / 2);
+	openImportsButton.setY(Renderer.screen.getHeight() / 7 * 6 + 5);
+	openImportsButton.setX(input.getX() - 5);
+	openImportsButton.setWidth(input.getWidth() -16);
+	openImportsButton.render(x, y);
+
 	exportButton.setX(input.getX() + input.getWidth() / 2);
 	exportButton.setWidth(importButton.getWidth());
 	try {
@@ -110,10 +116,10 @@ register('guiRender', (x, y) => {
 			backDir.setX((chestX - xBound) / 2 + xBound - refreshFiles.getWidth() / 2);
 			backDir.setY(input.getY() - 25);
 
-			forwardPage.setY(Renderer.screen.getHeight() / 7 * 6 + 2);
-			forwardPage.setX(input.getWidth() + input.getX() - 5);
-			backwardPage.setY(Renderer.screen.getHeight() / 7 * 6 + 2);
-			backwardPage.setX(input.getX() - 5);
+			forwardPage.setY(Renderer.screen.getHeight() / 7 * 6 + 5);
+			forwardPage.setX(input.getWidth() + input.getX() - 8);
+			backwardPage.setY(Renderer.screen.getHeight() / 7 * 6 + 5);
+			backwardPage.setX(input.getWidth() + input.getX() - 20);
 
 			// rendering
 
@@ -246,6 +252,18 @@ register('guiMouseClick', (x, y, mouseButton) => {
 	} else {
 		input.setEnabled(false);
 	}
+if (isButtonHovered(openImportsButton, x, y)) {
+    try {
+        const folderPath = `./config/ChatTriggers/modules/HTSL/imports/${subDir.replace(/\\+/g, "/")}`;
+        const folder = new java.io.File(folderPath);
+        const desktop = java.awt.Desktop.getDesktop();
+        desktop.open(folder);
+        World.playSound('random.click', 0.5, 1);
+    } catch (e) {
+        ChatLib.chat("&3[HTSL] &cFailed to open folder!");
+        console.error(e);
+    }
+}
 
 	if (isButtonHovered(refreshFiles, x, y)) { readFiles(); World.playSound('random.click', 0.5, 1) }
 	if (subDir != "" && isButtonHovered(backDir, x, y)) {

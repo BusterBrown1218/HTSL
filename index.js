@@ -85,6 +85,31 @@ register("command", ...args => {
             ChatLib.chat(file);
         });
     }
+	if (command === "files") {
+		let folderPath = "./config/ChatTriggers/modules/HTSL/imports/";
+
+		if (args.length > 1) {
+			args.shift();
+			let subPath = args.join(" ").replace(/\\+/g, "/");
+			if (!subPath.endsWith("/")) subPath += "/";
+			folderPath += subPath;
+		}
+
+		try {
+			const folder = new java.io.File(folderPath);
+			if (!folder.exists()) {
+				return ChatLib.chat(`&3[HTSL] &cFolder not found: ${folderPath}`);
+			}
+			const desktop = java.awt.Desktop.getDesktop();
+			desktop.open(folder);
+			World.playSound('random.click', 0.5, 1); // fancy sound ikik - spigotbase
+		} catch (e) {
+			ChatLib.chat("&3[HTSL] &cFailed to open folder!");
+			console.error(e);
+		}
+		return;
+	}
+
     if (command === "version") {
         return ChatLib.chat(`&3[HTSL] &fVersion ${JSON.parse(FileLib.read("HTSL", "./metadata.json")).version}`);
     }
@@ -119,6 +144,7 @@ register("command", ...args => {
         ChatLib.chat('&8&m-------------------------------------------------');
         ChatLib.chat('&6/htsl help &7Opens the HTSL help menu!')
         ChatLib.chat('&6/htsl gui <script name> &7Opens a window for editing scripts!');
+		ChatLib.chat('&6/htsl files <directory> &7Opens a specific imports directory.');
         ChatLib.chat('&6/htsl config &7Opens the settings menu for HTSL!');
         ChatLib.chat('&6/htsl guide &7Opens a syntax guide!');
         ChatLib.chat('&6/htsl changelog &7Shows you all the significant changes made in the last update!');
